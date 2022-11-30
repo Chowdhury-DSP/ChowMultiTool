@@ -6,7 +6,6 @@ namespace dsp::eq
 {
 struct Params
 {
-    static constexpr std::string_view name = "eq_params";
     chowdsp::BoolParameter::Ptr linearPhaseMode { juce::ParameterID { "eq_linear_phase", ParameterVersionHints::version1_0_0 },
                                                   "Linear Phase On/Off",
                                                   false };
@@ -15,8 +14,6 @@ struct Params
 class EQProcessor
 {
 public:
-    static constexpr std::string_view name = "EQ";
-
     EQProcessor() = default;
 
     template <typename PluginParams>

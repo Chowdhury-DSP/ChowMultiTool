@@ -6,14 +6,11 @@ namespace dsp::waveshaper
 {
 struct Params
 {
-    static constexpr std::string_view name = "waveshaper_params";
 };
 
 class WaveshaperProcessor
 {
 public:
-    static constexpr std::string_view name = "Waveshaper";
-
     WaveshaperProcessor() = default;
 
     template <typename PluginParams>

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dsp/EQ/EQProcessor.h"
+#include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
 
 namespace state
@@ -19,6 +20,7 @@ struct PluginParams
 
     dsp::eq::Params eqParams;
     dsp::waveshaper::Params waveshaperParams;
+    dsp::signal_gen::Params signalGenParams;
 };
 } // namespace state
 

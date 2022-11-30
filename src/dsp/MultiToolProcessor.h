@@ -6,7 +6,8 @@ namespace dsp
 {
 using ToolTypes = chowdsp::TypesList<
     eq::EQProcessor,
-    waveshaper::WaveshaperProcessor
+    waveshaper::WaveshaperProcessor,
+    signal_gen::SignalGeneratorProcessor
     >;
 
 class MultiToolProcessor

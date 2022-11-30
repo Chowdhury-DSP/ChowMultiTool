@@ -14,6 +14,7 @@
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_eq/chowdsp_eq.h>
+#include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
 // Any other widely used headers that don't change...
