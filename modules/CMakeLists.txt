@@ -14,6 +14,10 @@ target_link_libraries(juce_plugin_modules
         juce::juce_audio_utils
         juce::juce_dsp
         chowdsp::chowdsp_plugin_base
+        chowdsp::chowdsp_plugin_state
+        chowdsp::chowdsp_plugin_utils
+        chowdsp::chowdsp_eq
+        chowdsp::chowdsp_waveshapers
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

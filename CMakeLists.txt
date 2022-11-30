@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
-project(ChowMultiTool VERSION 1.0.0)
+project(ChowMultiTool VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(COMPANY_NAME "chowdsp")
@@ -50,7 +50,6 @@ if(NOT IOS)
     )
 endif()
 
-juce_generate_juce_header(ChowMultiTool)
 add_subdirectory(src)
 include_directories(src)
 add_subdirectory(res)
