@@ -5,6 +5,7 @@ target_sources(ChowMultiTool PRIVATE
 
     dsp/MultiToolProcessor.cpp
     dsp/EQ/EQProcessor.cpp
+    dsp/PultecEQ/PultecEQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
     dsp/Waveshaper/WaveshaperProcessor.cpp
 

@@ -3,6 +3,7 @@
 #include "dsp/EQ/EQProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
+#include "dsp/PultecEQ/PultecEQProcessor.h"
 
 namespace state
 {
@@ -21,6 +22,7 @@ struct PluginParams
     dsp::eq::Params eqParams;
     dsp::waveshaper::Params waveshaperParams;
     dsp::signal_gen::Params signalGenParams;
+    dsp::pultec::Params pultecEQParams;
 };
 } // namespace state
 
