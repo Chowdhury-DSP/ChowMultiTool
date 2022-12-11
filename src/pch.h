@@ -17,6 +17,7 @@
 #include <chowdsp_eq/chowdsp_eq.h>
 #include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
+#include <chowdsp_gui/chowdsp_gui.h>
 
 // Other third-party libraries
 #include "../modules/chowdsp_wdf/single_include/chowdsp_wdf/chowdsp_wdf.h"

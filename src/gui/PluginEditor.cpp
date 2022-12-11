@@ -2,6 +2,7 @@
 #include "EQ/EQEditor.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
+#include "PultecEQ/PultecEditor.h"
 
 namespace gui
 {
@@ -35,12 +36,16 @@ void PluginEditor::refreshEditor()
                 return;
 
             using ToolType = typename dsp::ToolTypes::template AtIndex<toolTypeIndex>;
+            auto& pluginState = plugin.getState();
+
             if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                editorComponent = std::make_unique<eq::EQEditor>();
+                editorComponent = std::make_unique<eq::EQEditor> (pluginState, pluginState.params.eqParams);
             else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                 editorComponent = std::make_unique<waveshaper::WaveshaperEditor>();
             else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
                 editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor>();
+            else if constexpr (std::is_same_v<ToolType, dsp::pultec::PultecEQProcessor>)
+                editorComponent = std::make_unique<pultec::PultecEditor> (pluginState, pluginState.params.pultecEQParams);
         });
 
     addAndMakeVisible (editorComponent.get());
