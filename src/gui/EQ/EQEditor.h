@@ -13,7 +13,7 @@ public:
     void resized() override;
 
 private:
-    chowdsp::ParametersView <State, dsp::eq::Params> paramsView;
+    chowdsp::ParametersView<State, dsp::eq::Params> paramsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQEditor)
 };

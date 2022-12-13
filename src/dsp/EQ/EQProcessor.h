@@ -69,7 +69,6 @@ private:
 
     static constexpr auto DecrampedMode = chowdsp::CoefficientCalculators::CoefficientCalculationMode::Decramped;
     using EQFloat = xsimd::batch<double>;
-
     using EQBand = chowdsp::EQ::EQBand<EQFloat,
                                        chowdsp::FirstOrderHPF<EQFloat>,
                                        chowdsp::SecondOrderHPF<EQFloat, DecrampedMode>,

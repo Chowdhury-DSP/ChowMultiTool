@@ -41,7 +41,7 @@ void PluginEditor::refreshEditor()
             if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
                 editorComponent = std::make_unique<eq::EQEditor> (pluginState, pluginState.params.eqParams);
             else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
-                editorComponent = std::make_unique<waveshaper::WaveshaperEditor>();
+                editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, pluginState.params.waveshaperParams);
             else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
                 editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor>();
             else if constexpr (std::is_same_v<ToolType, dsp::pultec::PultecEQProcessor>)
