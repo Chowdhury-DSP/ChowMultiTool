@@ -6,6 +6,12 @@
 This repository contains template code for building a Chowdhury DSP
 audio plugin.
 
+## TODO:
+- Waveshapers
+- Brickwall filters
+- Multi-band splitter
+- SVF
+
 ## Building
 
 To build from scratch, you must have CMake installed.
