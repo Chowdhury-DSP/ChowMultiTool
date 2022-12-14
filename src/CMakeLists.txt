@@ -8,12 +8,14 @@ target_sources(ChowMultiTool PRIVATE
     dsp/PultecEQ/PultecEQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
     dsp/Waveshaper/WaveshaperProcessor.cpp
+    dsp/BandSplitter/BandSplitterProcessor.cpp
 
     gui/PluginEditor.cpp
     gui/Toolbar/Toolbar.cpp
     gui/EQ/EQEditor.cpp
     gui/PultecEQ/PultecEditor.cpp
     gui/Waveshaper/WaveshaperEditor.cpp
+    gui/BandSplitter/BandSplitterEditor.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

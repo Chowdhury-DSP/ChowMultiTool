@@ -8,18 +8,19 @@ using ToolTypes = chowdsp::TypesList<
     eq::EQProcessor,
     waveshaper::WaveshaperProcessor,
     signal_gen::SignalGeneratorProcessor,
-    pultec::PultecEQProcessor
-    >;
+    pultec::PultecEQProcessor,
+    band_splitter::BandSplitterProcessor>;
 
 class MultiToolProcessor
 {
 public:
-    explicit MultiToolProcessor (state::PluginParams& pluginParams);
+    MultiToolProcessor (juce::AudioProcessor& plugin, state::PluginParams& pluginParams);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
-    void processBlock (const chowdsp::BufferView<float>& buffer);
+    void processBlock (juce::AudioBuffer<float>& buffer);
 
 private:
+    juce::AudioProcessor& plugin;
     state::PluginParams& params;
 
     ToolTypes::Types tools;

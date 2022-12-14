@@ -1,9 +1,10 @@
 #pragma once
 
+#include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "dsp/EQ/EQProcessor.h"
+#include "dsp/PultecEQ/PultecEQProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
-#include "dsp/PultecEQ/PultecEQProcessor.h"
 
 namespace state
 {
@@ -23,6 +24,7 @@ struct PluginParams
     dsp::waveshaper::Params waveshaperParams;
     dsp::signal_gen::Params signalGenParams;
     dsp::pultec::Params pultecEQParams;
+    dsp::band_splitter::Params bandSplitParams;
 };
 } // namespace state
 

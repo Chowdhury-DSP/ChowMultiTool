@@ -8,12 +8,36 @@ const juce::String logFileSubDir = "ChowdhuryDSP/ChowMultiTool/Logs";
 const juce::String logFileNameRoot = "ChowMultiTool_Log_";
 } // namespace
 
-ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager),
+ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, createBusLayout()),
                                  logger (logFileSubDir, logFileNameRoot),
-                                 processor (state.params)
+                                 processor (*this, state.params)
 {
     juce::Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
     pluginSettings->initialise (settingsFilePath);
+}
+
+juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()
+{
+    return BusesProperties()
+        .withInput ("Main", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Main", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Band-Split (Low)", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Band-Split (High)", juce::AudioChannelSet::stereo(), true);
+}
+
+bool ChowMultiTool::isBusesLayoutSupported (const BusesLayout& layout) const
+{
+    const auto mainInputLayout = layout.getMainInputChannelSet();
+    if (mainInputLayout.isDisabled() && mainInputLayout.isDiscreteLayout())
+        return false;
+
+    for (const auto& bus : layout.outputBuses)
+    {
+        if (! bus.isDiscreteLayout() && ! bus.isDisabled())
+            return false;
+    }
+
+    return true;
 }
 
 void ChowMultiTool::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -24,7 +48,6 @@ void ChowMultiTool::prepareToPlay (double sampleRate, int samplesPerBlock)
 void ChowMultiTool::processAudioBlock (juce::AudioBuffer<float>& buffer)
 {
     processor.processBlock (buffer);
-
     chowdsp::BufferMath::sanitizeBuffer (buffer);
 }
 

@@ -9,7 +9,6 @@ audio plugin.
 ## TODO:
 - Waveshapers
 - Brickwall filters
-- Multi-band splitter
 - SVF
 
 ## Building

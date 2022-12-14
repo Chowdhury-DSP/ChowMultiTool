@@ -1,8 +1,9 @@
 #include "PluginEditor.h"
+#include "BandSplitter/BandSplitterEditor.h"
 #include "EQ/EQEditor.h"
+#include "PultecEQ/PultecEditor.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
-#include "PultecEQ/PultecEditor.h"
 
 namespace gui
 {
@@ -16,7 +17,8 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
     setSize (600, 400);
 
     refreshEditor();
-    toolChangeCallback = plugin.getState().addParameterListener (*plugin.getState().params.toolParam, true, [this] { refreshEditor(); });
+    toolChangeCallback = plugin.getState().addParameterListener (*plugin.getState().params.toolParam, true, [this]
+                                                                 { refreshEditor(); });
 }
 
 void PluginEditor::refreshEditor()
@@ -46,6 +48,8 @@ void PluginEditor::refreshEditor()
                 editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor>();
             else if constexpr (std::is_same_v<ToolType, dsp::pultec::PultecEQProcessor>)
                 editorComponent = std::make_unique<pultec::PultecEditor> (pluginState, pluginState.params.pultecEQParams);
+            else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
+                editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, pluginState.params.bandSplitParams);
         });
 
     addAndMakeVisible (editorComponent.get());

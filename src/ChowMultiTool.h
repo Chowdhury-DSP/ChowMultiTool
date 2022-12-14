@@ -11,10 +11,13 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
     void processAudioBlock (juce::AudioBuffer<float>& buffer) override;
+    bool isBusesLayoutSupported (const BusesLayout& layout) const override;
 
     juce::AudioProcessorEditor* createEditor() override;
 
 private:
+    static BusesProperties createBusLayout();
+
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
 
