@@ -4,39 +4,100 @@
 
 namespace dsp::eq
 {
-struct Params
+struct Params : chowdsp::ParamHolder
 {
     static constexpr size_t numBands = 8;
     using EQParams = chowdsp::EQ::StandardEQParameters<numBands>;
 
+    Params()
+    {
+        add (eqParams, linearPhaseMode);
+    }
+
     // @TODO: brickwall filters
-    static constexpr std::string_view bandTypeChoices =
-        "HPF 6 dB/Oct,"
-        "HPF 12 dB/Oct,"
-        "HPF 18 dB/Oct,"
-        "HPF 24 dB/Oct,"
-        "HPF 48 dB/Oct,"
-        "Low-Shelf,"
-        "Bell,"
-        "Notch,"
-        "High-Shelf,"
-        "LPF 6 dB/Oct,"
-        "LPF 12 dB/Oct,"
-        "LPF 18 dB/Oct,"
-        "LPF 24 dB/Oct,"
-        "LPF 48 dB/Oct";
+    inline static const juce::StringArray bandTypeChoices {
+        "HPF 6 dB/Oct",
+        "HPF 12 dB/Oct",
+        "HPF 18 dB/Oct",
+        "HPF 24 dB/Oct",
+        "HPF 48 dB/Oct",
+        "Low-Shelf",
+        "Bell",
+        "Notch",
+        "High-Shelf",
+        "LPF 6 dB/Oct",
+        "LPF 12 dB/Oct",
+        "LPF 18 dB/Oct",
+        "LPF 24 dB/Oct",
+        "LPF 48 dB/Oct",
+    };
 
     EQParams eqParams {
-        "eq_params",
-        EQParams::EQParameterHandles {
-            EQParams::EQBandParams { 0, "eq_band_0", "EQ Band ", ParameterVersionHints::version1_0_0, 60.0f, bandTypeChoices, 1, 0.5f },
-            EQParams::EQBandParams { 1, "eq_band_1", "EQ Band ", ParameterVersionHints::version1_0_0, 125.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 2, "eq_band_2", "EQ Band ", ParameterVersionHints::version1_0_0, 250.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 3, "eq_band_3", "EQ Band ", ParameterVersionHints::version1_0_0, 500.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 4, "eq_band_4", "EQ Band ", ParameterVersionHints::version1_0_0, 1000.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 5, "eq_band_5", "EQ Band ", ParameterVersionHints::version1_0_0, 2000.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 6, "eq_band_6", "EQ Band ", ParameterVersionHints::version1_0_0, 4000.0f, bandTypeChoices, 6, 0.5f },
-            EQParams::EQBandParams { 7, "eq_band_7", "EQ Band ", ParameterVersionHints::version1_0_0, 8000.0f, bandTypeChoices, 10, 0.5f },
+        {
+            EQParams::EQBandParams { .bandIndex = 0,
+                                     .bandParamPrefix = "eq_band_0",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 1,
+                                     .freqDefault = 60.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 1,
+                                     .bandParamPrefix = "eq_band_1",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 125.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 2,
+                                     .bandParamPrefix = "eq_band_2",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 250.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 3,
+                                     .bandParamPrefix = "eq_band_3",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 500.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 4,
+                                     .bandParamPrefix = "eq_band_4",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 1000.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 5,
+                                     .bandParamPrefix = "eq_band_5",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 2000.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 6,
+                                     .bandParamPrefix = "eq_band_6",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 6,
+                                     .freqDefault = 4000.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
+            EQParams::EQBandParams { .bandIndex = 7,
+                                     .bandParamPrefix = "eq_band_7",
+                                     .bandNamePrefix = "EQ Band ",
+                                     .versionHint = ParameterVersionHints::version1_0_0,
+                                     .bandTypeChoices = bandTypeChoices,
+                                     .defaultEQBandTypeChoice = 10,
+                                     .freqDefault = 8000.0f,
+                                     .qRange = chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, chowdsp::CoefficientCalculators::butterworthQ<float>) },
         }
     };
 

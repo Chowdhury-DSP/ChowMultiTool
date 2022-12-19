@@ -25,7 +25,7 @@ private:
     juce::TextButton redoButton { "REDO" };
 
     juce::ComboBox toolChoiceBox;
-    chowdsp::ComboBoxAttachment<State> toolChoiceAttachment;
+    chowdsp::ComboBoxAttachment toolChoiceAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Toolbar)
 };

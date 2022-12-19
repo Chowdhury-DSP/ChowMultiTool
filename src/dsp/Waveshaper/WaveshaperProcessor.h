@@ -15,8 +15,13 @@ enum class Shapes
     Wave_Multiply,
 };
 
-struct Params
+struct Params : chowdsp::ParamHolder
 {
+    Params()
+    {
+        add (gainParam, shapeParam, oversampleParam);
+    }
+
     chowdsp::GainDBParameter::Ptr gainParam {
       juce::ParameterID { "waveshaper_gain", ParameterVersionHints::version1_0_0 },
         "Waveshaper Gain",

@@ -10,8 +10,18 @@ namespace state
 {
 namespace Hints = ParameterVersionHints;
 
-struct PluginParams
+struct PluginParams : chowdsp::ParamHolder
 {
+    PluginParams()
+    {
+        add (toolParam,
+             eqParams,
+             waveshaperParams,
+             signalGenParams,
+             pultecEQParams,
+             bandSplitParams);
+    }
+
     static const juce::StringArray toolChoices;
     chowdsp::ChoiceParameter::Ptr toolParam {
         juce::ParameterID { "tool", Hints::version1_0_0 },
@@ -28,4 +38,4 @@ struct PluginParams
 };
 } // namespace state
 
-using State = chowdsp::PluginState<state::PluginParams>;
+using State = chowdsp::PluginStateImpl<state::PluginParams>;

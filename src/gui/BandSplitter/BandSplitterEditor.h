@@ -13,7 +13,7 @@ public:
     void resized() override;
 
 private:
-    chowdsp::ParametersView<State, dsp::band_splitter::Params> paramsView;
+    chowdsp::ParametersView paramsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };

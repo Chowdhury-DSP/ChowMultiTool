@@ -13,8 +13,13 @@ enum class Oscillator
     Triangle,
 };
 
-struct Params
+struct Params : chowdsp::ParamHolder
 {
+    Params()
+    {
+        add (oscillatorChoice, frequency, gain);
+    }
+
     chowdsp::EnumChoiceParameter<Oscillator>::Ptr oscillatorChoice {
         juce::ParameterID { "signal_gen_oscillator", ParameterVersionHints::version1_0_0 },
         "Signal Generator Oscillator",

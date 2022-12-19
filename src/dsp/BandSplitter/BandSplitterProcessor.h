@@ -13,8 +13,13 @@ enum class Slope
     m96_dBpOct,
 };
 
-struct Params
+struct Params : chowdsp::ParamHolder
 {
+    Params()
+    {
+        add (slope, cutoff);
+    }
+
     chowdsp::EnumChoiceParameter<Slope>::Ptr slope {
         juce::ParameterID { "band_split_slope", ParameterVersionHints::version1_0_0 },
         "Band Splitter Slope",

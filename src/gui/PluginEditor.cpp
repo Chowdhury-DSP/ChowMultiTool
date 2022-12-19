@@ -17,7 +17,9 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
     setSize (600, 400);
 
     refreshEditor();
-    toolChangeCallback = plugin.getState().addParameterListener (*plugin.getState().params.toolParam, true, [this]
+    toolChangeCallback = plugin.getState().addParameterListener (*plugin.getState().params.toolParam,
+                                                                 chowdsp::ParameterListenerThread::MessageThread,
+                                                                 [this]
                                                                  { refreshEditor(); });
 }
 

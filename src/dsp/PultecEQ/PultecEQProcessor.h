@@ -4,8 +4,20 @@
 
 namespace dsp::pultec
 {
-struct Params
+struct Params : chowdsp::ParamHolder
 {
+    Params()
+    {
+        add (bassCutParam,
+             bassBoostParam,
+             trebleCutParam,
+             trebleBoostParam,
+             trebleBoostQParam,
+             bassFreqParam,
+             trebleCutFreqParam,
+             trebleBoostFreqParam);
+    }
+
     chowdsp::PercentParameter::Ptr bassCutParam { juce::ParameterID { "pultec_bass_cut", ParameterVersionHints::version1_0_0 },
                                                   "Pultec Bass Cut",
                                                   0.0f };
