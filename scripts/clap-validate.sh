@@ -17,8 +17,8 @@ install_clapval_mac()
 {
     curl -L "https://github.com/free-audio/clap-validator/releases/download/${version}/clap-validator-${version}-macos-universal.zip" -o clap-validator.zip
     unzip clap-validator > /dev/null
-    tar -xf clap-validator-${version}-ubuntu-18.04.tar.gz
-    echo "./clap-validator"
+    tar -xf clap-validator-${version}-macos-universal.tar.gz
+    echo "./binaries/clap-validator"
 }
 
 install_clapval_win()
@@ -46,8 +46,9 @@ $clapval --version
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    $clapval --verbosity info validate ${plugin}
+    $clapval --verbosity error validate ${plugin}
 done
 
 # clean up
 rm -Rf clap-validator*
+rm -Rf binaries
