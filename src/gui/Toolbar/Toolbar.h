@@ -21,8 +21,8 @@ private:
 
     State& state;
 
-    juce::TextButton undoButton { "UNDO" };
-    juce::TextButton redoButton { "REDO" };
+    juce::DrawableButton undoButton { "UNDO", juce::DrawableButton::ImageStretched };
+    juce::DrawableButton redoButton { "REDO", juce::DrawableButton::ImageStretched };
 
     juce::ComboBox toolChoiceBox;
     chowdsp::ComboBoxAttachment toolChoiceAttachment;

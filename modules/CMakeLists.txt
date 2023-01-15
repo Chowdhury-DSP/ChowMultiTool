@@ -1,16 +1,18 @@
 add_subdirectory(JUCE)
 add_subdirectory(chowdsp_utils)
+add_subdirectory(chowdsp_wdf)
 
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 subproject_version(chowdsp_utils chowdsp_version)
-message(STATUS "VERSION for chowdsp: ${chowdsp_version}")
+message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
+subproject_version(chowdsp_utils chowdsp_wdf_version)
+message(STATUS "VERSION for chowdsp_wdf: ${chowdsp_wdf_version}")
 
 include(cmake/WarningFlags.cmake)
 add_library(juce_plugin_modules STATIC)
 target_link_libraries(juce_plugin_modules
     PRIVATE
-        BinaryData
         juce::juce_audio_utils
         juce::juce_dsp
         chowdsp::chowdsp_plugin_base
@@ -20,6 +22,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_sources
         chowdsp::chowdsp_waveshapers
         chowdsp::chowdsp_gui
+        chowdsp::chowdsp_wdf
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

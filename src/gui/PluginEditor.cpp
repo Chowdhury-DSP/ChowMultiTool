@@ -33,7 +33,7 @@ void PluginEditor::refreshEditor()
         return;
     }
 
-    chowdsp::ForEachInTypeList<dsp::ToolTypes>::doForEach (
+    types_list::forEach<dsp::ToolTypes> (
         [this, toolChoice] (auto toolTypeIndex)
         {
             if ((int) toolTypeIndex != toolChoice)

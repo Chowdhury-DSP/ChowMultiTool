@@ -20,7 +20,11 @@
 #include <chowdsp_gui/chowdsp_gui.h>
 
 // Other third-party libraries
-#include "../modules/chowdsp_wdf/single_include/chowdsp_wdf/chowdsp_wdf.h"
+#include <chowdsp_wdf/chowdsp_wdf.h>
+
+// Resources
+#include <cmrc/cmrc.hpp>
+CMRC_DECLARE(gui);
 
 // Any other widely used headers that don't change...
 #include "state/ParameterVersionHints.h"

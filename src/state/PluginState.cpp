@@ -7,7 +7,7 @@ namespace state
 const juce::StringArray PluginParams::toolChoices = []
 {
     juce::StringArray choices { "None" };
-    chowdsp::ForEachInTypeList<dsp::ToolTypes>::doForEach (
+    types_list::forEach<dsp::ToolTypes> (
         [&choices] (auto toolTypeIndex)
         {
             using ToolType = typename dsp::ToolTypes::template AtIndex<toolTypeIndex>;

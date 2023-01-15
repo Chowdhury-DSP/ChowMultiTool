@@ -1,7 +1,8 @@
-juce_add_binary_data(BinaryData SOURCES
-    temp.png
-    )
+include(../modules/cmake/CMakeRC.cmake)
 
-# Need to build BinaryData with -fPIC flag on Linux
-set_target_properties(BinaryData PROPERTIES
-    POSITION_INDEPENDENT_CODE TRUE)
+cmrc_add_resource_library(gui-resources
+    ALIAS ChowMultiTool::gui-resources
+    NAMESPACE gui
+    redo-solid.svg
+    undo-solid.svg
+)

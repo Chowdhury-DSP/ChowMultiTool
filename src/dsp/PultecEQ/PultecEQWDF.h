@@ -48,7 +48,7 @@ public:
     inline void incident (T x) noexcept
     {
         wdf.a = x;
-        z = std::tanh (wdf.a);
+        z = chowdsp::Math::algebraicSigmoid (wdf.a);
     }
 
     inline T reflected() noexcept

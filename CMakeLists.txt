@@ -58,7 +58,11 @@ target_compile_definitions(ChowMultiTool PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
 )
 
-target_link_libraries(ChowMultiTool PRIVATE juce_plugin_modules)
+target_link_libraries(ChowMultiTool
+    PRIVATE
+        juce_plugin_modules
+        ChowMultiTool::gui-resources
+)
 
 # we need these flags for notarization on MacOS
 option(MACOS_RELEASE "Set build flags for MacOS Release" OFF)

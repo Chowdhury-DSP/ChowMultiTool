@@ -20,11 +20,17 @@ Toolbar::~Toolbar()
 
 void Toolbar::setupUndoRedoButtons()
 {
+    const auto fs = cmrc::gui::get_filesystem();
+    const auto undoSVG = fs.open ("undo-solid.svg");
+    undoButton.setImages (juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size()).get());
+
     addAndMakeVisible (undoButton);
     undoButton.onClick = [this] {
         state.undoManager->undo();
     };
 
+    const auto redoSVG = fs.open ("redo-solid.svg");
+    redoButton.setImages (juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size()).get());
     addAndMakeVisible (redoButton);
     redoButton.onClick = [this] {
         state.undoManager->redo();
@@ -56,8 +62,8 @@ void Toolbar::paint (juce::Graphics& g)
 void Toolbar::resized()
 {
     auto bounds = getLocalBounds();
-    undoButton.setBounds (bounds.removeFromLeft (60));
-    redoButton.setBounds (bounds.removeFromLeft (60));
+    undoButton.setBounds (bounds.removeFromLeft (40).reduced (5));
+    redoButton.setBounds (bounds.removeFromLeft (40).reduced (5));
 
     bounds.removeFromLeft (25);
 

@@ -4,7 +4,7 @@
 
 namespace dsp
 {
-using ToolTypes = chowdsp::TypesList<
+using ToolTypes = types_list::TypesList<
     eq::EQProcessor,
     waveshaper::WaveshaperProcessor,
     signal_gen::SignalGeneratorProcessor,
