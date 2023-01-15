@@ -6,7 +6,7 @@ subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 subproject_version(chowdsp_utils chowdsp_version)
 message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
-subproject_version(chowdsp_utils chowdsp_wdf_version)
+subproject_version(chowdsp_wdf chowdsp_wdf_version)
 message(STATUS "VERSION for chowdsp_wdf: ${chowdsp_wdf_version}")
 
 include(cmake/WarningFlags.cmake)

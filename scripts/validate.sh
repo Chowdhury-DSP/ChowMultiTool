@@ -2,7 +2,7 @@
 
 set -e
 
-version="v0.3.0"
+version="v1.0.2"
 
 # install functions
 install_pluginval_linux()
@@ -33,7 +33,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # declare -a plugins=()
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     pluginval=$(install_pluginval_mac)
-    declare -a plugins=("build/ChowMultiTool_artefacts/VST3/ChowMultiTool.vst3")
+    declare -a plugins=("build/ChowMultiTool_artefacts/Debug/VST3/ChowMultiTool.vst3")
 else
     pluginval=$(install_pluginval_win)
     declare -a plugins=("build/ChowMultiTool_artefacts/Release/VST3/ChowMultiTool.vst3")
