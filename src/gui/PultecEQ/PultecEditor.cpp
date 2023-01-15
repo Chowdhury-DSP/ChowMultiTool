@@ -12,4 +12,4 @@ void PultecEditor::resized()
 {
     paramsView.setBounds (getLocalBounds());
 }
-}
+} // namespace gui::pultec

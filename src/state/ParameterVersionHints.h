@@ -14,4 +14,4 @@ namespace ParameterVersionHints
 
 /** Version Hint 1.0.0 */
 static constexpr int version1_0_0 = 10'000;
-}
+} // namespace ParameterVersionHints

@@ -17,4 +17,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PultecEditor)
 };
-}
+} // namespace gui::pultec

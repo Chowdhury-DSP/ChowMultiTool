@@ -9,7 +9,7 @@ juce::String undoCamelCase (const juce::String& str)
     for (int i = str.length() - 1; i >= 1; --i)
     {
         using CharFunctions = juce::CharacterFunctions;
-        if (CharFunctions::isUpperCase (str[i]) && CharFunctions::isLowerCase (str[i-1]))
+        if (CharFunctions::isUpperCase (str[i]) && CharFunctions::isLowerCase (str[i - 1]))
             return undoCamelCase (undoCamelCase (str.substring (0, i)) + " " + str.substring (i));
     }
 
@@ -25,4 +25,4 @@ juce::String getNameForProcessor()
 
     return undoCamelCase (juce::String { toolDisplayName.data(), toolDisplayName.size() });
 }
-}
+} // namespace NameHelpers

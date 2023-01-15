@@ -12,4 +12,4 @@ void BandSplitterEditor::resized()
 {
     paramsView.setBounds (getLocalBounds());
 }
-}
+} // namespace gui::band_splitter

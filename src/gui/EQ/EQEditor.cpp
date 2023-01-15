@@ -12,4 +12,4 @@ void EQEditor::resized()
 {
     paramsView.setBounds (getLocalBounds());
 }
-}
+} // namespace gui::eq

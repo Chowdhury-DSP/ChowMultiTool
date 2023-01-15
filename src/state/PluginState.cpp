@@ -1,6 +1,6 @@
 #include "PluginState.h"
-#include "dsp/MultiToolProcessor.h"
 #include "NameHelpers.h"
+#include "dsp/MultiToolProcessor.h"
 
 namespace state
 {
