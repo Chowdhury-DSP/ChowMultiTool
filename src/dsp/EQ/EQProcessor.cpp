@@ -12,7 +12,7 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     eqBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize);
 
     const auto&& eqParams = getEQParams();
-    Params::EQParams::setEQParameters (eq, eqParams);
+    EQToolParams::EQParams::setEQParameters (eq, eqParams);
     eq.prepare (spec);
     linPhaseEQ.prepare (spec, getEQParams());
 }
@@ -20,7 +20,7 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
     const auto&& eqParams = getEQParams();
-    Params::EQParams::setEQParameters (eq, eqParams);
+    EQToolParams::EQParams::setEQParameters (eq, eqParams);
     linPhaseEQ.setParameters (eqParams);
 
     if (params->linearPhaseMode->get())

@@ -2,7 +2,7 @@
 
 namespace gui::eq
 {
-EQEditor::EQEditor (State& pluginState, dsp::eq::Params& eqParams)
+EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams)
     : paramsView (pluginState, eqParams)
 {
     addAndMakeVisible (paramsView);

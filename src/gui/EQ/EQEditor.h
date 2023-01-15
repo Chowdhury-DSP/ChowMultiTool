@@ -8,7 +8,7 @@ namespace gui::eq
 class EQEditor : public juce::Component
 {
 public:
-    EQEditor (State& pluginState, dsp::eq::Params& eqParams);
+    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams);
 
     void resized() override;
 
