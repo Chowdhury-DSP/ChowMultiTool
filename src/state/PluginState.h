@@ -30,7 +30,7 @@ struct PluginParams : chowdsp::ParamHolder
         0
     };
 
-    dsp::eq::Params eqParams;
+    dsp::eq::EQToolParams eqParams;
     dsp::waveshaper::Params waveshaperParams;
     dsp::signal_gen::Params signalGenParams;
     dsp::pultec::Params pultecEQParams;

@@ -6,7 +6,7 @@ subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 subproject_version(chowdsp_utils chowdsp_version)
 message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
-subproject_version(chowdsp_utils chowdsp_wdf_version)
+subproject_version(chowdsp_wdf chowdsp_wdf_version)
 message(STATUS "VERSION for chowdsp_wdf: ${chowdsp_wdf_version}")
 
 include(cmake/WarningFlags.cmake)
@@ -29,7 +29,7 @@ target_link_libraries(juce_plugin_modules
         warning_flags
 )
 
-if(NOT IOS)
+if(CHOWMULTITOOL_BUILD_CLAP)
     add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
     target_link_libraries(juce_plugin_modules
         PRIVATE

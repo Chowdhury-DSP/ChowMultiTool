@@ -6,3 +6,8 @@ cmrc_add_resource_library(gui-resources
     redo-solid.svg
     undo-solid.svg
 )
+
+set_target_properties(gui-resources
+    PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE
+)
