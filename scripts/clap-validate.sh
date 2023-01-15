@@ -50,4 +50,4 @@ for plugin in "${plugins[@]}"; do
 done
 
 # clean up
-# rm -Rf clap-validator*
+rm -Rf clap-validator*
