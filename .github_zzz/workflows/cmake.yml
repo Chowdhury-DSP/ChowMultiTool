@@ -35,10 +35,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Fetch submodules # only on Linux, since setup script will do this otherwsie
-      if: runner.os == 'Linux'
-      run: git submodule update --init --recursive
+      with:
+        submodules: recursive
 
     - name: Configure
       shell: bash
