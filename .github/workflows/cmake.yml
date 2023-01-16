@@ -21,7 +21,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang++-12"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12"
           - os: windows-2019
             cmake_args: "-T ClangCl"
           - os: macos-latest
@@ -52,12 +52,21 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build --config Release --parallel 4 --target ChowMultiTool_Standalone ChowMultiTool_VST3 ChowMultiTool_CLAP
 
-    - name: Validate
+    - name: Build AU
+      if: runner.os == 'MacOS'
+      shell: bash
+      run: cmake --build build --config Release --parallel 4 --target ChowMultiTool_AU
+
+    - name: Build LV2
+      if: runner.os == 'Linux'
+      shell: bash
+      run: cmake --build build --config Release --parallel 4 --target ChowMultiTool_LV2
+
+    - name: Pluginval
       if: runner.os == 'Windows' || runner.os == 'MacOS'
       run: bash scripts/pluginval.sh
 
-    - name: Validate
-      if: runner.os == 'Linux'
+    - name: clap-validator
       run: bash scripts/clap-validate.sh
