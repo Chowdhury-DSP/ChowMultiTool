@@ -1,7 +1,7 @@
 #pragma once
 
-#include "state/PluginState.h"
 #include "dsp/MultiToolProcessor.h"
+#include "state/PluginState.h"
 
 class ChowMultiTool : public chowdsp::PluginBase<State>
 {

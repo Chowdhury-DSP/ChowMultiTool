@@ -4,12 +4,12 @@
 
 namespace dsp::eq
 {
-struct Params : chowdsp::ParamHolder
+struct EQToolParams : chowdsp::ParamHolder
 {
     static constexpr size_t numBands = 8;
     using EQParams = chowdsp::EQ::StandardEQParameters<numBands>;
 
-    Params()
+    EQToolParams()
     {
         add (eqParams, linearPhaseMode);
     }
@@ -121,11 +121,11 @@ public:
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    Params* params = nullptr;
+    EQToolParams* params = nullptr;
 
     auto getEQParams()
     {
-        return Params::EQParams::getEQParameters (params->eqParams.eqParams);
+        return EQToolParams::EQParams::getEQParameters (params->eqParams.eqParams);
     }
 
     static constexpr auto DecrampedMode = chowdsp::CoefficientCalculators::CoefficientCalculationMode::Decramped;
@@ -146,13 +146,13 @@ private:
                                        chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, EQFloat>,
                                        chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Lowpass, EQFloat>,
                                        chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass, EQFloat>>;
-    chowdsp::EQ::EQProcessor<EQFloat, Params::EQParams::EQNumBands, EQBand> eq;
+    chowdsp::EQ::EQProcessor<EQFloat, EQToolParams::EQParams::EQNumBands, EQBand> eq;
 
     chowdsp::Buffer<EQFloat> eqBuffer;
 
     struct PrototypeEQ
     {
-        using Params = Params::EQParams::Params;
+        using Params = EQToolParams::EQParams::Params;
 
         using EQBand = chowdsp::EQ::EQBand<float,
                                            chowdsp::FirstOrderHPF<float>,
@@ -170,7 +170,7 @@ private:
                                            chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, float>,
                                            chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Lowpass, float>,
                                            chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass, float>>;
-        chowdsp::EQ::EQProcessor<float, dsp::eq::Params::EQParams::EQNumBands, EQBand> eq;
+        chowdsp::EQ::EQProcessor<float, dsp::eq::EQToolParams::EQParams::EQNumBands, EQBand> eq;
 
         PrototypeEQ() = default;
 

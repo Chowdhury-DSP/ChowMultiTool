@@ -12,8 +12,8 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 }
 
 void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>& bufferIn,
-                                       const chowdsp::BufferView<float>& bufferLow,
-                                       const chowdsp::BufferView<float>& bufferHigh)
+                                          const chowdsp::BufferView<float>& bufferLow,
+                                          const chowdsp::BufferView<float>& bufferHigh)
 {
     const auto processFilter = [&] (auto& filter)
     {

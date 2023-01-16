@@ -23,7 +23,7 @@ struct Params : chowdsp::ParamHolder
     }
 
     chowdsp::GainDBParameter::Ptr gainParam {
-      juce::ParameterID { "waveshaper_gain", ParameterVersionHints::version1_0_0 },
+        juce::ParameterID { "waveshaper_gain", ParameterVersionHints::version1_0_0 },
         "Waveshaper Gain",
         juce::NormalisableRange { -30.0f, 30.0f },
         0.0f
@@ -49,7 +49,10 @@ public:
     WaveshaperProcessor() = default;
 
     template <typename PluginParams>
-    void initialise (PluginParams& pluginParams) { params = &pluginParams.waveshaperParams; }
+    void initialise (PluginParams& pluginParams)
+    {
+        params = &pluginParams.waveshaperParams;
+    }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
@@ -79,4 +82,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };
-}
+} // namespace dsp::waveshaper

@@ -24,7 +24,7 @@ struct Params : chowdsp::ParamHolder
         juce::ParameterID { "band_split_slope", ParameterVersionHints::version1_0_0 },
         "Band Splitter Slope",
         Slope::m12_dBpOct,
-        std::initializer_list<std::pair<char, char>> { {'m', '-'}, {'_', ' '}, { 'p', '/' }}
+        std::initializer_list<std::pair<char, char>> { { 'm', '-' }, { '_', ' ' }, { 'p', '/' } }
     };
 
     chowdsp::FreqHzParameter::Ptr cutoff {

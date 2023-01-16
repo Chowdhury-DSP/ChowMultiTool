@@ -12,4 +12,4 @@ void WaveshaperEditor::resized()
 {
     paramsView.setBounds (getLocalBounds());
 }
-}
+} // namespace gui::waveshaper

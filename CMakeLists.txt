@@ -6,6 +6,16 @@ set(CMAKE_CXX_STANDARD 20)
 set(COMPANY_NAME "chowdsp")
 set(PRODUCT_NAME "ChowMultiTool")
 
+if(NOT IOS)
+    option(CHOWMULTITOOL_BUILD_CLAP "Create a CLAP plugin target" ON)
+else()
+    option(CHOWMULTITOOL_BUILD_CLAP "Create a CLAP plugin target" OFF)
+endif()
+
+if(CHOWMULTITOOL_BUILD_CLAP AND (CMAKE_VERSION VERSION_LESS 3.21.0))
+    message(WARNING "CLAP builds require CMake version 3.21 or higher! To disable CLAP builds, run CMake configuration with \"-DCHOWMULTITOOL_BUILD_CLAP=OFF\"")
+endif()
+
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
@@ -40,7 +50,7 @@ juce_add_plugin(ChowMultiTool
     MICROPHONE_PERMISSION_ENABLED TRUE
 )
 
-if(NOT IOS)
+if(CHOWMULTITOOL_BUILD_CLAP)
     clap_juce_extensions_plugin(
         TARGET ChowMultiTool
         CLAP_ID "org.chowdsp.ChowMultiTool"

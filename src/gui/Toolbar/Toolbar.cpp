@@ -25,14 +25,16 @@ void Toolbar::setupUndoRedoButtons()
     undoButton.setImages (juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size()).get());
 
     addAndMakeVisible (undoButton);
-    undoButton.onClick = [this] {
+    undoButton.onClick = [this]
+    {
         state.undoManager->undo();
     };
 
     const auto redoSVG = fs.open ("redo-solid.svg");
     redoButton.setImages (juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size()).get());
     addAndMakeVisible (redoButton);
-    redoButton.onClick = [this] {
+    redoButton.onClick = [this]
+    {
         state.undoManager->redo();
     };
 
@@ -69,4 +71,4 @@ void Toolbar::resized()
 
     toolChoiceBox.setBounds (bounds.removeFromLeft (100));
 }
-}
+} // namespace gui
