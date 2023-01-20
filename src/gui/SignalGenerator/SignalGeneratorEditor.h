@@ -1,17 +1,24 @@
 #pragma once
 
-#include <pch.h>
+#include "state/PluginState.h"
+#include "OscillatorController.h"
 
 namespace gui::signal_gen
 {
 class SignalGeneratorEditor : public juce::Component
 {
 public:
-    SignalGeneratorEditor() = default;
+    explicit SignalGeneratorEditor (State& state);
 
-    void paint (juce::Graphics& g) override
-    {
-        g.fillAll (juce::Colours::green);
-    }
+    void paint (juce::Graphics& g) override;
+    void resized() override;
+
+private:
+    juce::ComboBox oscillatorChoiceBox;
+    chowdsp::ComboBoxAttachment oscillatorChoiceAttachment;
+
+    OscillatorController oscController;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorEditor)
 };
 } // namespace gui::signal_gen

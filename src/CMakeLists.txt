@@ -16,7 +16,10 @@ target_sources(ChowMultiTool PRIVATE
     gui/PultecEQ/PultecEditor.cpp
     gui/Waveshaper/WaveshaperEditor.cpp
     gui/BandSplitter/BandSplitterEditor.cpp
+
+    gui/SignalGenerator/SignalGeneratorEditor.cpp
+    gui/SignalGenerator/OscillatorController.cpp
+    gui/SignalGenerator/OscillatorPlot.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)
-    

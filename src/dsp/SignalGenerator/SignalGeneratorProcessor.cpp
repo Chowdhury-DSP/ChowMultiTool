@@ -9,6 +9,7 @@ void SignalGeneratorProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                                            { oscillator.prepare (monoSpec); },
                                            oscillators);
 
+    gain.setGainDecibels (params->gain->getCurrentValue());
     gain.setRampDurationSeconds (0.05);
     gain.prepare (monoSpec);
 
@@ -16,6 +17,21 @@ void SignalGeneratorProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     freqParamSmoothed.setRampLength (0.05);
 
     nyquistHz = (float) spec.sampleRate / 2.0f;
+}
+
+void SignalGeneratorProcessor::reset()
+{
+    freqParamSmoothed.reset (juce::jmin (params->frequency->getCurrentValue(), nyquistHz));
+
+    gain.setGainDecibels (params->gain->getCurrentValue());
+    gain.reset();
+
+    chowdsp::TupleHelpers::visit_at (oscillators,
+                                     static_cast<size_t> (params->oscillatorChoice->get()),
+                                     [] (auto& oscillator)
+                                     {
+                                         oscillator.reset();
+                                     });
 }
 
 void SignalGeneratorProcessor::processBlock (const chowdsp::BufferView<float>& buffer)

@@ -53,6 +53,7 @@ public:
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
+    void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
