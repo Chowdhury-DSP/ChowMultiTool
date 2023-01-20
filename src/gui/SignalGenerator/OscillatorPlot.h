@@ -2,31 +2,32 @@
 
 #include <pch.h>
 
-namespace chowdsp
+namespace gui::signal_gen
 {
-class OscillatorPlot
+class OscillatorPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    OscillatorPlot() = default;
+    OscillatorPlot();
 
-    void updateSize (int width, int height);
+    void paint (juce::Graphics& g) override;
 
-    void drawPlot (juce::Graphics& g, const juce::PathStrokeType& strokeType = juce::PathStrokeType { 1.0f });
+    void updatePlot();
 
-    void updatePlotConfig (float sampleRate, float secondsToShow);
+    static constexpr auto analysisFs = 48000.0f;
+#if JUCE_DEBUG
+    static constexpr int fftSize = 1 << 14;
+#else
+    static constexpr int fftSize = 1 << 15;
+#endif
 
-    void updatePlot (juce::Component* parent = nullptr);
-
-    //    std::function<void()> plotUpdateCallback;
-    std::function<void (const chowdsp::BufferView<float>&)> plotUpdateCallback;
+    std::function<void (const chowdsp::BufferView<float>&)> plotUpdateCallback = nullptr;
 
 private:
-    float width = 0.0f;
-    float height = 0.0f;
+    chowdsp::StaticBuffer<float, 1, fftSize * 2> plotBuffer;
+    juce::dsp::FFT fft { chowdsp::Math::log2 (fftSize) };
 
-    juce::Path plotPath;
-    chowdsp::Buffer<float> plotBuffer;
+    std::array<float, (size_t) fftSize / 2 + 1> fftBinsSmoothDB {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscillatorPlot)
 };
-} // namespace chowdsp
+} // namespace gui::signal_gen

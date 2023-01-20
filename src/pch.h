@@ -12,6 +12,7 @@
 
 #include <chowdsp_eq/chowdsp_eq.h>
 #include <chowdsp_gui/chowdsp_gui.h>
+#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>

@@ -36,22 +36,26 @@ OscillatorController::OscillatorController (State& state)
     addAndMakeVisible (freqSlider.get());
 
     plotSignalGen.initialise (state.params);
+    plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });
 
-    static constexpr float fs = 480000.0f;
-    static constexpr float secondsToShow = 0.001f;
-    plotSignalGen.prepare ({ 48000.0, (uint32_t) juce::roundToInt (fs * secondsToShow), 1 });
-
-    plot.updatePlotConfig (fs, secondsToShow);
+    addAndMakeVisible (plot);
+    plot.toBack();
     plot.plotUpdateCallback = [this] (const chowdsp::BufferView<float>& buffer)
     {
         plotSignalGen.reset();
         plotSignalGen.processBlock (buffer);
     };
+    plot.updatePlot();
 
+    auto& params = state.params.signalGenParams;
+    static constexpr auto listenerThread = chowdsp::ParameterListenerThread::MessageThread;
     parameterChangeListeners += {
-        state.addParameterListener (*state.params.signalGenParams.frequency, chowdsp::ParameterListenerThread::MessageThread, [this] { plot.updatePlot (this); }),
-        state.addParameterListener (*state.params.signalGenParams.gain, chowdsp::ParameterListenerThread::MessageThread, [this] { plot.updatePlot (this); }),
-        state.addParameterListener (*state.params.signalGenParams.oscillatorChoice, chowdsp::ParameterListenerThread::MessageThread, [this] { plot.updatePlot (this); }),
+        state.addParameterListener (*params.frequency, listenerThread, [this]
+                                    { plot.updatePlot(); }),
+        state.addParameterListener (*params.gain, listenerThread, [this]
+                                    { plot.updatePlot(); }),
+        state.addParameterListener (*params.oscillatorChoice, listenerThread, [this]
+                                    { plot.updatePlot(); }),
     };
 }
 
@@ -59,13 +63,13 @@ void OscillatorController::paint (juce::Graphics& g)
 {
     g.fillAll (juce::Colours::black);
 
-    g.setColour (juce::Colours::red);
-    plot.drawPlot (g);
+    //    g.setColour (juce::Colours::red);
+    //    plot.drawPlot (g);
 }
 
 void OscillatorController::resized()
 {
-    plot.updateSize (getWidth(), getHeight());
+    plot.setBounds (getLocalBounds());
 
     auto bounds = getLocalBounds();
     gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));

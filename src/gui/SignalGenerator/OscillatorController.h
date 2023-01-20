@@ -14,7 +14,7 @@ public:
     void resized() override;
 
 private:
-    chowdsp::OscillatorPlot plot;
+    OscillatorPlot plot;
 
     dsp::signal_gen::SignalGeneratorProcessor plotSignalGen;
 
