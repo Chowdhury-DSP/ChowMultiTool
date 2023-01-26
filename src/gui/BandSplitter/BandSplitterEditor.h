@@ -1,7 +1,6 @@
 #pragma once
 
-#include "dsp/BandSplitter/BandSplitterProcessor.h"
-#include "state/PluginState.h"
+#include "BandSplitterPlot.h"
 
 namespace gui::band_splitter
 {
@@ -10,10 +9,14 @@ class BandSplitterEditor : public juce::Component
 public:
     BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params);
 
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
 private:
-    chowdsp::ParametersView paramsView;
+    juce::ComboBox slopeChoiceBox;
+    chowdsp::ComboBoxAttachment slopeChoiceAttachment;
+
+    BandSplitterPlot bandSplitterPlot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };

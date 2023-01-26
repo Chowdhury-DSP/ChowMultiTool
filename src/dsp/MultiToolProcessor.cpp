@@ -31,7 +31,7 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
                                          using ToolType [[maybe_unused]] = std::decay_t<decltype (tool)>;
                                          if constexpr (std::is_same_v<ToolType, band_splitter::BandSplitterProcessor>)
                                          {
-                                             if (plugin.getBusCount (false) != 2)
+                                             if (plugin.getBusCount (false) != 3)
                                                  return;
 
                                              const auto inBuffer = plugin.getBusBuffer (buffer, true, 0);

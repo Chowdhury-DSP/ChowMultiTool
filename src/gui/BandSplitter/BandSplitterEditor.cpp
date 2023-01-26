@@ -3,13 +3,22 @@
 namespace gui::band_splitter
 {
 BandSplitterEditor::BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params)
-    : paramsView (pluginState, params)
+    : slopeChoiceAttachment (*params.slope, pluginState, slopeChoiceBox),
+      bandSplitterPlot (pluginState, params)
 {
-    addAndMakeVisible (paramsView);
+    addAndMakeVisible (slopeChoiceBox);
+    addAndMakeVisible (bandSplitterPlot);
+}
+
+void BandSplitterEditor::paint (juce::Graphics& g)
+{
+    g.fillAll (juce::Colours::dodgerblue);
 }
 
 void BandSplitterEditor::resized()
 {
-    paramsView.setBounds (getLocalBounds());
+    auto bounds = getLocalBounds();
+    bandSplitterPlot.setBounds (bounds.removeFromTop (proportionOfHeight (0.85f)).reduced (10));
+    slopeChoiceBox.setBounds (bounds.reduced (20, 0));
 }
 } // namespace gui::band_splitter

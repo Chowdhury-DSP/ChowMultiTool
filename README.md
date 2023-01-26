@@ -15,6 +15,10 @@ use the repository "Watch" button.
 If you would lik to contribute to the development of the plugin,
 Please get in touch via GutHub Issues, or some other method.
 
+- EQ Gain label
+- Pultec Bass Frequency labels
+- Band Splitter multi-output
+
 ## Tools:
 
 Unfinished:

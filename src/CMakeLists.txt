@@ -15,7 +15,9 @@ target_sources(ChowMultiTool PRIVATE
     gui/EQ/EQEditor.cpp
     gui/PultecEQ/PultecEditor.cpp
     gui/Waveshaper/WaveshaperEditor.cpp
+
     gui/BandSplitter/BandSplitterEditor.cpp
+    gui/BandSplitter/BandSplitterPlot.cpp
 
     gui/SignalGenerator/SignalGeneratorEditor.cpp
     gui/SignalGenerator/OscillatorController.cpp

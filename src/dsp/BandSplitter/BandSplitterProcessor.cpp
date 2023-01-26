@@ -30,7 +30,7 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         processFilter (filter4);
     else if (slope == Slope::m48_dBpOct)
         processFilter (filter8);
-    else if (slope == Slope::m96_dBpOct)
+    else if (slope == Slope::m72_dBpOct)
         processFilter (filter12);
 }
 } // namespace dsp::band_splitter

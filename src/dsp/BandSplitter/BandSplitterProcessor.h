@@ -10,7 +10,7 @@ enum class Slope
     m12_dBpOct,
     m24_dBpOct,
     m48_dBpOct,
-    m96_dBpOct,
+    m72_dBpOct,
 };
 
 struct Params : chowdsp::ParamHolder
