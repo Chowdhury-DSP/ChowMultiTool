@@ -111,11 +111,11 @@ public:
         const auto treble_cut_skew = std::pow (treble_cut, 0.395f);
         P_treble_cut_plus.setResistanceValue (1.0e3f * (1.0f - treble_cut_skew));
         P_treble_cut_minus.setResistanceValue (1.0e3f * treble_cut_skew);
-        if (treble_cut_freq == 0) // 20k
+        if (treble_cut_freq == 2) // 20k
             C_treble_cut.setCapacitanceValue (47.0e-9f);
         else if (treble_cut_freq == 1) // 10k
             C_treble_cut.setCapacitanceValue (2.0f * 47.0e-9f);
-        else if (treble_cut_freq == 2) // 5k
+        else if (treble_cut_freq == 0) // 5k
             C_treble_cut.setCapacitanceValue (47.0e-9f + 150.0e-9f);
 
         const auto treble_boost_skew = std::pow (treble_boost, 0.621f);

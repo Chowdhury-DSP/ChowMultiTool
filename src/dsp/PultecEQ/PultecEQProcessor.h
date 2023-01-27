@@ -37,19 +37,19 @@ struct Params : chowdsp::ParamHolder
     chowdsp::ChoiceParameter::Ptr bassFreqParam {
         juce::ParameterID { "pultec_bass_freq", ParameterVersionHints::version1_0_0 },
         "Pultec Bass Frequency",
-        juce::StringArray { "20 kHz", "10 kHz", "5 kHz" },
-        1
+        juce::StringArray { "20 Hz", "30 Hz", "60 Hz", "100 Hz" },
+        2
     };
     chowdsp::ChoiceParameter::Ptr trebleCutFreqParam {
         juce::ParameterID { "pultec_treble_cut_freq", ParameterVersionHints::version1_0_0 },
         "Pultec Treble Cut Frequency",
-        juce::StringArray { "3 kHz", "4 kHz", "5 kHz", "8 kHz", "10 kHz", "12 kHz", "16 kHz" },
-        3
+        juce::StringArray { "5 kHz", "10 kHz", "20 kHz" },
+        1
     };
     chowdsp::ChoiceParameter::Ptr trebleBoostFreqParam {
         juce::ParameterID { "pultec_treble_boost_freq", ParameterVersionHints::version1_0_0 },
         "Pultec Treble Boost Frequency",
-        juce::StringArray { "20 Hz", "30 Hz", "60 Hz", "100 Hz" },
+        juce::StringArray { "3 kHz", "4 kHz", "5 kHz", "8 kHz", "10 kHz", "12 kHz", "16 kHz" },
         2
     };
 };
