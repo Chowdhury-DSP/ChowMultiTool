@@ -15,6 +15,9 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
                                           const chowdsp::BufferView<float>& bufferLow,
                                           const chowdsp::BufferView<float>& bufferHigh)
 {
+    if (bufferIn.getNumChannels() != bufferLow.getNumChannels() || bufferIn.getNumChannels() != bufferHigh.getNumChannels())
+        return;
+
     const auto processFilter = [&] (auto& filter)
     {
         filter.setCrossoverFrequency (params->cutoff->getCurrentValue());
