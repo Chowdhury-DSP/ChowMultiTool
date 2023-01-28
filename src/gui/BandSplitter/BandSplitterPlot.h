@@ -3,6 +3,8 @@
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "state/PluginState.h"
 
+namespace gui::band_splitter
+{
 class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot
 {
 public:
@@ -36,3 +38,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };
+} // namespace gui::band_splitter

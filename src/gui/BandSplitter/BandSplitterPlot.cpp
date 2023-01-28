@@ -1,8 +1,10 @@
 #include "BandSplitterPlot.h"
 
+namespace gui::band_splitter
+{
 namespace
 {
-constexpr int numBands = 2;
+    constexpr int numBands = 2;
 }
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
@@ -146,7 +148,6 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
     g.setColour (juce::Colours::white.withAlpha (0.25f));
     drawMagnitudeLines (g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
 
-
     g.setColour (juce::Colours::red);
     g.strokePath (getPath (0), juce::PathStrokeType { 1.5f });
     g.strokePath (getPath (1), juce::PathStrokeType { 1.5f });
@@ -157,3 +158,4 @@ void BandSplitterPlot::resized()
     chowdsp::EQ::EqualizerPlot::resized();
     cutoffSlider.setBounds (getLocalBounds());
 }
+} // namespace gui::band_splitter

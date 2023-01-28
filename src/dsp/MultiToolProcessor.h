@@ -9,7 +9,8 @@ using ToolTypes = types_list::TypesList<
     waveshaper::WaveshaperProcessor,
     signal_gen::SignalGeneratorProcessor,
     pultec::PultecEQProcessor,
-    band_splitter::BandSplitterProcessor>;
+    band_splitter::BandSplitterProcessor,
+    brickwall::BrickwallProcessor>;
 
 class MultiToolProcessor
 {

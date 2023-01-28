@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
+#include "dsp/Brickwall/BrickwallProcessor.h"
 #include "dsp/EQ/EQProcessor.h"
 #include "dsp/PultecEQ/PultecEQProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
@@ -19,7 +20,8 @@ struct PluginParams : chowdsp::ParamHolder
              waveshaperParams,
              signalGenParams,
              pultecEQParams,
-             bandSplitParams);
+             bandSplitParams,
+             brickwallParams);
     }
 
     static const juce::StringArray toolChoices;
@@ -35,6 +37,7 @@ struct PluginParams : chowdsp::ParamHolder
     dsp::signal_gen::Params signalGenParams;
     dsp::pultec::Params pultecEQParams;
     dsp::band_splitter::Params bandSplitParams;
+    dsp::brickwall::Params brickwallParams;
 };
 } // namespace state
 

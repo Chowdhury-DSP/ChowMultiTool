@@ -23,9 +23,9 @@ Unfinished:
 - Waveshaper
 - Band-Splitter
 - Pultec-style EQ
+- Brickwall filters
 
 Not yet started:
-- Brickwall filters
 - SVF
 
 ## Building
