@@ -37,7 +37,7 @@ double BandSplitterPlot::InternalSlider::valueToProportionOfLength (double value
 
 juce::Rectangle<int> BandSplitterPlot::InternalSlider::getThumbBounds() const
 {
-    static constexpr auto lowMult = 0.85f;
+    static constexpr auto lowMult = 0.9f;
     static constexpr auto highMult = 1.0f / lowMult;
     const auto cutoffBarXStart = juce::roundToInt (plotBase.getXCoordinateForFrequency (cutoffParam.get() * lowMult));
     const auto cutoffBarXEnd = juce::roundToInt (plotBase.getXCoordinateForFrequency (cutoffParam.get() * highMult));
@@ -130,15 +130,26 @@ void BandSplitterPlot::paint (juce::Graphics& g)
 
 void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::white);
-    drawFrequencyLines (g, { 100.0f, 1000.0f, 100000.0f }, 2.0f);
-    drawFrequencyLines (g, { 20.0f, 30.0f, 40.0f, 50.0f, 200.0f, 300.0f, 400.0f, 200000.0f }, 1.0f);
+    std::vector<float> freqLines { 20.0f };
+    while (freqLines.back() < params.maxFrequencyHz)
+    {
+        const auto increment = std::pow (10.0f, std::floor (std::log10 (freqLines.back())));
+        freqLines.push_back (freqLines.back() + increment);
+    }
 
+    g.setColour (juce::Colours::white.withAlpha (0.25f));
+    drawFrequencyLines (g, std::move (freqLines), 1.0f);
+
+    g.setColour (juce::Colours::white.withAlpha (0.5f));
+    drawFrequencyLines (g, { 100.0f, 1'000.0f, 10'000.0f }, 1.0f);
+
+    g.setColour (juce::Colours::white.withAlpha (0.25f));
     drawMagnitudeLines (g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
 
+
     g.setColour (juce::Colours::red);
-    g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
-    g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
+    g.strokePath (getPath (0), juce::PathStrokeType { 1.5f });
+    g.strokePath (getPath (1), juce::PathStrokeType { 1.5f });
 }
 
 void BandSplitterPlot::resized()
