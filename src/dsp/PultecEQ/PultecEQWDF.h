@@ -81,6 +81,15 @@ public:
         C_low_cut.prepare (sampleRate);
     }
 
+    void reset()
+    {
+        C_treble_boost.reset();
+        L_treble_boost.reset();
+        C_low_boost.reset();
+        C_treble_cut.reset();
+        C_low_cut.reset();
+    }
+
     void setParameters (float treble_boost, float treble_boost_q, int treble_boost_freq, float treble_cut, int treble_cut_freq, float low_boost, float low_cut, int bass_freq)
     {
         // @TODO: defer impedance changes?

@@ -59,6 +59,8 @@ class PultecEQProcessor
 public:
     PultecEQProcessor() = default;
 
+    PultecEQProcessor (Params& pultecParams) : params (&pultecParams) {}
+
     template <typename PluginParams>
     void initialise (PluginParams& pluginParams)
     {
@@ -66,6 +68,7 @@ public:
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
+    void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:

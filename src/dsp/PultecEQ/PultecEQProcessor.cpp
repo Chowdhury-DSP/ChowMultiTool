@@ -8,6 +8,12 @@ void PultecEQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
         model.prepare ((float) spec.sampleRate);
 }
 
+void PultecEQProcessor::reset()
+{
+    for (auto& model : wdf)
+        model.reset();
+}
+
 void PultecEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();

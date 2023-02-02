@@ -1,7 +1,6 @@
 #pragma once
 
-#include "dsp/PultecEQ/PultecEQProcessor.h"
-#include "state/PluginState.h"
+#include "PultecPlot.h"
 
 namespace gui::pultec
 {
@@ -14,6 +13,7 @@ public:
 
 private:
     chowdsp::ParametersView paramsView;
+    PultecPlot plot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PultecEditor)
 };
