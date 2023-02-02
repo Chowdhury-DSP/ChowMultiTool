@@ -5,6 +5,7 @@
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
 #include "Brickwall/BrickwallEditor.h"
+#include "SVF/SVFEditor.h"
 
 namespace gui
 {
@@ -55,6 +56,8 @@ void PluginEditor::refreshEditor()
                 editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, pluginState.params.bandSplitParams);
             else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
                 editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, pluginState.params.brickwallParams);
+            else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
+                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, pluginState.params.svfParams);
         });
 
     addAndMakeVisible (editorComponent.get());

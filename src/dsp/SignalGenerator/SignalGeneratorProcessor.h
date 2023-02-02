@@ -27,14 +27,14 @@ struct Params : chowdsp::ParamHolder
     };
 
     chowdsp::FreqHzParameter::Ptr frequency {
-        juce::ParameterID { "frequency", ParameterVersionHints::version1_0_0 },
+        juce::ParameterID { "signal_gen_frequency", ParameterVersionHints::version1_0_0 },
         "Signal Generator Frequency",
         chowdsp::ParamUtils::createNormalisableRange (10.0f, 25000.0f, 1000.0f),
         1000.0f
     };
 
     chowdsp::GainDBParameter::Ptr gain {
-        juce::ParameterID { "gain", ParameterVersionHints::version1_0_0 },
+        juce::ParameterID { "signal_gen_gain", ParameterVersionHints::version1_0_0 },
         "Signal Generator Gain",
         juce::NormalisableRange { -60.0f, 0.0f },
         -18.0f

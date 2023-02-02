@@ -6,6 +6,7 @@
 #include "dsp/PultecEQ/PultecEQProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
+#include "dsp/SVF/SVFProcessor.h"
 
 namespace state
 {
@@ -21,7 +22,8 @@ struct PluginParams : chowdsp::ParamHolder
              signalGenParams,
              pultecEQParams,
              bandSplitParams,
-             brickwallParams);
+             brickwallParams,
+             svfParams);
     }
 
     static const juce::StringArray toolChoices;
@@ -38,6 +40,7 @@ struct PluginParams : chowdsp::ParamHolder
     dsp::pultec::Params pultecEQParams;
     dsp::band_splitter::Params bandSplitParams;
     dsp::brickwall::Params brickwallParams;
+    dsp::svf::Params svfParams;
 };
 } // namespace state
 

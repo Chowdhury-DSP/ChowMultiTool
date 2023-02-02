@@ -10,7 +10,8 @@ using ToolTypes = types_list::TypesList<
     signal_gen::SignalGeneratorProcessor,
     pultec::PultecEQProcessor,
     band_splitter::BandSplitterProcessor,
-    brickwall::BrickwallProcessor>;
+    brickwall::BrickwallProcessor,
+    svf::SVFProcessor>;
 
 class MultiToolProcessor
 {

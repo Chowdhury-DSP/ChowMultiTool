@@ -10,6 +10,7 @@ target_sources(ChowMultiTool PRIVATE
     dsp/Waveshaper/WaveshaperProcessor.cpp
     dsp/BandSplitter/BandSplitterProcessor.cpp
     dsp/Brickwall/BrickwallProcessor.cpp
+    dsp/SVF/SVFProcessor.cpp
 
     gui/PluginEditor.cpp
     gui/Toolbar/Toolbar.cpp
@@ -26,6 +27,9 @@ target_sources(ChowMultiTool PRIVATE
     gui/SignalGenerator/SignalGeneratorEditor.cpp
     gui/SignalGenerator/OscillatorController.cpp
     gui/SignalGenerator/OscillatorPlot.cpp
+
+    gui/SVF/SVFEditor.cpp
+    gui/SVF/SVFPlot.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)
