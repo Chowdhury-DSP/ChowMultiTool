@@ -9,6 +9,12 @@
 
 namespace gui
 {
+namespace
+{
+    constexpr int defaultWidth = 600;
+    constexpr int defaultHeight = 400;
+}
+
 PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
       plugin (p),
@@ -16,13 +22,24 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
 {
     addAndMakeVisible (toolbar);
 
-    setSize (600, 400);
+    setResizeBehaviour();
 
     refreshEditor();
     toolChangeCallback = plugin.getState().addParameterListener (*plugin.getState().params.toolParam,
                                                                  chowdsp::ParameterListenerThread::MessageThread,
                                                                  [this]
                                                                  { refreshEditor(); });
+}
+
+void PluginEditor::setResizeBehaviour()
+{
+    constrainer.setSizeLimits (int ((float) defaultWidth * 0.5f),
+                               int ((float) defaultHeight * 0.5f),
+                               int ((float) defaultWidth * 3.0f),
+                               int ((float) defaultHeight * 3.0f));
+    setConstrainer (&constrainer);
+    setResizable (true, true);
+    setSize (defaultWidth, defaultHeight);
 }
 
 void PluginEditor::refreshEditor()

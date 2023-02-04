@@ -7,12 +7,13 @@ namespace
     constexpr double sampleRate = 48000.0f;
     constexpr int fftOrder = 15;
     constexpr int blockSize = 1 << fftOrder;
+    constexpr float maxFrequency = 22'000.0f;
 } // namespace
 
 PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = 18.0f,
-        .maxFrequencyHz = 22'000.0f,
+        .maxFrequencyHz = maxFrequency,
         .minMagnitudeDB = -30.0f,
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
@@ -52,12 +53,17 @@ void PultecPlot::updatePlot()
 
 void PultecPlot::paint (juce::Graphics& g)
 {
-    std::vector<float> freqLines { 20.0f };
-    while (freqLines.back() < params.maxFrequencyHz)
+    static constexpr auto freqLines = []
     {
-        const auto increment = std::pow (10.0f, std::floor (std::log10 (freqLines.back())));
-        freqLines.push_back (freqLines.back() + increment);
-    }
+        std::array<float, 28> lines {};
+        lines[0] = 20.0f;
+        for (size_t count = 1; count < lines.size(); ++count)
+        {
+            const auto increment = gcem::pow (10.0f, gcem::floor (gcem::log10 (lines[count - 1])));
+            lines[count] = lines[count - 1] + increment;
+        }
+        return lines;
+    }();
 
     g.setColour (juce::Colours::white.withAlpha (0.25f));
     drawFrequencyLines (g, std::move (freqLines), 1.0f);

@@ -111,6 +111,7 @@ class SVFProcessor
 {
 public:
     SVFProcessor() = default;
+    SVFProcessor (Params& svfParams) : params (&svfParams) {}
 
     template <typename PluginParams>
     void initialise (PluginParams& pluginParams)

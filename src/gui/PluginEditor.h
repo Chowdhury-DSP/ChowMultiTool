@@ -14,6 +14,7 @@ public:
     void resized() override;
 
 private:
+    void setResizeBehaviour();
     void refreshEditor();
 
     ChowMultiTool& plugin;
@@ -22,6 +23,7 @@ private:
     std::unique_ptr<juce::Component> editorComponent;
 
     chowdsp::ScopedCallback toolChangeCallback;
+    juce::ComponentBoundsConstrainer constrainer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

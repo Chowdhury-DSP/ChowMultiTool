@@ -1,12 +1,26 @@
-//
-// Created by jatin on 2/2/23.
-//
+#pragma once
 
-#ifndef CHOWMULTITOOL_SVFPLOT_H
-#define CHOWMULTITOOL_SVFPLOT_H
+#include "dsp/SVF/SVFProcessor.h"
+#include "state/PluginState.h"
 
-class SVFPlot
+namespace gui::svf
 {
-};
+class SVFPlot : public chowdsp::SpectrumPlotBase
+{
+public:
+    SVFPlot (State& pluginState, dsp::svf::Params& params);
 
-#endif //CHOWMULTITOOL_SVFPLOT_H
+    void paint (juce::Graphics& g) override;
+    void resized() override;
+
+private:
+    void updatePlot();
+
+    chowdsp::GenericFilterPlotter filterPlotter;
+    dsp::svf::SVFProcessor processor;
+
+    chowdsp::ScopedCallbackList callbacks;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFPlot)
+};
+}

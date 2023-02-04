@@ -1,7 +1,6 @@
 #pragma once
 
-#include "dsp/SVF/SVFProcessor.h"
-#include "state/PluginState.h"
+#include "SVFPlot.h"
 
 namespace gui::svf
 {
@@ -14,6 +13,7 @@ public:
 
 private:
     chowdsp::ParametersView paramsView;
+    SVFPlot plot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFEditor)
 };
