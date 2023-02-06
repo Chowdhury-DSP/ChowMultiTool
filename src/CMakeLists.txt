@@ -4,8 +4,11 @@ target_sources(ChowMultiTool PRIVATE
     state/PluginState.cpp
 
     dsp/MultiToolProcessor.cpp
-    dsp/EQ/EQProcessor.cpp
+
+    dsp/PultecEQ/PultecEQWDF.cpp
     dsp/PultecEQ/PultecEQProcessor.cpp
+
+    dsp/EQ/EQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
     dsp/Waveshaper/WaveshaperProcessor.cpp
     dsp/BandSplitter/BandSplitterProcessor.cpp
