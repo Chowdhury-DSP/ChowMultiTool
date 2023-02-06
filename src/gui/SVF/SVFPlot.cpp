@@ -18,6 +18,7 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams)
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
                                 .sampleRate = sampleRate,
+                                .fftOrder = 15
                             }),
       processor (svfParams)
 {

@@ -14,7 +14,6 @@ struct EQToolParams : chowdsp::ParamHolder
         add (eqParams, linearPhaseMode);
     }
 
-    // @TODO: brickwall filters
     inline static const juce::StringArray bandTypeChoices {
         "HPF 6 dB/Oct",
         "HPF 12 dB/Oct",
@@ -129,73 +128,30 @@ private:
     }
 
     static constexpr auto DecrampedMode = chowdsp::CoefficientCalculators::CoefficientCalculationMode::Decramped;
+    template <typename FloatType>
+    using EQBand = chowdsp::EQ::EQBand<FloatType,
+                                       chowdsp::FirstOrderHPF<FloatType>,
+                                       chowdsp::SecondOrderHPF<FloatType, DecrampedMode>,
+                                       chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Highpass, FloatType>,
+                                       chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Highpass, FloatType>,
+                                       chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Highpass, FloatType>,
+                                       chowdsp::LowShelfFilter<FloatType, DecrampedMode>,
+                                       chowdsp::PeakingFilter<FloatType, DecrampedMode>,
+                                       chowdsp::NotchFilter<FloatType, DecrampedMode>,
+                                       chowdsp::HighShelfFilter<FloatType, DecrampedMode>,
+                                       chowdsp::SecondOrderBPF<FloatType, DecrampedMode>,
+                                       chowdsp::FirstOrderLPF<FloatType>,
+                                       chowdsp::SecondOrderLPF<FloatType, DecrampedMode>,
+                                       chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, FloatType>,
+                                       chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Lowpass, FloatType>,
+                                       chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass, FloatType>>;
     using EQFloat = xsimd::batch<double>;
-    using EQBand = chowdsp::EQ::EQBand<EQFloat,
-                                       chowdsp::FirstOrderHPF<EQFloat>,
-                                       chowdsp::SecondOrderHPF<EQFloat, DecrampedMode>,
-                                       chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Highpass, EQFloat>,
-                                       chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Highpass, EQFloat>,
-                                       chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Highpass, EQFloat>,
-                                       chowdsp::LowShelfFilter<EQFloat, DecrampedMode>,
-                                       chowdsp::PeakingFilter<EQFloat, DecrampedMode>,
-                                       chowdsp::NotchFilter<EQFloat, DecrampedMode>,
-                                       chowdsp::HighShelfFilter<EQFloat, DecrampedMode>,
-                                       chowdsp::SecondOrderBPF<EQFloat, DecrampedMode>,
-                                       chowdsp::FirstOrderLPF<EQFloat>,
-                                       chowdsp::SecondOrderLPF<EQFloat, DecrampedMode>,
-                                       chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, EQFloat>,
-                                       chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Lowpass, EQFloat>,
-                                       chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass, EQFloat>>;
-    chowdsp::EQ::EQProcessor<EQFloat, EQToolParams::EQParams::EQNumBands, EQBand> eq;
+    chowdsp::EQ::EQProcessor<EQFloat, EQToolParams::EQParams::EQNumBands, EQBand<EQFloat>> eq;
 
     chowdsp::Buffer<EQFloat> eqBuffer;
 
-    struct PrototypeEQ
-    {
-        using Params = EQToolParams::EQParams::Params;
-
-        using EQBand = chowdsp::EQ::EQBand<float,
-                                           chowdsp::FirstOrderHPF<float>,
-                                           chowdsp::SecondOrderHPF<float, DecrampedMode>,
-                                           chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Highpass, float>,
-                                           chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Highpass, float>,
-                                           chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Highpass, float>,
-                                           chowdsp::LowShelfFilter<float, DecrampedMode>,
-                                           chowdsp::PeakingFilter<float, DecrampedMode>,
-                                           chowdsp::NotchFilter<float, DecrampedMode>,
-                                           chowdsp::HighShelfFilter<float, DecrampedMode>,
-                                           chowdsp::SecondOrderBPF<float, DecrampedMode>,
-                                           chowdsp::FirstOrderLPF<float>,
-                                           chowdsp::SecondOrderLPF<float, DecrampedMode>,
-                                           chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, float>,
-                                           chowdsp::ButterworthFilter<4, chowdsp::ButterworthFilterType::Lowpass, float>,
-                                           chowdsp::ButterworthFilter<8, chowdsp::ButterworthFilterType::Lowpass, float>>;
-        chowdsp::EQ::EQProcessor<float, dsp::eq::EQToolParams::EQParams::EQNumBands, EQBand> eq;
-
-        PrototypeEQ() = default;
-
-        void setParameters (const Params& eqParams)
-        {
-            Params::setEQParameters (eq, eqParams);
-        }
-
-        void prepare (const juce::dsp::ProcessSpec& spec)
-        {
-            eq.prepare (spec);
-        }
-
-        void reset()
-        {
-            eq.reset();
-        }
-
-        void processBlock (juce::AudioBuffer<float>& buffer)
-        {
-            eq.processBlock (buffer);
-        }
-    } protoEQ;
-
-    chowdsp::EQ::LinearPhaseEQ<PrototypeEQ> linPhaseEQ;
+    using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;
+    chowdsp::EQ::LinearPhaseEQ<LinearPhaseProtoEQ> linPhaseEQ;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

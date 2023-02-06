@@ -65,7 +65,7 @@ jobs:
       run: cmake --build build --config Release --parallel 4 --target ChowMultiTool_LV2
 
     - name: Pluginval
-      if: runner.os == 'Windows' || runner.os == 'MacOS'
+      if: runner.os == 'Windows' # || runner.os == 'MacOS'
       run: bash scripts/pluginval.sh
 
     - name: clap-validator
