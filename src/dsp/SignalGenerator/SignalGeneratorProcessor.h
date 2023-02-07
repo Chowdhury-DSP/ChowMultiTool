@@ -44,20 +44,14 @@ struct Params : chowdsp::ParamHolder
 class SignalGeneratorProcessor
 {
 public:
-    SignalGeneratorProcessor() = default;
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.signalGenParams;
-    }
+    explicit SignalGeneratorProcessor (Params& signalGenParams) : params (signalGenParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    Params* params = nullptr;
+    const Params& params;
 
     std::tuple<
         chowdsp::SineWave<float>,

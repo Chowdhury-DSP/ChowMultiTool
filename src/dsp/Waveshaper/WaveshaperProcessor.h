@@ -46,19 +46,13 @@ struct Params : chowdsp::ParamHolder
 class WaveshaperProcessor
 {
 public:
-    WaveshaperProcessor() = default;
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.waveshaperParams;
-    }
+    explicit WaveshaperProcessor (Params& wsParams) : params (wsParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    Params* params = nullptr;
+    const Params& params;
 
     chowdsp::Gain<float> gain;
 

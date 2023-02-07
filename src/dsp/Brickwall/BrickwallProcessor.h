@@ -69,13 +69,7 @@ struct Params : chowdsp::ParamHolder
 class BrickwallProcessor
 {
 public:
-    BrickwallProcessor() = default;
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.brickwallParams;
-    }
+    explicit BrickwallProcessor (Params& brickwallParams) : params (brickwallParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
@@ -83,7 +77,7 @@ public:
 private:
     int getFilterTypeIndex() const;
 
-    Params* params = nullptr;
+    const Params& params;
 
     using EQBand = chowdsp::EQ::EQBand<
         float,

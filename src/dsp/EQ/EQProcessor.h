@@ -108,23 +108,17 @@ struct EQToolParams : chowdsp::ParamHolder
 class EQProcessor
 {
 public:
-    EQProcessor() = default;
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.eqParams;
-    }
+    explicit EQProcessor (EQToolParams& eqParams) : params (eqParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    EQToolParams* params = nullptr;
+    const EQToolParams& params;
 
     auto getEQParams()
     {
-        return EQToolParams::EQParams::getEQParameters (params->eqParams.eqParams);
+        return EQToolParams::EQParams::getEQParameters (params.eqParams.eqParams);
     }
 
     static constexpr auto DecrampedMode = chowdsp::CoefficientCalculators::CoefficientCalculationMode::Decramped;

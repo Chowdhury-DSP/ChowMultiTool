@@ -20,14 +20,14 @@ void PultecEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        wdf[ch].setParameters (params->trebleBoostParam->getCurrentValue(),
-                               params->trebleBoostQParam->getCurrentValue(),
-                               params->trebleBoostFreqParam->getCurrentValue(),
-                               params->trebleCutParam->getCurrentValue(),
-                               params->trebleCutFreqParam->getCurrentValue(),
-                               params->bassBoostParam->getCurrentValue(),
-                               params->bassCutParam->getCurrentValue(),
-                               params->bassFreqParam->getCurrentValue());
+        wdf[ch].setParameters (params.trebleBoostParam->getCurrentValue(),
+                               params.trebleBoostQParam->getCurrentValue(),
+                               params.trebleBoostFreqParam->getCurrentValue(),
+                               params.trebleCutParam->getCurrentValue(),
+                               params.trebleCutFreqParam->getCurrentValue(),
+                               params.bassBoostParam->getCurrentValue(),
+                               params.bassCutParam->getCurrentValue(),
+                               params.bassFreqParam->getCurrentValue());
 
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)

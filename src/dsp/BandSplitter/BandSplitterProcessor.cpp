@@ -20,11 +20,11 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
 
     const auto processFilter = [&] (auto& filter)
     {
-        filter.setCrossoverFrequency (params->cutoff->getCurrentValue());
+        filter.setCrossoverFrequency (params.cutoff->getCurrentValue());
         filter.processBlock (bufferIn, bufferLow, bufferHigh);
     };
 
-    const auto slope = params->slope->get();
+    const auto slope = params.slope->get();
     if (slope == Slope::m6_dBpOct)
         processFilter (filter1);
     else if (slope == Slope::m12_dBpOct)

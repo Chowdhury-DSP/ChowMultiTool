@@ -38,13 +38,7 @@ struct Params : chowdsp::ParamHolder
 class BandSplitterProcessor
 {
 public:
-    BandSplitterProcessor() = default;
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.bandSplitParams;
-    }
+    explicit BandSplitterProcessor (Params& bandSplitParams) : params (bandSplitParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<const float>& bufferIn,
@@ -52,7 +46,7 @@ public:
                        const chowdsp::BufferView<float>& bufferHigh);
 
 private:
-    Params* params = nullptr;
+    const Params& params;
 
     chowdsp::LinkwitzRileyFilter<float, 1> filter1;
     chowdsp::LinkwitzRileyFilter<float, 2> filter2;

@@ -110,21 +110,14 @@ struct Params : public chowdsp::ParamHolder
 class SVFProcessor
 {
 public:
-    SVFProcessor() = default;
-    SVFProcessor (Params& svfParams) : params (&svfParams) {}
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.svfParams;
-    }
+    explicit SVFProcessor (Params& svfParams) : params (svfParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    Params* params = nullptr;
+    const Params& params;
 
     std::tuple<
         chowdsp::SVFLowpass<>,

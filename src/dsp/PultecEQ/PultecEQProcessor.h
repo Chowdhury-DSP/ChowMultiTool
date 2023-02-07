@@ -64,22 +64,14 @@ struct Params : chowdsp::ParamHolder
 class PultecEQProcessor
 {
 public:
-    PultecEQProcessor() = default;
-
-    explicit PultecEQProcessor (Params& pultecParams) : params (&pultecParams) {}
-
-    template <typename PluginParams>
-    void initialise (PluginParams& pluginParams)
-    {
-        params = &pluginParams.pultecEQParams;
-    }
+    explicit PultecEQProcessor (Params& pultecParams) : params (pultecParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
-    Params* params = nullptr;
+    const Params& params;
 
     PultecEqWDF wdf[2];
 

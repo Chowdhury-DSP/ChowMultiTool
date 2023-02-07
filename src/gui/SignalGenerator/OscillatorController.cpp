@@ -26,6 +26,7 @@ struct DraggingSlider : public juce::Slider
 };
 
 OscillatorController::OscillatorController (State& state)
+    : plotSignalGen (state.params.signalGenParams)
 {
     gainSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams.gain, state, juce::MouseCursor::StandardCursorType::UpDownResizeCursor);
     gainSlider->setSliderStyle (juce::Slider::LinearVertical);
@@ -35,7 +36,6 @@ OscillatorController::OscillatorController (State& state)
     freqSlider->setSliderStyle (juce::Slider::LinearHorizontal);
     addAndMakeVisible (freqSlider.get());
 
-    plotSignalGen.initialise (state.params);
     plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });
 
     addAndMakeVisible (plot);

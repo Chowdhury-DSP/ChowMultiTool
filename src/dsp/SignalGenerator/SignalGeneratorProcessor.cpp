@@ -9,7 +9,7 @@ void SignalGeneratorProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                                            { oscillator.prepare (monoSpec); },
                                            oscillators);
 
-    gain.setGainDecibels (params->gain->getCurrentValue());
+    gain.setGainDecibels (params.gain->getCurrentValue());
     gain.setRampDurationSeconds (0.05);
     gain.prepare (monoSpec);
 
@@ -21,13 +21,13 @@ void SignalGeneratorProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 
 void SignalGeneratorProcessor::reset()
 {
-    freqParamSmoothed.reset (juce::jmin (params->frequency->getCurrentValue(), nyquistHz));
+    freqParamSmoothed.reset (juce::jmin (params.frequency->getCurrentValue(), nyquistHz));
 
-    gain.setGainDecibels (params->gain->getCurrentValue());
+    gain.setGainDecibels (params.gain->getCurrentValue());
     gain.reset();
 
     chowdsp::TupleHelpers::visit_at (oscillators,
-                                     static_cast<size_t> (params->oscillatorChoice->get()),
+                                     static_cast<size_t> (params.oscillatorChoice->get()),
                                      [] (auto& oscillator)
                                      {
                                          oscillator.reset();
@@ -43,9 +43,9 @@ void SignalGeneratorProcessor::processBlock (const chowdsp::BufferView<float>& b
     auto monoBuffer = chowdsp::BufferView<float> { buffer, 0, -1, 0, 1 };
     monoBuffer.clear();
 
-    freqParamSmoothed.process (juce::jmin (params->frequency->getCurrentValue(), nyquistHz), numSamples);
+    freqParamSmoothed.process (juce::jmin (params.frequency->getCurrentValue(), nyquistHz), numSamples);
     chowdsp::TupleHelpers::visit_at (oscillators,
-                                     static_cast<size_t> (params->oscillatorChoice->get()),
+                                     static_cast<size_t> (params.oscillatorChoice->get()),
                                      [this, &monoBuffer, numSamples] (auto& oscillator)
                                      {
                                          if (freqParamSmoothed.isSmoothing())
@@ -65,7 +65,7 @@ void SignalGeneratorProcessor::processBlock (const chowdsp::BufferView<float>& b
                                          }
                                      });
 
-    gain.setGainDecibels (params->gain->getCurrentValue());
+    gain.setGainDecibels (params.gain->getCurrentValue());
     gain.process (monoBuffer);
 
     // back from mono to multi-channel

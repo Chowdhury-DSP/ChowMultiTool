@@ -23,7 +23,7 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     linPhaseEQ.setParameters (eqParams);
 
-    if (params->linearPhaseMode->get())
+    if (params.linearPhaseMode->get())
     {
         linPhaseEQ.processBlock (buffer);
     }

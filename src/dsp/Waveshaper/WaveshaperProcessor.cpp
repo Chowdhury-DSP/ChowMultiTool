@@ -18,24 +18,24 @@ void WaveshaperProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 
 void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
-    gain.setGainDecibels (params->gainParam->getCurrentValue());
+    gain.setGainDecibels (params.gainParam->getCurrentValue());
     gain.process (buffer);
 
     // @TODO: oversampling
 
-    if (params->shapeParam->get() == Shapes::Hard_Clip)
+    if (params.shapeParam->get() == Shapes::Hard_Clip)
         adaaHardClipper.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::Tanh_Clip)
+    else if (params.shapeParam->get() == Shapes::Tanh_Clip)
         adaaTanhClipper.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::Cubic_Clip)
+    else if (params.shapeParam->get() == Shapes::Cubic_Clip)
         adaaCubicClipper.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::Nonic_Clip)
+    else if (params.shapeParam->get() == Shapes::Nonic_Clip)
         adaa9thOrderClipper.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::Full_Wave_Rectify)
+    else if (params.shapeParam->get() == Shapes::Full_Wave_Rectify)
         fullWaveRectifier.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::West_Coast)
+    else if (params.shapeParam->get() == Shapes::West_Coast)
         westCoastFolder.processBlock (buffer);
-    else if (params->shapeParam->get() == Shapes::Wave_Multiply)
+    else if (params.shapeParam->get() == Shapes::Wave_Multiply)
         waveMultiplyFolder.processBlock (buffer);
 }
 } // namespace dsp::waveshaper

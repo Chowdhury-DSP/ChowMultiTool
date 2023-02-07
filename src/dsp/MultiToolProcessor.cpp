@@ -2,13 +2,50 @@
 
 namespace dsp
 {
+namespace detail
+{
+    template <class U, class F>
+    struct tool_maker_t
+    {
+        operator U()
+        {
+            return f();
+        }
+        F f;
+    };
+
+    template <class U, class F>
+    tool_maker_t<U, std::decay_t<F>> tool_maker (F&& f)
+    {
+        return { std::forward<F> (f) };
+    }
+
+    ToolTypes::Types generate_tools (state::PluginParams& params)
+    {
+        return {
+            tool_maker<eq::EQProcessor> ([&params]
+                                         { return eq::EQProcessor { params.eqParams }; }),
+            tool_maker<waveshaper::WaveshaperProcessor> ([&params]
+                                                         { return waveshaper::WaveshaperProcessor { params.waveshaperParams }; }),
+            tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
+                                                              { return signal_gen::SignalGeneratorProcessor { params.signalGenParams }; }),
+            tool_maker<pultec::PultecEQProcessor> ([&params]
+                                                   { return pultec::PultecEQProcessor { params.pultecEQParams }; }),
+            tool_maker<band_splitter::BandSplitterProcessor> ([&params]
+                                                              { return band_splitter::BandSplitterProcessor { params.bandSplitParams }; }),
+            tool_maker<brickwall::BrickwallProcessor> ([&params]
+                                                       { return brickwall::BrickwallProcessor { params.brickwallParams }; }),
+            tool_maker<svf::SVFProcessor> ([&params]
+                                  { return svf::SVFProcessor { params.svfParams }; })
+        };
+    }
+} // namespace detail
+
 MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, state::PluginParams& pluginParams)
     : plugin (parentPlugin),
-      params (pluginParams)
+      params (pluginParams),
+      tools (detail::generate_tools (params))
 {
-    chowdsp::TupleHelpers::forEachInTuple ([this] (auto& tool, size_t)
-                                           { tool.initialise (params); },
-                                           tools);
 }
 
 void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)

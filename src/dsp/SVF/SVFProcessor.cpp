@@ -30,17 +30,17 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     {
         using FilterType = std::decay_t<decltype (filter)>;
 
-        filter.template setCutoffFrequency<false> (*params->cutoff);
-        filter.template setQValue<false> (*params->qParam);
+        filter.template setCutoffFrequency<false> (*params.cutoff);
+        filter.template setQValue<false> (*params.qParam);
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFBell<>, chowdsp::SVFLowShelf<>, chowdsp::SVFHighShelf<>>)
-            filter.template setGainDecibels<false> (*params->gain);
+            filter.template setGainDecibels<false> (*params.gain);
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFMultiMode<>>)
-            filter.setMode (0.5f + 0.5f * *params->mode); // TODO: maybe smooth this parameter
+            filter.setMode (0.5f + 0.5f * *params.mode); // TODO: maybe smooth this parameter
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::ARPFilter<float>>)
-            filter.setLimitMode (*params->arpLimitMode);
+            filter.setLimitMode (*params.arpLimitMode);
 
         filter.update();
     };
@@ -57,25 +57,25 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
             });
     };
 
-    if (params->type->get() == SVFType::Plain)
+    if (params.type->get() == SVFType::Plain)
     {
-        processFilterType (plainFilters, params->plainType->get());
+        processFilterType (plainFilters, params.plainType->get());
     }
-    else if (params->type->get() == SVFType::ARP)
+    else if (params.type->get() == SVFType::ARP)
     {
         setFilterParams (arpFilter);
         magic_enum::enum_switch (
             [this, &buffer] (auto subType)
             {
                 constexpr chowdsp::ARPFilterType type = subType;
-                arpFilter.template processBlock<type> (buffer, -(*params->mode));
+                arpFilter.template processBlock<type> (buffer, -(*params.mode));
             },
-            params->arpType->get());
+            params.arpType->get());
     }
-    else if (params->type->get() == SVFType::Werner)
+    else if (params.type->get() == SVFType::Werner)
     {
-        const auto resonance = params->qParam->convertTo0to1 (*params->qParam);
-        wernerFilter.calcCoeffs (*params->cutoff, *params->wernerDamping, resonance);
+        const auto resonance = params.qParam->convertTo0to1 (*params.qParam);
+        wernerFilter.calcCoeffs (*params.cutoff, *params.wernerDamping, resonance);
 
         magic_enum::enum_switch (
             [this, &buffer] (auto subType)
@@ -83,7 +83,7 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
                 constexpr chowdsp::WernerFilterType type = subType;
                 if constexpr (type == chowdsp::WernerFilterType::MultiMode)
                 {
-                    const auto mix = 0.5f + 0.5f * *params->mode;
+                    const auto mix = 0.5f + 0.5f * *params.mode;
                     wernerFilter.template processBlock<type> (buffer, mix);
                 }
                 else
@@ -91,7 +91,7 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
                     wernerFilter.template processBlock<type> (buffer);
                 }
             },
-            params->wernerType->get());
+            params.wernerType->get());
     }
 }
 } // namespace dsp::svf
