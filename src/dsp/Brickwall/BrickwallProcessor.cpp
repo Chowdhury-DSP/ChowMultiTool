@@ -8,6 +8,13 @@ void BrickwallProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     filter.setQValue (chowdsp::CoefficientCalculators::butterworthQ<float>);
 }
 
+void BrickwallProcessor::reset()
+{
+    filter.setFilterType (getFilterTypeIndex());
+    filter.setCutoffFrequency (*params.cutoff);
+    filter.reset();
+}
+
 void BrickwallProcessor::processBlock (const chowdsp::BufferView<float>& buffer) noexcept
 {
     filter.setFilterType (getFilterTypeIndex());

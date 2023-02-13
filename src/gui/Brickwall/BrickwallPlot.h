@@ -1,30 +1,31 @@
 #pragma once
 
-#include "dsp/BandSplitter/BandSplitterProcessor.h"
+#include "dsp/Brickwall/BrickwallProcessor.h"
 #include "state/PluginState.h"
 
-namespace gui::band_splitter
+namespace gui::brickwall
 {
-class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot
+class BrickwallPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& params);
+    BrickwallPlot (State& pluginState, dsp::brickwall::Params& params);
 
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
 
 private:
-    void updateCutoffFrequency();
-    void updateFilterSlope();
+    void updatePlot();
 
-    const dsp::band_splitter::Params& bandSplitterParams;
+    chowdsp::GenericFilterPlotter filterPlotter;
+    dsp::brickwall::BrickwallProcessor brickwall;
+
     chowdsp::ScopedCallbackList callbacks;
 
     struct InternalSlider : juce::Slider
     {
         InternalSlider (chowdsp::FloatParameter& cutoffParam,
-                        chowdsp::EQ::EqualizerPlot& plotBase,
+                        chowdsp::SpectrumPlotBase& plotBase,
                         State& pluginState);
         void paint (juce::Graphics& g) override;
         bool hitTest (int x, int y) override;
@@ -33,10 +34,10 @@ private:
         juce::Rectangle<int> getThumbBounds() const;
 
         chowdsp::FloatParameter& cutoffParam;
-        chowdsp::EQ::EqualizerPlot& plotBase;
+        chowdsp::SpectrumPlotBase& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
     } cutoffSlider;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallPlot)
 };
-} // namespace gui::band_splitter
+} // namespace gui::brickwall

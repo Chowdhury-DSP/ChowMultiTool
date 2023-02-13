@@ -72,6 +72,7 @@ public:
     explicit BrickwallProcessor (Params& brickwallParams) : params (brickwallParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
+    void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
 
 private:

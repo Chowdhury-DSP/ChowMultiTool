@@ -1,7 +1,6 @@
 #pragma once
 
-#include "dsp/Brickwall/BrickwallProcessor.h"
-#include "state/PluginState.h"
+#include "BrickwallPlot.h"
 
 namespace gui::brickwall
 {
@@ -14,6 +13,7 @@ public:
 
 private:
     chowdsp::ParametersView paramsView;
+    BrickwallPlot plot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallEditor)
 };

@@ -1,15 +1,21 @@
 #include "BandSplitterPlot.h"
+#include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::band_splitter
 {
 namespace
 {
     constexpr int numBands = 2;
+    constexpr int minFrequency = 18;
+    constexpr int maxFrequency = 22'000;
 }
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
-                                                  chowdsp::EQ::EqualizerPlot& plot)
-    : cutoffParam (cutoff), plotBase (plot)
+                                                  chowdsp::EQ::EqualizerPlot& plot,
+                                                  State& pluginState)
+    : cutoffParam (cutoff),
+      plotBase (plot),
+      cutoffAttachment (cutoff, pluginState, *this)
 {
     setTextBoxStyle (NoTextBox, false, 0, 0);
     setSliderStyle (LinearHorizontal);
@@ -52,13 +58,12 @@ juce::Rectangle<int> BandSplitterPlot::InternalSlider::getThumbBounds() const
 BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& bandSplitParams)
     : chowdsp::EQ::EqualizerPlot (numBands,
                                   chowdsp::SpectrumPlotParams {
-                                      .minFrequencyHz = 18.0f,
-                                      .maxFrequencyHz = 22'000.0f,
+                                      .minFrequencyHz = (float) minFrequency,
+                                      .maxFrequencyHz = (float) maxFrequency,
                                       .minMagnitudeDB = -60.0f,
                                       .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
-      cutoffSlider (*bandSplitParams.cutoff, *this),
-      cutoffAttachment (*bandSplitParams.cutoff, pluginState, cutoffSlider)
+      cutoffSlider (*bandSplitParams.cutoff, *this, pluginState)
 {
     addAndMakeVisible (cutoffSlider);
 
@@ -132,21 +137,8 @@ void BandSplitterPlot::paint (juce::Graphics& g)
 
 void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 {
-    std::vector<float> freqLines { 20.0f };
-    while (freqLines.back() < params.maxFrequencyHz)
-    {
-        const auto increment = std::pow (10.0f, std::floor (std::log10 (freqLines.back())));
-        freqLines.push_back (freqLines.back() + increment);
-    }
-
-    g.setColour (juce::Colours::white.withAlpha (0.25f));
-    drawFrequencyLines (g, std::move (freqLines), 1.0f);
-
-    g.setColour (juce::Colours::white.withAlpha (0.5f));
-    drawFrequencyLines (g, { 100.0f, 1'000.0f, 10'000.0f }, 1.0f);
-
-    g.setColour (juce::Colours::white.withAlpha (0.25f));
-    drawMagnitudeLines (g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
+    gui::drawMagnitudeLines (*this, g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
 
     g.setColour (juce::Colours::red);
     g.strokePath (getPath (0), juce::PathStrokeType { 1.5f });
