@@ -8,9 +8,11 @@ target_sources(ChowMultiTool PRIVATE
     dsp/PultecEQ/PultecEQWDF.cpp
     dsp/PultecEQ/PultecEQProcessor.cpp
 
+    dsp/Waveshaper/WaveshaperProcessor.cpp
+    dsp/Waveshaper/SignalSmithWaveshaper.cpp
+
     dsp/EQ/EQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
-    dsp/Waveshaper/WaveshaperProcessor.cpp
     dsp/BandSplitter/BandSplitterProcessor.cpp
     dsp/Brickwall/BrickwallProcessor.cpp
     dsp/SVF/SVFProcessor.cpp

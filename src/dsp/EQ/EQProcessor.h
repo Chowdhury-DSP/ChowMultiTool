@@ -142,6 +142,7 @@ private:
     using EQFloat = xsimd::batch<double>;
     chowdsp::EQ::EQProcessor<EQFloat, EQToolParams::EQParams::EQNumBands, EQBand<EQFloat>> eq;
 
+    chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<EQFloat> eqBuffer;
 
     using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;

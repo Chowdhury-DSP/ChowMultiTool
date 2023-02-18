@@ -16,10 +16,11 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -30.0f,
-        .maxMagnitudeDB = 30.0f }),
+        .minMagnitudeDB = -20.0f,
+        .maxMagnitudeDB = 20.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
                                 .sampleRate = sampleRate,
+                                .freqSmoothOctaves = 1.0f / 12.0f,
                                 .fftOrder = fftOrder,
                             }),
       pultecEQ (pultecParams)
@@ -28,8 +29,9 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
     {
         pultecEQ.reset();
-        juce::FloatVectorOperations::copy (output, input, numSamples);
+        juce::FloatVectorOperations::multiply (output, input, 0.1f, numSamples);
         pultecEQ.processBlock (chowdsp::BufferView<float> { output, numSamples });
+        juce::FloatVectorOperations::multiply (output, output, 10.0f, numSamples);
     };
 
     pultecParams.doForAllParameters (

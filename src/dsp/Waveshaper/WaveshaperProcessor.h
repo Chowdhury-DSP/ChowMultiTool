@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pch.h>
+#include "SignalSmithWaveshaper.h"
 
 namespace dsp::waveshaper
 {
@@ -13,19 +13,20 @@ enum class Shapes
     Full_Wave_Rectify,
     West_Coast,
     Wave_Multiply,
+    Fold_Fuzz,
 };
 
 struct Params : chowdsp::ParamHolder
 {
     Params()
     {
-        add (gainParam, shapeParam, oversampleParam);
+        add (gainParam, shapeParam, kParam, MParam, oversampleParam);
     }
 
     chowdsp::GainDBParameter::Ptr gainParam {
         juce::ParameterID { "waveshaper_gain", ParameterVersionHints::version1_0_0 },
         "Waveshaper Gain",
-        juce::NormalisableRange { -30.0f, 30.0f },
+        juce::NormalisableRange { -12.0f, 12.0f },
         0.0f
     };
 
@@ -33,6 +34,18 @@ struct Params : chowdsp::ParamHolder
         juce::ParameterID { "waveshaper_shape", ParameterVersionHints::version1_0_0 },
         "Waveshaper Shape",
         Shapes::Tanh_Clip
+    };
+
+    chowdsp::PercentParameter::Ptr kParam {
+        juce::ParameterID { "waveshaper_k", ParameterVersionHints::version1_0_0 },
+        "Waveshaper Fold/Fuzz Fold",
+        0.5f
+    };
+
+    chowdsp::PercentParameter::Ptr MParam {
+        juce::ParameterID { "waveshaper_M", ParameterVersionHints::version1_0_0 },
+        "Waveshaper Fold/Fuzz Fuzz",
+        0.5f
     };
 
     chowdsp::ChoiceParameter::Ptr oversampleParam {
@@ -56,23 +69,20 @@ private:
 
     chowdsp::Gain<float> gain;
 
-    using AAFilter = chowdsp::ButterworthFilter<12>;
-    chowdsp::Buffer<float> upsampledBuffer;
-    chowdsp::Downsampler<float, AAFilter> resample2;
-    chowdsp::Downsampler<float, AAFilter> resample3;
-    chowdsp::Downsampler<float, AAFilter> resample4;
+    // TODO: oversampling
 
-    chowdsp::Downsampler<float, AAFilter>* resampler = nullptr;
-    int previousUpSampleChoice = 0;
+    chowdsp::Buffer<double> doubleBuffer;
+    chowdsp::Buffer<xsimd::batch<double>> doubleSIMDBuffer;
 
     chowdsp::SharedLookupTableCache lookupTableCache;
-    chowdsp::ADAAHardClipper<float> adaaHardClipper { &lookupTableCache.get() };
-    chowdsp::ADAATanhClipper<float> adaaTanhClipper { &lookupTableCache.get() };
-    chowdsp::ADAASoftClipper<float> adaaCubicClipper { &lookupTableCache.get() };
-    chowdsp::ADAASoftClipper<float, 9> adaa9thOrderClipper { &lookupTableCache.get() };
-    chowdsp::ADAAFullWaveRectifier<float> fullWaveRectifier { &lookupTableCache.get() };
-    chowdsp::WestCoastWavefolder<float> westCoastFolder { &lookupTableCache.get() };
-    chowdsp::WaveMultiplier<float, 6> waveMultiplyFolder { &lookupTableCache.get() };
+    chowdsp::ADAAHardClipper<double> adaaHardClipper { &lookupTableCache.get() };
+    chowdsp::ADAATanhClipper<double> adaaTanhClipper { &lookupTableCache.get() };
+    chowdsp::ADAASoftClipper<double> adaaCubicClipper { &lookupTableCache.get() };
+    chowdsp::ADAASoftClipper<double, 9> adaa9thOrderClipper { &lookupTableCache.get() };
+    chowdsp::ADAAFullWaveRectifier<double> fullWaveRectifier { &lookupTableCache.get() };
+    chowdsp::WestCoastWavefolder<double> westCoastFolder { &lookupTableCache.get() };
+    chowdsp::WaveMultiplier<double, 6> waveMultiplyFolder { &lookupTableCache.get() };
+    SignalSmithWaveshaper ssWaveshaper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };
