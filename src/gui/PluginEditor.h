@@ -14,6 +14,8 @@ public:
     void resized() override;
 
 private:
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+
     void setResizeBehaviour();
     void refreshEditor();
 
@@ -24,6 +26,8 @@ private:
 
     chowdsp::ScopedCallback toolChangeCallback;
     juce::ComponentBoundsConstrainer constrainer;
+
+    melatonin::Inspector inspector { *this, false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };

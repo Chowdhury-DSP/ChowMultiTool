@@ -20,6 +20,8 @@
 #include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
+#include <melatonin_inspector/melatonin_inspector.h>
+
 // Other third-party libraries
 #include <chowdsp_wdf/chowdsp_wdf.h>
 

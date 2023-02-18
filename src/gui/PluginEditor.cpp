@@ -95,4 +95,13 @@ void PluginEditor::resized()
     if (editorComponent != nullptr)
         editorComponent->setBounds (bounds);
 }
+
+void PluginEditor::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    if (e.mods.isShiftDown())
+    {
+        inspector.setVisible (true);
+        inspector.toggle (true);
+    }
+}
 } // namespace gui
