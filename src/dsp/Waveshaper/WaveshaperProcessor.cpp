@@ -49,7 +49,6 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
     }
     else if (params.shapeParam->get() == Shapes::Wave_Multiply)
     {
-        chowdsp::BufferMath::applyGain (doubleBuffer, juce::Decibels::decibelsToGain (-6.0));
         waveMultiplyFolder.processBlock (doubleBuffer);
         chowdsp::BufferMath::applyGain (doubleBuffer, juce::Decibels::decibelsToGain (16.0));
     }
