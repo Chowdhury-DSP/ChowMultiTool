@@ -1,7 +1,8 @@
 #pragma once
 
-#include "state/PluginState.h"
 #include "OscillatorPlot.h"
+#include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
+#include "state/PluginState.h"
 
 namespace gui::signal_gen
 {
@@ -25,4 +26,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscillatorController)
 };
-}
+} // namespace gui::signal_gen

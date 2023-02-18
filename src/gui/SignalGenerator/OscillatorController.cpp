@@ -26,13 +26,13 @@ struct DraggingSlider : public juce::Slider
 };
 
 OscillatorController::OscillatorController (State& state)
-    : plotSignalGen (state.params.signalGenParams)
+    : plotSignalGen (*state.params.signalGenParams)
 {
-    gainSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams.gain, state, juce::MouseCursor::StandardCursorType::UpDownResizeCursor);
+    gainSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams->gain, state, juce::MouseCursor::StandardCursorType::UpDownResizeCursor);
     gainSlider->setSliderStyle (juce::Slider::LinearVertical);
     addAndMakeVisible (gainSlider.get());
 
-    freqSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams.frequency, state, juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
+    freqSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams->frequency, state, juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
     freqSlider->setSliderStyle (juce::Slider::LinearHorizontal);
     addAndMakeVisible (freqSlider.get());
 
@@ -50,11 +50,11 @@ OscillatorController::OscillatorController (State& state)
     auto& params = state.params.signalGenParams;
     static constexpr auto listenerThread = chowdsp::ParameterListenerThread::MessageThread;
     parameterChangeListeners += {
-        state.addParameterListener (*params.frequency, listenerThread, [this]
+        state.addParameterListener (*params->frequency, listenerThread, [this]
                                     { plot.updatePlot(); }),
-        state.addParameterListener (*params.gain, listenerThread, [this]
+        state.addParameterListener (*params->gain, listenerThread, [this]
                                     { plot.updatePlot(); }),
-        state.addParameterListener (*params.oscillatorChoice, listenerThread, [this]
+        state.addParameterListener (*params->oscillatorChoice, listenerThread, [this]
                                     { plot.updatePlot(); }),
     };
 }

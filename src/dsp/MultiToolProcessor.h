@@ -2,6 +2,14 @@
 
 #include "state/PluginState.h"
 
+#include "dsp/EQ/EQProcessor.h"
+#include "dsp/BandSplitter/BandSplitterProcessor.h"
+#include "dsp/Brickwall/BrickwallProcessor.h"
+#include "dsp/PultecEQ/PultecEQProcessor.h"
+#include "dsp/SVF/SVFProcessor.h"
+#include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
+#include "dsp/Waveshaper/WaveshaperProcessor.h"
+
 namespace dsp
 {
 using ToolTypes = types_list::TypesList<

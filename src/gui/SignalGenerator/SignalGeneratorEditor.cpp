@@ -3,7 +3,7 @@
 namespace gui::signal_gen
 {
 SignalGeneratorEditor::SignalGeneratorEditor (State& state)
-    : oscillatorChoiceAttachment (*state.params.signalGenParams.oscillatorChoice,
+    : oscillatorChoiceAttachment (*state.params.signalGenParams->oscillatorChoice,
                                   state,
                                   oscillatorChoiceBox),
       oscController (state)

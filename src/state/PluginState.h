@@ -1,12 +1,38 @@
 #pragma once
 
-#include "dsp/BandSplitter/BandSplitterProcessor.h"
-#include "dsp/Brickwall/BrickwallProcessor.h"
-#include "dsp/EQ/EQProcessor.h"
-#include "dsp/PultecEQ/PultecEQProcessor.h"
-#include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
-#include "dsp/Waveshaper/WaveshaperProcessor.h"
-#include "dsp/SVF/SVFProcessor.h"
+#include <pch.h>
+
+namespace dsp
+{
+namespace eq
+{
+    struct EQToolParams;
+}
+namespace waveshaper
+{
+    struct Params;
+}
+namespace signal_gen
+{
+    struct Params;
+}
+namespace pultec
+{
+    struct Params;
+}
+namespace band_splitter
+{
+    struct Params;
+}
+namespace brickwall
+{
+    struct Params;
+}
+namespace svf
+{
+    struct Params;
+}
+} // namespace dsp
 
 namespace state
 {
@@ -14,17 +40,8 @@ namespace Hints = ParameterVersionHints;
 
 struct PluginParams : chowdsp::ParamHolder
 {
-    PluginParams()
-    {
-        add (toolParam,
-             eqParams,
-             waveshaperParams,
-             signalGenParams,
-             pultecEQParams,
-             bandSplitParams,
-             brickwallParams,
-             svfParams);
-    }
+    PluginParams();
+    ~PluginParams();
 
     static const juce::StringArray toolChoices;
     chowdsp::ChoiceParameter::Ptr toolParam {
@@ -34,13 +51,13 @@ struct PluginParams : chowdsp::ParamHolder
         0
     };
 
-    dsp::eq::EQToolParams eqParams;
-    dsp::waveshaper::Params waveshaperParams;
-    dsp::signal_gen::Params signalGenParams;
-    dsp::pultec::Params pultecEQParams;
-    dsp::band_splitter::Params bandSplitParams;
-    dsp::brickwall::Params brickwallParams;
-    dsp::svf::Params svfParams;
+    std::unique_ptr<dsp::eq::EQToolParams> eqParams;
+    std::unique_ptr<dsp::waveshaper::Params> waveshaperParams;
+    std::unique_ptr<dsp::signal_gen::Params> signalGenParams;
+    std::unique_ptr<dsp::pultec::Params> pultecEQParams;
+    std::unique_ptr<dsp::band_splitter::Params> bandSplitParams;
+    std::unique_ptr<dsp::brickwall::Params> brickwallParams;
+    std::unique_ptr<dsp::svf::Params> svfParams;
 };
 } // namespace state
 

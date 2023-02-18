@@ -24,19 +24,19 @@ namespace detail
     {
         return {
             tool_maker<eq::EQProcessor> ([&params]
-                                         { return eq::EQProcessor { params.eqParams }; }),
+                                         { return eq::EQProcessor { *params.eqParams }; }),
             tool_maker<waveshaper::WaveshaperProcessor> ([&params]
-                                                         { return waveshaper::WaveshaperProcessor { params.waveshaperParams }; }),
+                                                         { return waveshaper::WaveshaperProcessor { *params.waveshaperParams }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
-                                                              { return signal_gen::SignalGeneratorProcessor { params.signalGenParams }; }),
+                                                              { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
             tool_maker<pultec::PultecEQProcessor> ([&params]
-                                                   { return pultec::PultecEQProcessor { params.pultecEQParams }; }),
+                                                   { return pultec::PultecEQProcessor { *params.pultecEQParams }; }),
             tool_maker<band_splitter::BandSplitterProcessor> ([&params]
-                                                              { return band_splitter::BandSplitterProcessor { params.bandSplitParams }; }),
+                                                              { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
             tool_maker<brickwall::BrickwallProcessor> ([&params]
-                                                       { return brickwall::BrickwallProcessor { params.brickwallParams }; }),
+                                                       { return brickwall::BrickwallProcessor { *params.brickwallParams }; }),
             tool_maker<svf::SVFProcessor> ([&params]
-                                  { return svf::SVFProcessor { params.svfParams }; })
+                                           { return svf::SVFProcessor { *params.svfParams }; })
         };
     }
 } // namespace detail

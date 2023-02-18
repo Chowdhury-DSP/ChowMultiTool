@@ -1,11 +1,11 @@
 #include "PluginEditor.h"
 #include "BandSplitter/BandSplitterEditor.h"
+#include "Brickwall/BrickwallEditor.h"
 #include "EQ/EQEditor.h"
 #include "PultecEQ/PultecEditor.h"
+#include "SVF/SVFEditor.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
-#include "Brickwall/BrickwallEditor.h"
-#include "SVF/SVFEditor.h"
 
 namespace gui
 {
@@ -13,7 +13,7 @@ namespace
 {
     constexpr int defaultWidth = 600;
     constexpr int defaultHeight = 400;
-}
+} // namespace
 
 PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
@@ -62,19 +62,19 @@ void PluginEditor::refreshEditor()
             auto& pluginState = plugin.getState();
 
             if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                editorComponent = std::make_unique<eq::EQEditor> (pluginState, pluginState.params.eqParams);
+                editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams);
             else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
-                editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, pluginState.params.waveshaperParams);
+                editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams);
             else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
                 editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState);
             else if constexpr (std::is_same_v<ToolType, dsp::pultec::PultecEQProcessor>)
-                editorComponent = std::make_unique<pultec::PultecEditor> (pluginState, pluginState.params.pultecEQParams);
+                editorComponent = std::make_unique<pultec::PultecEditor> (pluginState, *pluginState.params.pultecEQParams);
             else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
-                editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, pluginState.params.bandSplitParams);
+                editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams);
             else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
-                editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, pluginState.params.brickwallParams);
+                editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams);
             else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
-                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, pluginState.params.svfParams);
+                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams);
         });
 
     addAndMakeVisible (editorComponent.get());
