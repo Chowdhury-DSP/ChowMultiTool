@@ -74,7 +74,7 @@ void PluginEditor::refreshEditor()
             else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
                 editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams);
             else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
-                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams);
+                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, plugin.supportsParameterModulation());
         });
 
     addAndMakeVisible (editorComponent.get());

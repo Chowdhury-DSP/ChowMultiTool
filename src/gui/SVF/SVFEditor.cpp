@@ -2,9 +2,9 @@
 
 namespace gui::svf
 {
-SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams)
+SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)
     : paramsView (pluginState, svfParams),
-      plot (pluginState, svfParams)
+      plot (pluginState, svfParams, allowParamModulation)
 {
     addAndMakeVisible (paramsView);
     addAndMakeVisible (plot);

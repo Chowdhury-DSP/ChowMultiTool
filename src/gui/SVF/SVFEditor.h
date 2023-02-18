@@ -7,7 +7,7 @@ namespace gui::svf
 class SVFEditor : public juce::Component
 {
 public:
-    SVFEditor (State& pluginState, dsp::svf::Params& svfParams);
+    SVFEditor (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation);
 
     void resized() override;
 

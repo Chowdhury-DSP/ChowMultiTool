@@ -114,10 +114,17 @@ public:
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
-    void processBlock (const chowdsp::BufferView<float>& buffer);
+    void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
 
 private:
+    void processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept;
+
     const Params& params;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> cutoffSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> qSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gainDBSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> modeSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> dampingSmooth;
 
     std::tuple<
         chowdsp::SVFLowpass<>,

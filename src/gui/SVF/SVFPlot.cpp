@@ -12,7 +12,7 @@ namespace
     constexpr int maxFrequency = 22'000;
 } // namespace
 
-SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams)
+SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -45,6 +45,14 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams)
                 };
         });
 
+    updatePlot();
+
+    if (allowParamModulation)
+        startTimerHz (29);
+}
+
+void SVFPlot::timerCallback()
+{
     updatePlot();
 }
 

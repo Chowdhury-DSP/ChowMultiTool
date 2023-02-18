@@ -10,6 +10,17 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                                            plainFilters);
     arpFilter.prepare (spec);
     wernerFilter.prepare (spec);
+
+    cutoffSmooth.reset (spec.sampleRate, 0.025);
+    cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
+    qSmooth.reset (spec.sampleRate, 0.025);
+    qSmooth.setCurrentAndTargetValue (*params.qParam);
+    gainDBSmooth.reset (spec.sampleRate, 0.025);
+    gainDBSmooth.setCurrentAndTargetValue (*params.gain);
+    modeSmooth.reset (spec.sampleRate, 0.025);
+    modeSmooth.setCurrentAndTargetValue (*params.mode);
+    dampingSmooth.reset (spec.sampleRate, 0.025);
+    dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
 }
 
 void SVFProcessor::reset()
@@ -19,25 +30,60 @@ void SVFProcessor::reset()
                                            plainFilters);
     arpFilter.reset();
     wernerFilter.reset();
+
+    cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
+    qSmooth.setCurrentAndTargetValue (*params.qParam);
+    gainDBSmooth.setCurrentAndTargetValue (*params.gain);
+    modeSmooth.setCurrentAndTargetValue (*params.mode);
+    dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
 }
 
 template <typename FilterType, typename... TestFilterTypes>
 constexpr bool IsOneOfFilters = std::disjunction<std::is_same<FilterType, TestFilterTypes>...>::value;
 
-void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
+void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer) noexcept
 {
+    cutoffSmooth.setTargetValue (*params.cutoff);
+    qSmooth.setTargetValue (*params.qParam);
+    gainDBSmooth.setTargetValue (*params.gain);
+    modeSmooth.setTargetValue (*params.mode);
+    dampingSmooth.setTargetValue (*params.wernerDamping);
+
+    static constexpr int smallBlockSize = 32;
+
+    auto sampleCount = 0;
+    auto numSamplesRemaining = buffer.getNumSamples();
+    while (numSamplesRemaining > 0)
+    {
+        const auto samplesToProcess = juce::jmin (smallBlockSize, numSamplesRemaining);
+        processSmallBlock (chowdsp::BufferView<float> { buffer, sampleCount, samplesToProcess });
+
+        sampleCount += samplesToProcess;
+        numSamplesRemaining -= samplesToProcess;
+    }
+}
+
+void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept
+{
+    const auto numSamples = buffer.getNumSamples();
+    cutoffSmooth.skip (numSamples);
+    qSmooth.skip (numSamples);
+    gainDBSmooth.skip (numSamples);
+    modeSmooth.skip (numSamples);
+    dampingSmooth.skip (numSamples);
+
     const auto setFilterParams = [this] (auto& filter)
     {
         using FilterType = std::decay_t<decltype (filter)>;
 
-        filter.template setCutoffFrequency<false> (*params.cutoff);
-        filter.template setQValue<false> (*params.qParam);
+        filter.template setCutoffFrequency<false> (cutoffSmooth.getCurrentValue());
+        filter.template setQValue<false> (qSmooth.getCurrentValue());
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFBell<>, chowdsp::SVFLowShelf<>, chowdsp::SVFHighShelf<>>)
-            filter.template setGainDecibels<false> (*params.gain);
+            filter.template setGainDecibels<false> (gainDBSmooth.getCurrentValue());
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFMultiMode<>>)
-            filter.setMode (0.5f + 0.5f * *params.mode); // TODO: maybe smooth this parameter
+            filter.setMode (0.5f + 0.5f * modeSmooth.getCurrentValue());
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::ARPFilter<float>>)
             filter.setLimitMode (*params.arpLimitMode);
@@ -68,14 +114,14 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
             [this, &buffer] (auto subType)
             {
                 constexpr chowdsp::ARPFilterType type = subType;
-                arpFilter.template processBlock<type> (buffer, -(*params.mode));
+                arpFilter.template processBlock<type> (buffer, -modeSmooth.getCurrentValue());
             },
             params.arpType->get());
     }
     else if (params.type->get() == SVFType::Werner)
     {
-        const auto resonance = params.qParam->convertTo0to1 (*params.qParam);
-        wernerFilter.calcCoeffs (*params.cutoff, *params.wernerDamping, resonance);
+        const auto resonance = params.qParam->convertTo0to1 (qSmooth.getCurrentValue());
+        wernerFilter.calcCoeffs (cutoffSmooth.getCurrentValue(), dampingSmooth.getCurrentValue(), resonance);
 
         magic_enum::enum_switch (
             [this, &buffer] (auto subType)
@@ -83,7 +129,7 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
                 constexpr chowdsp::WernerFilterType type = subType;
                 if constexpr (type == chowdsp::WernerFilterType::MultiMode)
                 {
-                    const auto mix = 0.5f + 0.5f * *params.mode;
+                    const auto mix = 0.5f + 0.5f * modeSmooth.getCurrentValue();
                     wernerFilter.template processBlock<type> (buffer, mix);
                 }
                 else

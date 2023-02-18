@@ -54,7 +54,6 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
     }
     else if (params.shapeParam->get() == Shapes::Fold_Fuzz)
     {
-        // @TODO: this get's pretty glitchy when changing the parameters
         chowdsp::copyToSIMDBuffer (doubleBuffer, doubleSIMDBuffer);
         ssWaveshaper.processBlock (doubleSIMDBuffer,
                                    params.kParam->getCurrentValue(),
