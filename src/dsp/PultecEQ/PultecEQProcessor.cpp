@@ -16,17 +16,23 @@ void PultecEQProcessor::reset()
 
 void PultecEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
+    const auto getMagParam = [] (const chowdsp::FloatParameter* param, bool isBoosting)
+    {
+        const auto normValue = param->convertTo0to1 (param->getCurrentValue());
+        return isBoosting ? normValue : 1.0f - normValue;
+    };
+
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        wdf[ch].setParameters (params.trebleBoostParam->getCurrentValue(),
+        wdf[ch].setParameters (getMagParam (params.trebleBoostParam.get(), true),
                                params.trebleBoostQParam->getCurrentValue(),
                                params.trebleBoostFreqParam->getCurrentValue(),
-                               params.trebleCutParam->getCurrentValue(),
+                               getMagParam (params.trebleCutParam.get(), false),
                                params.trebleCutFreqParam->getCurrentValue(),
-                               params.bassBoostParam->getCurrentValue(),
-                               params.bassCutParam->getCurrentValue(),
+                               getMagParam (params.bassBoostParam.get(), true),
+                               getMagParam (params.bassCutParam.get(), false),
                                params.bassFreqParam->getCurrentValue());
 
         auto* x = buffer.getWritePointer (ch);

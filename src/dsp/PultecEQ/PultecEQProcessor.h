@@ -18,18 +18,22 @@ struct Params : chowdsp::ParamHolder
              trebleBoostFreqParam);
     }
 
-    chowdsp::PercentParameter::Ptr bassCutParam { juce::ParameterID { "pultec_bass_cut", ParameterVersionHints::version1_0_0 },
-                                                  "Pultec Bass Cut",
-                                                  0.0f };
-    chowdsp::PercentParameter::Ptr bassBoostParam { juce::ParameterID { "pultec_bass_boost", ParameterVersionHints::version1_0_0 },
-                                                    "Pultec Bass Boost",
-                                                    0.0f };
-    chowdsp::PercentParameter::Ptr trebleCutParam { juce::ParameterID { "pultec_treble_cut", ParameterVersionHints::version1_0_0 },
-                                                    "Pultec Treble Cut",
-                                                    0.0f };
-    chowdsp::PercentParameter::Ptr trebleBoostParam { juce::ParameterID { "pultec_treble_boost", ParameterVersionHints::version1_0_0 },
-                                                      "Pultec Treble Boost",
-                                                      0.0f };
+    chowdsp::GainDBParameter::Ptr bassCutParam { juce::ParameterID { "pultec_bass_cut", ParameterVersionHints::version1_0_0 },
+                                                 "Pultec Bass Cut",
+                                                 juce::NormalisableRange { -20.0f, 0.0f },
+                                                 0.0f };
+    chowdsp::GainDBParameter::Ptr bassBoostParam { juce::ParameterID { "pultec_bass_boost", ParameterVersionHints::version1_0_0 },
+                                                   "Pultec Bass Boost",
+                                                   juce::NormalisableRange { 0.0f, 16.0f },
+                                                   0.0f };
+    chowdsp::GainDBParameter::Ptr trebleCutParam { juce::ParameterID { "pultec_treble_cut", ParameterVersionHints::version1_0_0 },
+                                                   "Pultec Treble Cut",
+                                                   juce::NormalisableRange { -16.0f, 0.0f },
+                                                   0.0f };
+    chowdsp::GainDBParameter::Ptr trebleBoostParam { juce::ParameterID { "pultec_treble_boost", ParameterVersionHints::version1_0_0 },
+                                                     "Pultec Treble Boost",
+                                                     juce::NormalisableRange { 0.0f, 15.0f },
+                                                     0.0f };
     chowdsp::PercentParameter::Ptr trebleBoostQParam { juce::ParameterID { "pultec_treble_boost_q", ParameterVersionHints::version1_0_0 },
                                                        "Pultec Treble Boost Q",
                                                        0.5f };

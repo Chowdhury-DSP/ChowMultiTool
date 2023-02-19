@@ -1,4 +1,5 @@
 #include "PultecPlot.h"
+#include "gui/Shared/DotSlider.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::pultec
@@ -47,8 +48,65 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
                 };
         });
 
+    lowFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassFreqParam,
+                                                               pluginState,
+                                                               *this,
+                                                               gui::SpectrumDotSlider::FrequencyOriented);
+    lowFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    addAndMakeVisible (lowFreqControl.get());
+
+    lowBoostControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassBoostParam,
+                                                                pluginState,
+                                                                *this,
+                                                                gui::SpectrumDotSlider::MagnitudeOriented);
+    lowBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    static_cast<gui::SpectrumDotSlider*> (lowBoostControl.get())->getXCoordinate = // NOLINT
+        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    {
+        return getXCoordinateForFrequency (bassFreqParam.get() * 0.9f);
+    };
+    addAndMakeVisible (lowBoostControl.get());
+
+    lowCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassCutParam,
+                                                              pluginState,
+                                                              *this,
+                                                              gui::SpectrumDotSlider::MagnitudeOriented);
+    lowCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    static_cast<gui::SpectrumDotSlider*> (lowCutControl.get())->getXCoordinate = // NOLINT
+        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    {
+        return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.9f);
+    };
+    addAndMakeVisible (lowCutControl.get());
+
+    highBoostControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleBoostParam,
+                                                              pluginState,
+                                                              *this,
+                                                              gui::SpectrumDotSlider::MagnitudeOriented);
+    highBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+    static_cast<gui::SpectrumDotSlider*> (highBoostControl.get())->getXCoordinate = // NOLINT
+        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    {
+        return getXCoordinateForFrequency (8000.0f);
+    };
+    addAndMakeVisible (highBoostControl.get());
+
+    highCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutParam,
+                                                              pluginState,
+                                                              *this,
+                                                              gui::SpectrumDotSlider::MagnitudeOriented);
+    highCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    static_cast<gui::SpectrumDotSlider*> (highCutControl.get())->getXCoordinate = // NOLINT
+        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    {
+        return getXCoordinateForFrequency (12000.0f);
+    };
+    addAndMakeVisible (highCutControl.get());
+
     updatePlot();
 }
+
+PultecPlot::~PultecPlot() = default;
 
 void PultecPlot::updatePlot()
 {
@@ -68,5 +126,11 @@ void PultecPlot::paint (juce::Graphics& g)
 void PultecPlot::resized()
 {
     updatePlot();
+
+    lowFreqControl->setBounds (getLocalBounds());
+    lowBoostControl->setBounds (getLocalBounds());
+    lowCutControl->setBounds (getLocalBounds());
+    highBoostControl->setBounds (getLocalBounds());
+    highCutControl->setBounds (getLocalBounds());
 }
 } // namespace gui::pultec

@@ -37,6 +37,8 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/SVF/SVFEditor.cpp
     gui/SVF/SVFPlot.cpp
+
+    gui/Shared/DotSlider.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)
