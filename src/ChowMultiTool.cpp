@@ -1,5 +1,6 @@
 #include "ChowMultiTool.h"
 #include "gui/PluginEditor.h"
+#include "state/PresetManager.h"
 
 namespace
 {
@@ -14,6 +15,8 @@ ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, creat
 {
     juce::Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
     pluginSettings->initialise (settingsFilePath);
+
+    presetManager = std::make_unique<state::presets::PresetManager> (*this);
 }
 
 juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()

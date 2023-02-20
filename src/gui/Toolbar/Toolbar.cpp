@@ -1,16 +1,22 @@
 #include "Toolbar.h"
+#include "ChowMultiTool.h"
+#include "state/PresetManager.h"
 
 namespace gui
 {
-Toolbar::Toolbar (State& pluginState)
-    : state (pluginState),
+Toolbar::Toolbar (ChowMultiTool& plugin)
+    : state (plugin.getState()),
       toolChoiceAttachment (state.params.toolParam,
                             state,
-                            toolChoiceBox)
+                            toolChoiceBox),
+      presetsFileInterface (plugin.getPresetManager(),
+                            static_cast<state::presets::PresetManager&> (plugin.getPresetManager()).getPresetSettings()), //NOLINT
+      presetsComp (plugin.getPresetManager(), &presetsFileInterface)
 {
     setupUndoRedoButtons();
 
     addAndMakeVisible (toolChoiceBox);
+    addAndMakeVisible (presetsComp);
 }
 
 Toolbar::~Toolbar()
@@ -68,7 +74,9 @@ void Toolbar::resized()
     redoButton.setBounds (bounds.removeFromLeft (40).reduced (5));
 
     bounds.removeFromLeft (25);
-
     toolChoiceBox.setBounds (bounds.removeFromLeft (100));
+
+    bounds.removeFromLeft (25);
+    presetsComp.setBounds (bounds.removeFromLeft (180));
 }
 } // namespace gui

@@ -2,13 +2,15 @@
 
 #include "state/PluginState.h"
 
+class ChowMultiTool;
+
 namespace gui
 {
 class Toolbar : public juce::Component,
                 private juce::ChangeListener
 {
 public:
-    explicit Toolbar (State& pluginState);
+    explicit Toolbar (ChowMultiTool& plugin);
     ~Toolbar() override;
 
     void paint (juce::Graphics& g) override;
@@ -26,6 +28,9 @@ private:
 
     juce::ComboBox toolChoiceBox;
     chowdsp::ComboBoxAttachment toolChoiceAttachment;
+
+    chowdsp::presets::frontend::FileInterface presetsFileInterface;
+    chowdsp::presets::PresetsComponent presetsComp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Toolbar)
 };

@@ -6,14 +6,14 @@ namespace dsp::waveshaper
 {
 enum class Shapes
 {
-    Hard_Clip,
-    Tanh_Clip,
-    Cubic_Clip,
-    Nonic_Clip,
-    Full_Wave_Rectify,
-    West_Coast,
-    Wave_Multiply,
-    Fold_Fuzz,
+    Hard_Clip = 1,
+    Tanh_Clip = 2,
+    Cubic_Clip = 4,
+    Nonic_Clip = 8,
+    Full_Wave_Rectify = 16,
+    West_Coast = 32,
+    Wave_Multiply = 64,
+    Fold_Fuzz = 128,
 };
 
 struct Params : chowdsp::ParamHolder

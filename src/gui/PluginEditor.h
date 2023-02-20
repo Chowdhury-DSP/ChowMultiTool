@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ChowMultiTool.h"
 #include "Toolbar/Toolbar.h"
+
+class ChowMultiTool;
 
 namespace gui
 {

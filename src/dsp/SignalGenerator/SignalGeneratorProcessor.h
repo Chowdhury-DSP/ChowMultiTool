@@ -7,10 +7,10 @@ namespace dsp::signal_gen
 {
 enum class Oscillator
 {
-    Sine,
-    Saw,
-    Square,
-    Triangle,
+    Sine = 1,
+    Saw = 2,
+    Square = 4,
+    Triangle = 8,
 };
 
 struct Params : chowdsp::ParamHolder

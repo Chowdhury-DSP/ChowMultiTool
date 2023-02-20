@@ -6,22 +6,22 @@ namespace dsp::svf
 {
 enum class SVFType
 {
-    Plain,
-    ARP,
-    Werner,
+    Plain = 1,
+    ARP = 2,
+    Werner = 4,
 };
 
 enum class PlainType
 {
-    Lowpass,
-    Highpass,
-    Bandpass,
-    Allpass,
-    Notch,
-    Bell,
-    LowShelf,
-    HighShelf,
-    Multi,
+    Lowpass = 1,
+    Highpass = 2,
+    Bandpass = 4,
+    Allpass = 8,
+    Notch = 16,
+    Bell = 32,
+    LowShelf = 64,
+    HighShelf = 128,
+    Multi = 256,
 };
 
 struct Params : public chowdsp::ParamHolder

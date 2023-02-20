@@ -6,11 +6,11 @@ namespace dsp::band_splitter
 {
 enum class Slope
 {
-    m6_dBpOct,
-    m12_dBpOct,
-    m24_dBpOct,
-    m48_dBpOct,
-    m72_dBpOct,
+    m6_dBpOct = 1,
+    m12_dBpOct = 2,
+    m24_dBpOct = 4,
+    m48_dBpOct = 8,
+    m72_dBpOct = 16,
 };
 
 struct Params : chowdsp::ParamHolder

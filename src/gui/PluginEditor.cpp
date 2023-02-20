@@ -1,6 +1,7 @@
 #include "PluginEditor.h"
 #include "BandSplitter/BandSplitterEditor.h"
 #include "Brickwall/BrickwallEditor.h"
+#include "ChowMultiTool.h"
 #include "EQ/EQEditor.h"
 #include "PultecEQ/PultecEditor.h"
 #include "SVF/SVFEditor.h"
@@ -18,7 +19,7 @@ namespace
 PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
       plugin (p),
-      toolbar (plugin.getState())
+      toolbar (plugin)
 {
     addAndMakeVisible (toolbar);
 

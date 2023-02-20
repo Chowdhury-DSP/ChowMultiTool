@@ -72,6 +72,7 @@ target_link_libraries(ChowMultiTool
     PRIVATE
         juce_plugin_modules
         ChowMultiTool::gui-resources
+        ChowMultiTool::presets-resources
 )
 
 # we need these flags for notarization on MacOS

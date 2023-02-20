@@ -19,6 +19,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_plugin_base
         chowdsp::chowdsp_plugin_state
         chowdsp::chowdsp_plugin_utils
+        chowdsp::chowdsp_presets_v2
         chowdsp::chowdsp_eq
         chowdsp::chowdsp_sources
         chowdsp::chowdsp_waveshapers

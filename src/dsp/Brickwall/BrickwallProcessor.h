@@ -6,27 +6,27 @@ namespace dsp::brickwall
 {
 enum class FilterMode
 {
-    LPF,
-    HPF,
+    LPF = 1,
+    HPF = 2,
 };
 
 enum class Order
 {
-    m2nd_Order,
-    m4th_Order,
-    m6th_Order,
-    m8th_Order,
-    m10th_Order,
-    m12th_Order,
-    m14th_Order,
-    m16th_Order,
+    m2nd_Order = 1,
+    m4th_Order = 2,
+    m6th_Order = 4,
+    m8th_Order = 8,
+    m10th_Order = 16,
+    m12th_Order = 32,
+    m14th_Order = 64,
+    m16th_Order = 128,
 };
 
 enum class FilterType
 {
-    Butterworth,
-    ChebyshevII,
-    Elliptic,
+    Butterworth = 1,
+    ChebyshevII = 2,
+    Elliptic = 4,
 };
 
 struct Params : chowdsp::ParamHolder

@@ -16,6 +16,7 @@
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
+#include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_sources/chowdsp_sources.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
@@ -28,6 +29,7 @@
 // Resources
 #include <cmrc/cmrc.hpp>
 CMRC_DECLARE (gui);
+CMRC_DECLARE (presets);
 
 // Any other widely used headers that don't change...
 #include "state/ParameterVersionHints.h"
