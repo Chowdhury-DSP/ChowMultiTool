@@ -21,7 +21,7 @@ private:
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
 
-    dsp::MultiToolProcessor processor;
+    dsp::MultiToolProcessor processor { *this, state };
 
     juce::UndoManager undoManager { 500000 };
 

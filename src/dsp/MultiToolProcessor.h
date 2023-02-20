@@ -24,7 +24,7 @@ using ToolTypes = types_list::TypesList<
 class MultiToolProcessor
 {
 public:
-    MultiToolProcessor (juce::AudioProcessor& plugin, state::PluginParams& pluginParams);
+    MultiToolProcessor (juce::AudioProcessor& plugin, State& pluginState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (juce::AudioBuffer<float>& buffer);

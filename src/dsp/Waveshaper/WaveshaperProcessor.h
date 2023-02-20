@@ -16,6 +16,36 @@ enum class Shapes
     Fold_Fuzz = 128,
 };
 
+enum class OversamplingRatio
+{
+    OneX = 1,
+    TwoX = 2,
+    FourX = 4,
+    EightX = 8,
+};
+}
+
+template <>
+constexpr magic_enum::customize::customize_t
+    magic_enum::customize::enum_name<dsp::waveshaper::OversamplingRatio> (dsp::waveshaper::OversamplingRatio value) noexcept
+{
+    using dsp::waveshaper::OversamplingRatio;
+    switch (value)
+    {
+        case OversamplingRatio::OneX:
+            return "1x";
+        case OversamplingRatio::TwoX:
+            return "2x";
+        case OversamplingRatio::FourX:
+            return "4x";
+        case OversamplingRatio::EightX:
+            return "8x";
+    }
+    return default_tag;
+}
+
+namespace dsp::waveshaper
+{
 struct Params : chowdsp::ParamHolder
 {
     Params()
@@ -48,28 +78,35 @@ struct Params : chowdsp::ParamHolder
         0.5f
     };
 
-    chowdsp::ChoiceParameter::Ptr oversampleParam {
+    chowdsp::EnumChoiceParameter<OversamplingRatio>::Ptr oversampleParam {
         juce::ParameterID { "waveshaper_oversample", ParameterVersionHints::version1_0_0 },
         "Waveshaper Oversampling",
-        juce::StringArray { "1x", "2x", "3x", "4x" },
-        1
+        OversamplingRatio::TwoX
     };
 };
 
 class WaveshaperProcessor
 {
 public:
-    explicit WaveshaperProcessor (Params& wsParams) : params (wsParams) {}
+    WaveshaperProcessor (chowdsp::PluginState& state, Params& wsParams);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
 private:
+    void oversamplingRateChanged();
+
     const Params& params;
+    chowdsp::ScopedCallback osChangeCallback;
+
+    juce::dsp::ProcessSpec processSpec {};
+    juce::SpinLock processingMutex;
 
     chowdsp::Gain<float> gain;
 
-    // TODO: oversampling
+    using AAFilter = chowdsp::EllipticFilter<8>;
+    chowdsp::Upsampler<float, AAFilter> upsampler;
+    chowdsp::Downsampler<float, AAFilter> downsampler;
 
     chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<xsimd::batch<double>> doubleSIMDBuffer;

@@ -20,13 +20,14 @@ namespace detail
         return { std::forward<F> (f) };
     }
 
-    ToolTypes::Types generate_tools (state::PluginParams& params)
+    ToolTypes::Types generate_tools (State& pluginState)
     {
+        const auto& params = pluginState.params;
         return {
             tool_maker<eq::EQProcessor> ([&params]
                                          { return eq::EQProcessor { *params.eqParams }; }),
-            tool_maker<waveshaper::WaveshaperProcessor> ([&params]
-                                                         { return waveshaper::WaveshaperProcessor { *params.waveshaperParams }; }),
+            tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState, &params]
+                                                         { return waveshaper::WaveshaperProcessor { pluginState, *params.waveshaperParams }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
             tool_maker<pultec::PultecEQProcessor> ([&params]
@@ -41,10 +42,10 @@ namespace detail
     }
 } // namespace detail
 
-MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, state::PluginParams& pluginParams)
+MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, State& pluginState)
     : plugin (parentPlugin),
-      params (pluginParams),
-      tools (detail::generate_tools (params))
+      params (pluginState.params),
+      tools (detail::generate_tools (pluginState))
 {
 }
 

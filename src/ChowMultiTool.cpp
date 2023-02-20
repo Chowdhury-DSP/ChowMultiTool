@@ -10,8 +10,7 @@ const juce::String logFileNameRoot = "ChowMultiTool_Log_";
 } // namespace
 
 ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, createBusLayout()),
-                                 logger (logFileSubDir, logFileNameRoot),
-                                 processor (*this, state.params)
+                                 logger (logFileSubDir, logFileNameRoot)
 {
     juce::Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
     pluginSettings->initialise (settingsFilePath);
