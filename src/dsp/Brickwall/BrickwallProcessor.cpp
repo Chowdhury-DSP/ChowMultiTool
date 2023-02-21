@@ -24,8 +24,8 @@ void BrickwallProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 
 int BrickwallProcessor::getFilterTypeIndex() const
 {
-    return static_cast<int> ((size_t) params.filterType->get() * magic_enum::enum_count<FilterMode>() * magic_enum::enum_count<Order>()
-                             + (size_t) params.order->get() * magic_enum::enum_count<FilterMode>()
-                             + (size_t) params.filterMode->get());
+    return static_cast<int> ((size_t) params.filterType->getIndex() * magic_enum::enum_count<FilterMode>() * magic_enum::enum_count<Order>()
+                             + (size_t) params.order->getIndex() * magic_enum::enum_count<FilterMode>()
+                             + (size_t) params.filterMode->getIndex());
 }
 } // namespace dsp::brickwall

@@ -105,7 +105,7 @@ void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) 
 
     if (params.type->get() == SVFType::Plain)
     {
-        processFilterType (plainFilters, params.plainType->get());
+        processFilterType (plainFilters, params.plainType->getIndex());
     }
     else if (params.type->get() == SVFType::ARP)
     {

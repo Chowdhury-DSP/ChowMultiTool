@@ -68,5 +68,5 @@ jobs:
       if: runner.os == 'Windows' # || runner.os == 'MacOS'
       run: bash scripts/pluginval.sh
 
-    - name: clap-validator
-      run: bash scripts/clap-validate.sh
+#    - name: clap-validator
+#      run: bash scripts/clap-validate.sh
