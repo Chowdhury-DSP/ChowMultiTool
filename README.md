@@ -30,6 +30,11 @@ Unfinished:
 
 To build from scratch, you must have CMake installed.
 
+Currently, the plugin has only been tested building with Clang (across
+Mac, Windows, and Linux). It is likely that the plugin would build fine
+with other major compilers, but for the moment, we're planning to ship
+Clang builds on all platforms.
+
 ```bash
 # Clone the repository
 $ git clone https://github.com/Chowdhury-DSP/ChowMultiTool.git
