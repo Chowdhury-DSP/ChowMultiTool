@@ -1,7 +1,7 @@
 #pragma once
 
-#include "state/PluginState.h"
 #include "OscillatorController.h"
+#include "state/PluginState.h"
 
 namespace gui::signal_gen
 {

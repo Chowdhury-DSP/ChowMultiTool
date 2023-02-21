@@ -66,8 +66,8 @@ namespace detail
 
 template <int startFreqHz, int endFreqHz>
 void drawFrequencyLines (const chowdsp::SpectrumPlotBase& plotBase,
-                                juce::Graphics& g,
-                                const std::initializer_list<float>& majorLines = { 100.0f, 1'000.0f, 10'000.0f })
+                         juce::Graphics& g,
+                         const std::initializer_list<float>& majorLines = { 100.0f, 1'000.0f, 10'000.0f })
 {
     g.setColour (juce::Colours::white.withAlpha (0.25f));
     plotBase.drawFrequencyLines (g, detail::getFreqLines<startFreqHz, endFreqHz>(), 1.0f);

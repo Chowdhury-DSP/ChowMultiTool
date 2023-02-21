@@ -23,4 +23,4 @@ void SignalGeneratorEditor::resized()
     oscController.setBounds (bounds.removeFromTop (proportionOfHeight (0.85f)).reduced (10));
     oscillatorChoiceBox.setBounds (bounds.reduced (20, 0));
 }
-}
+} // namespace gui::signal_gen

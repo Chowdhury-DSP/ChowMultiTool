@@ -12,13 +12,13 @@
 
 #include <chowdsp_eq/chowdsp_eq.h>
 #include <chowdsp_gui/chowdsp_gui.h>
-#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>
 #include <chowdsp_presets_v2/chowdsp_presets_v2.h>
 #include <chowdsp_simd/chowdsp_simd.h>
 #include <chowdsp_sources/chowdsp_sources.h>
+#include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
 #include <melatonin_inspector/melatonin_inspector.h>

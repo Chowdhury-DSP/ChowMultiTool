@@ -80,9 +80,9 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     addAndMakeVisible (lowCutControl.get());
 
     highBoostControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleBoostParam,
-                                                              pluginState,
-                                                              *this,
-                                                              gui::SpectrumDotSlider::MagnitudeOriented);
+                                                                 pluginState,
+                                                                 *this,
+                                                                 gui::SpectrumDotSlider::MagnitudeOriented);
     highBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
     static_cast<gui::SpectrumDotSlider*> (highBoostControl.get())->getXCoordinate = // NOLINT
         [this, &bassFreqParam = *pultecParams.bassFreqParam]
@@ -92,9 +92,9 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     addAndMakeVisible (highBoostControl.get());
 
     highCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutParam,
-                                                              pluginState,
-                                                              *this,
-                                                              gui::SpectrumDotSlider::MagnitudeOriented);
+                                                               pluginState,
+                                                               *this,
+                                                               gui::SpectrumDotSlider::MagnitudeOriented);
     highCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
     static_cast<gui::SpectrumDotSlider*> (highCutControl.get())->getXCoordinate = // NOLINT
         [this, &bassFreqParam = *pultecParams.bassFreqParam]

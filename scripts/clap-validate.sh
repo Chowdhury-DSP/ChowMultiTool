@@ -2,22 +2,20 @@
 
 set -e
 
-version="0.2.0"
+version="0.3.0"
 
 # install functions
 install_clapval_linux()
 {
-    curl -L "https://github.com/free-audio/clap-validator/releases/download/${version}/clap-validator-${version}-ubuntu-18.04.zip" -o clap-validator.zip
-    unzip clap-validator > /dev/null
-    tar -xf clap-validator-${version}-ubuntu-18.04.tar.gz
+    curl -L "https://github.com/free-audio/clap-validator/releases/download/${version}/clap-validator-${version}-ubuntu-18.04.tar,gz" -o clap-validator.tar.gz
+    tar -xf clap-validator.tar.gz
     echo "./clap-validator"
 }
 
 install_clapval_mac()
 {
-    curl -L "https://github.com/free-audio/clap-validator/releases/download/${version}/clap-validator-${version}-macos-universal.zip" -o clap-validator.zip
-    unzip clap-validator > /dev/null
-    tar -xf clap-validator-${version}-macos-universal.tar.gz
+    curl -L "https://github.com/free-audio/clap-validator/releases/download/${version}/clap-validator-${version}-macos-universal.tar.gz" -o clap-validator.tar.gz
+    tar -xf clap-validator.tar.gz
     echo "./binaries/clap-validator"
 }
 
@@ -46,9 +44,9 @@ $clapval --version
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    $clapval --verbosity error validate ${plugin}
+    $clapval --verbosity error validate --hide-output --in-process ${plugin}
 done
 
 # clean up
-rm -Rf clap-validator*
-rm -Rf binaries
+#rm -Rf clap-validator*
+#rm -Rf binaries

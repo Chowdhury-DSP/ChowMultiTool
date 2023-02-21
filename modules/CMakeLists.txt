@@ -1,7 +1,6 @@
 add_subdirectory(JUCE)
 add_subdirectory(chowdsp_utils)
 add_subdirectory(chowdsp_wdf)
-add_subdirectory(melatonin_inspector)
 
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
@@ -9,6 +8,11 @@ subproject_version(chowdsp_utils chowdsp_version)
 message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
 subproject_version(chowdsp_wdf chowdsp_wdf_version)
 message(STATUS "VERSION for chowdsp_wdf: ${chowdsp_wdf_version}")
+
+juce_add_modules(
+    ALIAS_NAMESPACE melatonin
+    melatonin_inspector
+)
 
 include(cmake/WarningFlags.cmake)
 add_library(juce_plugin_modules STATIC)
@@ -26,7 +30,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_wdf
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_visualizers
-        Melatonin::Inspector
+        melatonin::melatonin_inspector
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

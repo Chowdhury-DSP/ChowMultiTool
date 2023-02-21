@@ -45,7 +45,7 @@ void SignalGeneratorProcessor::processBlock (const chowdsp::BufferView<float>& b
 
     freqParamSmoothed.process (juce::jmin (params.frequency->getCurrentValue(), nyquistHz), numSamples);
     chowdsp::TupleHelpers::visit_at (oscillators,
-                                     static_cast<size_t> (params.oscillatorChoice->get()),
+                                     static_cast<size_t> (params.oscillatorChoice->getIndex()),
                                      [this, &monoBuffer, numSamples] (auto& oscillator)
                                      {
                                          if (freqParamSmoothed.isSmoothing())

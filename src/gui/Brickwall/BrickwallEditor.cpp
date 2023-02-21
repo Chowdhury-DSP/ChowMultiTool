@@ -16,4 +16,4 @@ void BrickwallEditor::resized()
     plot.setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)).reduced (5));
     paramsView.setBounds (bounds);
 }
-}
+} // namespace gui::brickwall
