@@ -23,7 +23,7 @@ enum class OversamplingRatio
     FourX = 4,
     EightX = 8,
 };
-}
+} // namespace dsp::waveshaper
 
 template <>
 constexpr magic_enum::customize::customize_t

@@ -8,7 +8,7 @@ namespace
     constexpr int numBands = 2;
     constexpr int minFrequency = 18;
     constexpr int maxFrequency = 22'000;
-}
+} // namespace
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
                                                   chowdsp::EQ::EqualizerPlot& plot,

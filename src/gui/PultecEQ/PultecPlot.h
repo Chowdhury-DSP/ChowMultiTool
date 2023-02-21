@@ -30,20 +30,20 @@ private:
     std::unique_ptr<juce::Slider> highBoostControl;
     std::unique_ptr<juce::Slider> highCutControl;
 
-//    struct Dot : juce::Component
-//    {
-//        void paint (juce::Graphics& g) override
-//        {
-//            g.setColour (juce::Colours::red);
-//            g.fillEllipse (getLocalBounds().toFloat());
-//        }
-//
-//        std::function<void()> reposition;
-//    };
-//
-//    Dot lowFreqDot;
-//    Dot highBoostFreqDot;
-//    Dot highCutFreqDot;
+    //    struct Dot : juce::Component
+    //    {
+    //        void paint (juce::Graphics& g) override
+    //        {
+    //            g.setColour (juce::Colours::red);
+    //            g.fillEllipse (getLocalBounds().toFloat());
+    //        }
+    //
+    //        std::function<void()> reposition;
+    //    };
+    //
+    //    Dot lowFreqDot;
+    //    Dot highBoostFreqDot;
+    //    Dot highCutFreqDot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PultecPlot)
 };

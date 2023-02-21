@@ -135,8 +135,8 @@ private:
         chowdsp::SVFBell<>,
         chowdsp::SVFHighShelf<>,
         chowdsp::SVFLowShelf<>,
-        chowdsp::SVFMultiMode<>
-        > plainFilters;
+        chowdsp::SVFMultiMode<>>
+        plainFilters;
 
     chowdsp::ARPFilter<float> arpFilter;
     chowdsp::WernerFilter wernerFilter;

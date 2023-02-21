@@ -18,10 +18,7 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowPar
         .maxFrequencyHz = (float) maxFrequency,
         .minMagnitudeDB = -30.0f,
         .maxMagnitudeDB = 30.0f }),
-      filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
-                                .sampleRate = sampleRate,
-                                .fftOrder = 15
-                            }),
+      filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
       processor (svfParams)
 {
     processor.prepare ({ sampleRate, (uint32_t) blockSize, 1 });

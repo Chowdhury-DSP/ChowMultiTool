@@ -11,7 +11,7 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
 {
     getPresetTree().treeInserter = &PresetTreeInserters::vendorCategoryInserter;
 
-    const auto fs = cmrc::presets::get_filesystem ();
+    const auto fs = cmrc::presets::get_filesystem();
     const auto createPresetFromEmbeddedFile = [&fs] (const std::string& path) -> Preset
     {
         const auto presetFile = fs.open (path);
