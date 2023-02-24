@@ -16,9 +16,9 @@ OscillatorController::OscillatorController (State& state)
     addAndMakeVisible (gainSlider.get());
 
     auto freqSlider = std::make_unique<SpectrumDotSlider> (*state.params.signalGenParams->frequency,
-                                                      state,
-                                                      plot,
-                                                      SpectrumDotSlider::Orientation::FrequencyOriented);
+                                                           state,
+                                                           plot,
+                                                           SpectrumDotSlider::Orientation::FrequencyOriented);
     freqSlider->getYCoordinate = [this, &state]
     {
         return plot.getYCoordinateForDecibels (state.params.signalGenParams->gain->get());
@@ -64,9 +64,9 @@ void OscillatorController::resized()
 {
     plot.setBounds (getLocalBounds());
 
-//    auto bounds = getLocalBounds();
-//    gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));
-//    freqSlider->setBounds (bounds);
+    //    auto bounds = getLocalBounds();
+    //    gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));
+    //    freqSlider->setBounds (bounds);
 
     sliders.setBounds (getLocalBounds());
 }
