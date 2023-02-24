@@ -76,8 +76,16 @@ juce::Rectangle<float> SpectrumDotSlider::getThumbBounds() const noexcept
     {
         if (getSliderStyle() == LinearHorizontal)
         {
-            return juce::Point { plotBase.getXCoordinateForFrequency (param.get()),
-                                 plotBase.getYCoordinateForDecibels (0.0f) };
+            if (getYCoordinate == nullptr)
+            {
+                return juce::Point { plotBase.getXCoordinateForFrequency (param.get()),
+                                     plotBase.getYCoordinateForDecibels (0.0f) };
+            }
+            else
+            {
+                return juce::Point { plotBase.getXCoordinateForFrequency (param.get()),
+                                     getYCoordinate() };
+            }
         }
         else if (getSliderStyle() == LinearVertical)
         {
@@ -93,5 +101,50 @@ juce::Rectangle<float> SpectrumDotSlider::getThumbBounds() const noexcept
     return juce::Rectangle { dim, dim }
         .toFloat()
         .withCentre (centre);
+}
+
+//==================================================
+bool DotSliderGroup::hitTest (int x, int y)
+{
+    bool result = false;
+    for (auto& slider : sliders)
+        result |= slider->hitTest (x, y);
+    return result;
+}
+
+void DotSliderGroup::resized()
+{
+    for (auto& slider : sliders)
+        slider->setBounds (getBoundsInParent());
+}
+
+void DotSliderGroup::addSlider (std::unique_ptr<DotSlider>&& slider)
+{
+    slider->setInterceptsMouseClicks (false, false);
+    sliders.emplace_back (std::move (slider));
+}
+
+void DotSliderGroup::mouseDown (const juce::MouseEvent& e)
+{
+    for (auto& slider : sliders)
+        slider->mouseDown (e);
+}
+
+void DotSliderGroup::mouseDrag (const juce::MouseEvent& e)
+{
+    for (auto& slider : sliders)
+        slider->mouseDrag (e);
+}
+
+void DotSliderGroup::mouseUp (const juce::MouseEvent& e)
+{
+    for (auto& slider : sliders)
+        slider->mouseUp (e);
+}
+
+void DotSliderGroup::mouseDoubleClick (const juce::MouseEvent& e)
+{
+    for (auto& slider : sliders)
+        slider->mouseDoubleClick (e);
 }
 } // namespace gui

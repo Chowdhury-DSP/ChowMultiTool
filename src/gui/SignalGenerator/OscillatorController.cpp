@@ -2,39 +2,32 @@
 
 namespace gui::signal_gen
 {
-struct DraggingSlider : public juce::Slider
-{
-    DraggingSlider (chowdsp::FloatParameter& param,
-                    State& state,
-                    juce::MouseCursor&& mouseCursor)
-        : attachment (param, state, *this),
-          cursor (std::move (mouseCursor))
-    {
-        setTextBoxStyle (NoTextBox, false, 0, 0);
-    }
-
-    void paint (juce::Graphics&) override {}
-
-    void mouseMove (const juce::MouseEvent& e) override
-    {
-        setMouseCursor (cursor);
-        juce::Slider::mouseMove (e);
-    }
-
-    chowdsp::SliderAttachment attachment;
-    juce::MouseCursor cursor;
-};
-
 OscillatorController::OscillatorController (State& state)
     : plotSignalGen (*state.params.signalGenParams)
 {
-    gainSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams->gain, state, juce::MouseCursor::StandardCursorType::UpDownResizeCursor);
-    gainSlider->setSliderStyle (juce::Slider::LinearVertical);
+    auto gainSlider = std::make_unique<SpectrumDotSlider> (*state.params.signalGenParams->gain,
+                                                           state,
+                                                           plot,
+                                                           SpectrumDotSlider::Orientation::MagnitudeOriented);
+    gainSlider->getXCoordinate = [this, &state]
+    {
+        return plot.getXCoordinateForFrequency (state.params.signalGenParams->frequency->get());
+    };
     addAndMakeVisible (gainSlider.get());
 
-    freqSlider = std::make_unique<DraggingSlider> (*state.params.signalGenParams->frequency, state, juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
-    freqSlider->setSliderStyle (juce::Slider::LinearHorizontal);
+    auto freqSlider = std::make_unique<SpectrumDotSlider> (*state.params.signalGenParams->frequency,
+                                                           state,
+                                                           plot,
+                                                           SpectrumDotSlider::Orientation::FrequencyOriented);
+    freqSlider->getYCoordinate = [this, &state]
+    {
+        return plot.getYCoordinateForDecibels (state.params.signalGenParams->gain->get());
+    };
     addAndMakeVisible (freqSlider.get());
+
+    sliders.addSlider (std::move (gainSlider));
+    sliders.addSlider (std::move (freqSlider));
+    addAndMakeVisible (sliders);
 
     plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });
 
@@ -71,8 +64,10 @@ void OscillatorController::resized()
 {
     plot.setBounds (getLocalBounds());
 
-    auto bounds = getLocalBounds();
-    gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));
-    freqSlider->setBounds (bounds);
+    //    auto bounds = getLocalBounds();
+    //    gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));
+    //    freqSlider->setBounds (bounds);
+
+    sliders.setBounds (getLocalBounds());
 }
 } // namespace gui::signal_gen
