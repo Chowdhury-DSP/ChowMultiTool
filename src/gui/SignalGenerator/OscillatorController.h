@@ -3,6 +3,7 @@
 #include "OscillatorPlot.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "state/PluginState.h"
+#include "gui/Shared/DotSlider.h"
 
 namespace gui::signal_gen
 {
@@ -19,8 +20,7 @@ private:
 
     dsp::signal_gen::SignalGeneratorProcessor plotSignalGen;
 
-    std::unique_ptr<juce::Slider> freqSlider;
-    std::unique_ptr<juce::Slider> gainSlider;
+    DotSliderGroup sliders;
 
     chowdsp::ScopedCallbackList parameterChangeListeners;
 

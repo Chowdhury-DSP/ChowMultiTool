@@ -1,4 +1,5 @@
 #include "OscillatorPlot.h"
+#include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::signal_gen
 {
@@ -29,12 +30,15 @@ constexpr std::array<float, N> getFFTFreqs (float fs)
     //    }
 }
 
+constexpr int minFrequency = 10;
+constexpr int maxFrequency = 24000;
+
 OscillatorPlot::OscillatorPlot()
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
-        .minFrequencyHz = 10.0f,
-        .maxFrequencyHz = 24000.0f,
+        .minFrequencyHz = (float) minFrequency,
+        .maxFrequencyHz = (float) maxFrequency,
         .minMagnitudeDB = -66.0f,
-        .maxMagnitudeDB = 30.0f,
+        .maxMagnitudeDB = 6.0f,
     })
 {
     plotBuffer.setMaxSize (1, fft.getSize() * 2); // over-allocate by 2x so that FFT has extra space
@@ -43,8 +47,8 @@ OscillatorPlot::OscillatorPlot()
 void OscillatorPlot::paint (juce::Graphics& g)
 {
     g.setColour (juce::Colours::white);
-    drawFrequencyLines (g, { 100.0f, 1000.0f, 10'000.0f });
-    drawMagnitudeLines (g, { -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
+    gui::drawMagnitudeLines (*this, g, { -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f });
 
     juce::Path plotPath {};
     static constexpr auto fftFreqs = getFFTFreqs<(size_t) fftSize / 2 + 1> (analysisFs);
@@ -105,7 +109,7 @@ void OscillatorPlot::updatePlot()
         plotBuffer,
         [] (const auto& x)
         {
-            return chowdsp::SIMDUtils::gainToDecibels (x * x) - 80.0f;
+            return chowdsp::SIMDUtils::gainToDecibels (x * x) - 96.0f;
         });
     freqSmooth (plotBuffer.getReadPointer (0), fftBinsSmoothDB.data(), (int) fftBinsSmoothDB.size()); //, 1.0f / 4.0f);
 
