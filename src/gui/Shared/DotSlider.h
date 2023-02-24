@@ -42,10 +42,29 @@ public:
     double valueToProportionOfLength (double value) override;
 
     std::function<float()> getXCoordinate = nullptr;
+    std::function<float()> getYCoordinate = nullptr;
 
 private:
     const chowdsp::SpectrumPlotBase& plotBase;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumDotSlider)
+};
+
+struct DotSliderGroup : public juce::Component
+{
+    DotSliderGroup() = default;
+
+    bool hitTest (int x, int y) override;
+
+    void resized() override;
+
+    void addSlider (std::unique_ptr<DotSlider>&& slider);
+
+    void mouseDown (const juce::MouseEvent&) override;
+    void mouseDrag (const juce::MouseEvent&) override;
+    void mouseUp (const juce::MouseEvent&) override;
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+
+    std::vector<std::unique_ptr<DotSlider>> sliders;
 };
 } // namespace gui
