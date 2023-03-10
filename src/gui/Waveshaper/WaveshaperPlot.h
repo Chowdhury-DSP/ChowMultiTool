@@ -14,7 +14,6 @@ public:
     void resized() override;
 
 private:
-    dsp::waveshaper::WaveshaperProcessor processor;
     chowdsp::WaveshaperPlot plotter;
 
     chowdsp::ScopedCallbackList callbacks;
