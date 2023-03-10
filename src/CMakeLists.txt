@@ -21,7 +21,9 @@ target_sources(ChowMultiTool PRIVATE
     gui/PluginEditor.cpp
     gui/Toolbar/Toolbar.cpp
     gui/EQ/EQEditor.cpp
+
     gui/Waveshaper/WaveshaperEditor.cpp
+    gui/Waveshaper/WaveshaperPlot.cpp
 
     gui/Brickwall/BrickwallEditor.cpp
     gui/Brickwall/BrickwallPlot.cpp

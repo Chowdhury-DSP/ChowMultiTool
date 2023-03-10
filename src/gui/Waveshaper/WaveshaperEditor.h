@@ -1,7 +1,6 @@
 #pragma once
 
-#include "dsp/Waveshaper/WaveshaperProcessor.h"
-#include "state/PluginState.h"
+#include "WaveshaperPlot.h"
 
 namespace gui::waveshaper
 {
@@ -13,6 +12,7 @@ public:
     void resized() override;
 
 private:
+    WaveshaperPlot plot;
     chowdsp::ParametersView paramsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperEditor)
