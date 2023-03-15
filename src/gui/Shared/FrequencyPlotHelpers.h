@@ -67,24 +67,28 @@ namespace detail
 template <int startFreqHz, int endFreqHz>
 void drawFrequencyLines (const chowdsp::SpectrumPlotBase& plotBase,
                          juce::Graphics& g,
-                         const std::initializer_list<float>& majorLines = { 100.0f, 1'000.0f, 10'000.0f })
+                         const std::initializer_list<float>& majorLines = { 100.0f, 1'000.0f, 10'000.0f },
+                         juce::Colour majorLinesColour = juce::Colours::white.withAlpha (0.5f),
+                         juce::Colour minorLinesColour = juce::Colours::white.withAlpha (0.25f))
 {
-    g.setColour (juce::Colours::white.withAlpha (0.25f));
+    g.setColour (minorLinesColour);
     plotBase.drawFrequencyLines (g, detail::getFreqLines<startFreqHz, endFreqHz>(), 1.0f);
 
-    g.setColour (juce::Colours::white.withAlpha (0.5f));
+    g.setColour (majorLinesColour);
     plotBase.drawFrequencyLines (g, majorLines, 1.0f);
 }
 
 inline void drawMagnitudeLines (const chowdsp::SpectrumPlotBase& plotBase,
                                 juce::Graphics& g,
                                 const std::initializer_list<float>& minorLines = { -30.0f, -20.0f, -10.0f, 10.0f, 20.0f, 30.0f },
-                                const std::initializer_list<float>& majorLines = { 0.0f })
+                                const std::initializer_list<float>& majorLines = { 0.0f },
+                                juce::Colour majorLinesColour = juce::Colours::white.withAlpha (0.5f),
+                                juce::Colour minorLinesColour = juce::Colours::white.withAlpha (0.25f))
 {
-    g.setColour (juce::Colours::white.withAlpha (0.25f));
+    g.setColour (minorLinesColour);
     plotBase.drawMagnitudeLines (g, minorLines);
 
-    g.setColour (juce::Colours::white.withAlpha (0.5f));
+    g.setColour (majorLinesColour);
     plotBase.drawMagnitudeLines (g, majorLines);
 }
 } // namespace gui

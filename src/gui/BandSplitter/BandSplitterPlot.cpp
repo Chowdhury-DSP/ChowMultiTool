@@ -8,6 +8,11 @@ namespace
     constexpr int numBands = 2;
     constexpr int minFrequency = 18;
     constexpr int maxFrequency = 22'000;
+
+    const auto majorLinesColour = juce::Colour { 0xFFD3D3D3 }.withAlpha (0.5f);
+    const auto minorLinesColour = juce::Colour { 0xFFD3D3D3 }.withAlpha (0.2f);
+    const auto plotColour = juce::Colour { 0xFF3399BB };
+    const auto thumbColour = juce::Colour { 0xFFA18336 };
 } // namespace
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
@@ -24,8 +29,16 @@ BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutof
 
 void BandSplitterPlot::InternalSlider::paint (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::gold.withAlpha (0.5f));
-    g.fillRect (getThumbBounds());
+    const auto thumbBounds = getThumbBounds();
+    const auto thumbBoundsFloat = thumbBounds.toFloat();
+    juce::ColourGradient grad { thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getX(), thumbBoundsFloat.getHeight() * 0.5f },
+                                thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getRight(), thumbBoundsFloat.getHeight() * 0.5f },
+                                false };
+    grad.addColour (0.5, thumbColour.withAlpha (0.8f));
+    g.setGradientFill (std::move (grad));
+    g.fillRect (thumbBounds);
 }
 
 bool BandSplitterPlot::InternalSlider::hitTest (int x, int y)
@@ -130,19 +143,23 @@ void BandSplitterPlot::updateFilterSlope()
     }
 }
 
-void BandSplitterPlot::paint (juce::Graphics& g)
-{
-    g.fillAll (juce::Colours::black);
-}
-
 void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 {
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
+                                                         g,
+                                                         { 100.0f, 1'000.0f, 10'000.0f },
+                                                         majorLinesColour,
+                                                         minorLinesColour);
+    gui::drawMagnitudeLines (*this,
+                             g,
+                             { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f },
+                             { 0.0f },
+                             majorLinesColour,
+                             minorLinesColour);
 
-    g.setColour (juce::Colours::red);
-    g.strokePath (getPath (0), juce::PathStrokeType { 1.5f });
-    g.strokePath (getPath (1), juce::PathStrokeType { 1.5f });
+    g.setColour (plotColour);
+    g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
+    g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
 }
 
 void BandSplitterPlot::resized()
