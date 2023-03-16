@@ -12,4 +12,4 @@ const auto majorLinesColour = linesColour.withAlpha (0.5f);
 const auto minorLinesColour = linesColour.withAlpha (0.2f);
 const auto plotColour = juce::Colour { 0xFF3399BB };
 const auto thumbColour = juce::Colour { 0xFFA18336 };
-}
+} // namespace gui::band_splitter::colours

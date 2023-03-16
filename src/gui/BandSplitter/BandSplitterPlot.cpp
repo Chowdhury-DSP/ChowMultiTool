@@ -1,6 +1,6 @@
 #include "BandSplitterPlot.h"
-#include "gui/Shared/FrequencyPlotHelpers.h"
 #include "BandSplitterColours.h"
+#include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::band_splitter
 {

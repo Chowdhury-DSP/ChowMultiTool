@@ -18,7 +18,8 @@ private:
 
     State& state;
     dsp::band_splitter::Params& params;
-    chowdsp::ParameterAttachment<chowdsp::ChoiceParameter> slopeAttach { *params.slope, state, [this] (int) { repaint(); }};
+    chowdsp::ParameterAttachment<chowdsp::ChoiceParameter> slopeAttach { *params.slope, state, [this] (int)
+                                                                         { repaint(); } };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SlopePicker)
 };

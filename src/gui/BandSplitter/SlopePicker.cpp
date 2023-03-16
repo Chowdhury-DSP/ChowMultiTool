@@ -26,7 +26,6 @@ void SlopePicker::paint (juce::Graphics& g)
     g.setGradientFill (verticalGrad (juce::Colours::black.withAlpha (0.0f), juce::Colours::black));
     g.fillAll();
 
-
     g.setFont (juce::Font { juce::String { "Roboto" }, 0.6f * (float) getHeight(), juce::Font::FontStyleFlags::bold });
     magic_enum::enum_for_each<dsp::band_splitter::Slope> (
         [&] (auto slopeTag)
