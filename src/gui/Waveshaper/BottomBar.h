@@ -1,7 +1,7 @@
 #pragma once
 
-#include "state/PluginState.h"
 #include "WaveshaperColours.h"
+#include "state/PluginState.h"
 
 namespace gui::waveshaper
 {
@@ -33,4 +33,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BottomBar)
 };
-}
+} // namespace gui::waveshaper
