@@ -1,4 +1,5 @@
 #include "WaveshaperPlot.h"
+#include "WaveshaperColours.h"
 
 namespace gui::waveshaper
 {
@@ -23,7 +24,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 };
         });
 
-    plotter.generatePlotCallback = [&params = std::as_const (wsParams)]()
+    plotter.generatePlotCallback = [&plotter = this->plotter, &params = std::as_const (wsParams)]()
         -> std::pair<std::vector<float>, std::vector<float>>
     {
         static constexpr auto fs = 16000.0;
@@ -42,7 +43,13 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
         chowdsp::BufferView<float> xBuffer { xData.data(), numSamples };
         sine.processBlock (xBuffer);
-        chowdsp::BufferMath::applyGain (xBuffer, juce::Decibels::decibelsToGain (params.gainParam->get()));
+
+        const auto linearGain = juce::Decibels::decibelsToGain (params.gainParam->get());
+        chowdsp::BufferMath::applyGain (xBuffer, linearGain);
+        plotter.params.xMin = -linearGain;
+        plotter.params.xMax = linearGain;
+        plotter.params.yMin = -1.1f;
+        plotter.params.yMax = 1.1f;
 
         using dsp::waveshaper::Shapes;
         if (params.shapeParam->get() == Shapes::Tanh_Clip)
@@ -75,12 +82,18 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
         }
         else if (params.shapeParam->get() == Shapes::Full_Wave_Rectify)
         {
+            plotter.params.yMin = -linearGain;
+            plotter.params.yMax = linearGain;
+
             using chowdsp::Power::ipow;
             for (auto [x, y] : chowdsp::zip (xData, yData))
                 y = std::max (x, 0.0f);
         }
         else if (params.shapeParam->get() == Shapes::Wave_Multiply)
         {
+            plotter.params.yMin = -1.25f;
+            plotter.params.yMax = 1.25f;
+
             static constexpr auto D = 2.45f;
             static constexpr auto B = 1.0f - 2.0f * 0.02f;
 
@@ -88,6 +101,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
             for (int n = 0; n < 6; ++n)
                 for (auto& y : yData)
                     y = (2.0f / D) * std::tanh (y * D) - B * y;
+
+            juce::FloatVectorOperations::multiply (yData.data(), juce::Decibels::decibelsToGain (16.0f), numSamples);
         }
         else if (params.shapeParam->get() == Shapes::West_Coast)
         {
@@ -121,9 +136,14 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 for (auto& cell : cells)
                     y += (float) cell.mix * (float) cell ((double) x);
             }
+
+            juce::FloatVectorOperations::multiply (yData.data(), juce::Decibels::decibelsToGain (-10.0f), numSamples);
         }
         else if (params.shapeParam->get() == Shapes::Fold_Fuzz)
         {
+            plotter.params.yMin = 1.25f * -linearGain;
+            plotter.params.yMax = 1.25f * linearGain;
+
             using chowdsp::Power::ipow;
             const auto k = params.kParam->get();
             const auto k_sq = ipow<2> (k);
@@ -140,8 +160,42 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
 void WaveshaperPlot::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::black);
+    // background
+    g.setGradientFill (juce::ColourGradient { colours::backgroundLight,
+                                              juce::Point { 0.0f, 0.0f },
+                                              colours::backgroundDark,
+                                              juce::Point { (float) getWidth() * 0.35f, (float) getHeight() * 0.5f },
+                                              false });
+    g.fillAll();
 
+    // grid lines
+    const auto drawVerticalLine = [&g, height = (float) getHeight()] (float xPos, bool major)
+    {
+        g.setColour (major ? colours::majorLinesColour : colours::minorLinesColour);
+        g.drawLine ({ { xPos, 0.0f }, { xPos, height } });
+    };
+    const auto drawHorizontalLine = [&g, width = (float) getWidth()] (float yPos, bool major)
+    {
+        g.setColour (major ? colours::majorLinesColour : colours::minorLinesColour);
+        g.drawLine ({ { 0.0f, yPos }, { width, yPos } });
+    };
+    const auto clampToMultiple = [] (float x, float mul)
+    {
+        return x + chowdsp::Math::sign (x) * std::fmod (x, mul);
+    };
+
+    drawHorizontalLine (plotter.getYCoordinateForAmplitude (0.0f), true);
+
+    static constexpr float xInc = 0.2f;
+    for (auto xPos = clampToMultiple (plotter.params.xMin, xInc); xPos < clampToMultiple (plotter.params.xMax, xInc); xPos += xInc)
+    {
+        const auto xPosMod = std::abs (std::fmod (xPos, 1.0f));
+        const auto isMajorGridLine = juce::isWithin (xPosMod, 0.0f, 1.0e-4f) || juce::isWithin (xPosMod, 1.0f, 1.0e-4f);
+        drawVerticalLine (plotter.getXCoordinateForAmplitude (xPos), isMajorGridLine);
+    }
+    drawVerticalLine (plotter.getXCoordinateForAmplitude (0.0f), true);
+
+    // plot
     g.setColour (juce::Colours::red);
     g.strokePath (plotter.getPath(), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
 }
