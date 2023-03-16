@@ -160,14 +160,6 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
 void WaveshaperPlot::paint (juce::Graphics& g)
 {
-    // background
-    g.setGradientFill (juce::ColourGradient { colours::backgroundLight,
-                                              juce::Point { 0.0f, 0.0f },
-                                              colours::backgroundDark,
-                                              juce::Point { (float) getWidth() * 0.35f, (float) getHeight() * 0.5f },
-                                              false });
-    g.fillAll();
-
     // grid lines
     const auto drawVerticalLine = [&g, height = (float) getHeight()] (float xPos, bool major)
     {
