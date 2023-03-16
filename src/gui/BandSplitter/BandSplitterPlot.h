@@ -10,7 +10,6 @@ class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot
 public:
     BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& params);
 
-    void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
 
