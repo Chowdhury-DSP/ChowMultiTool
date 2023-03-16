@@ -1,5 +1,6 @@
 #include "BandSplitterPlot.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "BandSplitterColours.h"
 
 namespace gui::band_splitter
 {
@@ -24,8 +25,16 @@ BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutof
 
 void BandSplitterPlot::InternalSlider::paint (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::gold.withAlpha (0.5f));
-    g.fillRect (getThumbBounds());
+    const auto thumbBounds = getThumbBounds();
+    const auto thumbBoundsFloat = thumbBounds.toFloat();
+    juce::ColourGradient grad { colours::thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getX(), thumbBoundsFloat.getHeight() * 0.5f },
+                                colours::thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getRight(), thumbBoundsFloat.getHeight() * 0.5f },
+                                false };
+    grad.addColour (0.5, colours::thumbColour.withAlpha (0.8f));
+    g.setGradientFill (std::move (grad));
+    g.fillRect (thumbBounds);
 }
 
 bool BandSplitterPlot::InternalSlider::hitTest (int x, int y)
@@ -130,19 +139,23 @@ void BandSplitterPlot::updateFilterSlope()
     }
 }
 
-void BandSplitterPlot::paint (juce::Graphics& g)
-{
-    g.fillAll (juce::Colours::black);
-}
-
 void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 {
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
+                                                         g,
+                                                         { 100.0f, 1'000.0f, 10'000.0f },
+                                                         colours::majorLinesColour,
+                                                         colours::minorLinesColour);
+    gui::drawMagnitudeLines (*this,
+                             g,
+                             { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f },
+                             { 0.0f },
+                             colours::majorLinesColour,
+                             colours::minorLinesColour);
 
-    g.setColour (juce::Colours::red);
-    g.strokePath (getPath (0), juce::PathStrokeType { 1.5f });
-    g.strokePath (getPath (1), juce::PathStrokeType { 1.5f });
+    g.setColour (colours::plotColour);
+    g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
+    g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
 }
 
 void BandSplitterPlot::resized()
