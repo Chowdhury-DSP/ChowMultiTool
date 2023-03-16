@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BandSplitterPlot.h"
-#include "BandSplitterSlopePicker.h"
+#include "SlopePicker.h"
 
 namespace gui::band_splitter
 {
@@ -14,9 +14,6 @@ public:
     void resized() override;
 
 private:
-    juce::ComboBox slopeChoiceBox;
-    chowdsp::ComboBoxAttachment slopeChoiceAttachment;
-
     BandSplitterPlot bandSplitterPlot;
     SlopePicker slopePicker;
 
