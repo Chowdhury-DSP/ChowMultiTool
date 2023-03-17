@@ -5,7 +5,7 @@
 
 namespace gui::waveshaper
 {
-class WaveshaperPlot : public juce::Component
+class WaveshaperPlot : public juce::Slider
 {
 public:
     WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsParams);
@@ -15,8 +15,8 @@ public:
 
 private:
     chowdsp::WaveshaperPlot plotter;
-
     chowdsp::ScopedCallbackList callbacks;
+    chowdsp::SliderAttachment gainAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperPlot)
 };

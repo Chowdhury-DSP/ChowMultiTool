@@ -22,6 +22,6 @@ const auto thumbColour = juce::Colour { 0xFFA18336 };
 namespace gui::waveshaper::colours
 {
 using namespace gui::colours;
-const auto plotColour = juce::Colour { 0xFFf37748 };
-const auto boxColour = juce::Colour { 0xFF067bc2 };
+const auto plotColour = juce::Colour { 0xFFC70C0C };
+const auto boxColour = juce::Colour { 0xFF0b7189 };
 } // namespace gui::waveshaper::colours

@@ -7,7 +7,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     : plotter ({
         .xMin = -1.5f,
         .xMax = 1.5f,
-    })
+    }),
+      gainAttach (*wsParams.gainParam, pluginState, *this)
 {
     wsParams.doForAllParameters (
         [this, &pluginState] (const auto& param, size_t)
@@ -155,6 +156,10 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
         return { std::vector<float> { xData.begin() + (size_t) numSamples / 2, xData.end() },
                  std::vector<float> { yData.begin() + (size_t) numSamples / 2, yData.end() } };
     };
+
+    setTextBoxStyle (NoTextBox, false, 0, 0);
+    setSliderStyle (LinearHorizontal);
+    setMouseCursor (juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
 }
 
 void WaveshaperPlot::paint (juce::Graphics& g)
@@ -193,6 +198,7 @@ void WaveshaperPlot::paint (juce::Graphics& g)
 
 void WaveshaperPlot::resized()
 {
+    juce::Slider::resized();
     plotter.setSize (getLocalBounds());
 }
 } // namespace gui::waveshaper

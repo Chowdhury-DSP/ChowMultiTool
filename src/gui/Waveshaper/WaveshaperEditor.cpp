@@ -1,23 +1,29 @@
 #include "WaveshaperEditor.h"
+#include "BottomBar.h"
 #include "gui/Shared/Colours.h"
 
 namespace gui::waveshaper
 {
 WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams)
-    : plot (pluginState, wsParams),
-      bottomBar (pluginState, wsParams),
-      paramsView (pluginState, wsParams)
+    : params (wsParams),
+      plot (pluginState, wsParams),
+      foldFuzzControls (pluginState, wsParams)
 {
+    bottomBar = std::make_unique<BottomBar>(pluginState, wsParams);
+
     addAndMakeVisible (plot);
-    addAndMakeVisible (bottomBar);
-    addAndMakeVisible (paramsView);
+    addAndMakeVisible (bottomBar.get());
+    addAndMakeVisible (foldFuzzControls);
 }
 
 void WaveshaperEditor::resized()
 {
     auto bounds = getLocalBounds();
-    paramsView.setBounds (bounds.removeFromBottom (proportionOfHeight (0.15f)));
-    bottomBar.setBounds (bounds.removeFromBottom (proportionOfHeight (0.075f)));
+    bottomBar->setBounds (bounds.removeFromBottom (proportionOfHeight (0.075f)));
+
+    if (params.shapeParam->get() == dsp::waveshaper::Shapes::Fold_Fuzz)
+        foldFuzzControls.setBounds (bounds.removeFromRight (proportionOfWidth (0.15f)));
+
     plot.setBounds (bounds);
 }
 

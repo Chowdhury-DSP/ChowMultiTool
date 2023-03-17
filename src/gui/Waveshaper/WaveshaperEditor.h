@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BottomBar.h"
 #include "WaveshaperPlot.h"
+#include "FoldFuzzControls.h"
 
 namespace gui::waveshaper
 {
@@ -14,9 +14,11 @@ public:
     void resized() override;
 
 private:
+    dsp::waveshaper::Params& params;
+
     WaveshaperPlot plot;
-    BottomBar bottomBar;
-    chowdsp::ParametersView paramsView;
+    std::unique_ptr<juce::Component> bottomBar;
+    FoldFuzzControls foldFuzzControls;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperEditor)
 };
