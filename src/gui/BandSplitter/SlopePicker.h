@@ -1,8 +1,8 @@
 #pragma once
 
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
-#include "state/PluginState.h"
 #include "gui/Shared/Fonts.h"
+#include "state/PluginState.h"
 
 namespace gui::band_splitter
 {

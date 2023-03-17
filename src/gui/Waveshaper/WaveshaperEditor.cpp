@@ -9,7 +9,7 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
       plot (pluginState, wsParams),
       foldFuzzControls (pluginState, wsParams)
 {
-    bottomBar = std::make_unique<BottomBar>(pluginState, wsParams);
+    bottomBar = std::make_unique<BottomBar> (pluginState, wsParams);
 
     addAndMakeVisible (plot);
     addAndMakeVisible (bottomBar.get());

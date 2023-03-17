@@ -20,7 +20,7 @@ private:
     struct BandsButton : juce::Button
     {
         BandsButton (chowdsp::BoolParameter& param, State& pluginState);
-        void paintButton (juce::Graphics &g, bool, bool) override;
+        void paintButton (juce::Graphics& g, bool, bool) override;
         chowdsp::ButtonAttachment attach;
         chowdsp::BoolParameter& bandParam;
         gui::SharedFonts fonts;

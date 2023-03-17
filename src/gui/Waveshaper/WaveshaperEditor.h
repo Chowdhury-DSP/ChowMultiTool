@@ -1,7 +1,7 @@
 #pragma once
 
-#include "WaveshaperPlot.h"
 #include "FoldFuzzControls.h"
+#include "WaveshaperPlot.h"
 
 namespace gui::waveshaper
 {

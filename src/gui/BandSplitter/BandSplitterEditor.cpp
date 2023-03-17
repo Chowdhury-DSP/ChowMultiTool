@@ -11,7 +11,7 @@ BandSplitterEditor::BandsButton::BandsButton (chowdsp::BoolParameter& param, Sta
     setClickingTogglesState (true);
 }
 
-void BandSplitterEditor::BandsButton::paintButton (juce::Graphics &g, bool, bool)
+void BandSplitterEditor::BandsButton::paintButton (juce::Graphics& g, bool, bool)
 {
     g.setColour (juce::Colours::black.withAlpha (0.75f));
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 0.1f * (float) getHeight());

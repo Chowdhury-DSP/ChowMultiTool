@@ -8,4 +8,4 @@ Fonts::Fonts()
     const auto robotoBoldFont = fs.open ("Fonts/Roboto-Bold.ttf");
     robotoBold = juce::Typeface::createSystemTypefaceFor (robotoBoldFont.begin(), robotoBoldFont.size());
 }
-}
+} // namespace gui
