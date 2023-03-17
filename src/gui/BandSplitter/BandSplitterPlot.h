@@ -34,7 +34,7 @@ private:
         chowdsp::FloatParameter& cutoffParam;
         chowdsp::EQ::EqualizerPlot& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
-    } cutoffSlider;
+    } cutoffSlider, cutoff2Slider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };

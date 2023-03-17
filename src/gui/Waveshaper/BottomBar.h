@@ -1,6 +1,7 @@
 #pragma once
 
-#include "WaveshaperColours.h"
+#include "gui/Shared/Colours.h"
+#include "gui/Shared/Fonts.h"
 #include "state/PluginState.h"
 
 namespace gui::waveshaper
@@ -16,13 +17,43 @@ public:
 private:
     struct SimpleBox : juce::ComboBox
     {
+        struct LNF : juce::LookAndFeel_V4
+        {
+            LNF()
+            {
+                setColour (juce::PopupMenu::backgroundColourId, colours::backgroundDark);
+                setColour (juce::PopupMenu::textColourId, colours::linesColour);
+                setColour (juce::PopupMenu::highlightedTextColourId, colours::linesColour);
+                setColour (juce::PopupMenu::highlightedBackgroundColourId, colours::boxColour.withAlpha (0.75f));
+            }
+
+            juce::Font getPopupMenuFont() override
+            {
+                return fonts->robotoBold;
+            }
+
+            gui::SharedFonts fonts;
+        };
+
+        SimpleBox()
+        {
+            setLookAndFeel (lnfs->getLookAndFeel<LNF>());
+        }
+        ~SimpleBox() override
+        {
+            setLookAndFeel (nullptr);
+        }
+
         void paint (juce::Graphics& g) override
         {
-            g.setFont (juce::Font { juce::String { "Roboto" }, 0.6f * (float) getHeight(), juce::Font::FontStyleFlags::bold });
+            g.setFont (juce::Font (fonts->robotoBold).withHeight (0.6f * (float) getHeight()));
             g.setColour (colours::linesColour);
             g.drawFittedText (getText(), getLocalBounds(), juce::Justification::centred, 1);
         }
         void resized() override {}
+
+        chowdsp::SharedLNFAllocator lnfs;
+        gui::SharedFonts fonts;
     };
 
     SimpleBox shapeMenu;
