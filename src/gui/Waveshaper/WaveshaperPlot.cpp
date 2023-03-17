@@ -1,5 +1,5 @@
 #include "WaveshaperPlot.h"
-#include "WaveshaperColours.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::waveshaper
 {
@@ -7,7 +7,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     : plotter ({
         .xMin = -1.5f,
         .xMax = 1.5f,
-    })
+    }),
+      gainAttach (*wsParams.gainParam, pluginState, *this)
 {
     wsParams.doForAllParameters (
         [this, &pluginState] (const auto& param, size_t)
@@ -152,10 +153,13 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 y = x * ((1.0f - k_sq) + k * std::sin (M * std::log (std::abs (x))));
         }
 
-        // @TODO: make this look better!
         return { std::vector<float> { xData.begin() + (size_t) numSamples / 2, xData.end() },
                  std::vector<float> { yData.begin() + (size_t) numSamples / 2, yData.end() } };
     };
+
+    setTextBoxStyle (NoTextBox, false, 0, 0);
+    setSliderStyle (LinearHorizontal);
+    setMouseCursor (juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
 }
 
 void WaveshaperPlot::paint (juce::Graphics& g)
@@ -188,12 +192,13 @@ void WaveshaperPlot::paint (juce::Graphics& g)
     drawVerticalLine (plotter.getXCoordinateForAmplitude (0.0f), true);
 
     // plot
-    g.setColour (juce::Colours::red);
+    g.setColour (colours::plotColour);
     g.strokePath (plotter.getPath(), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
 }
 
 void WaveshaperPlot::resized()
 {
+    juce::Slider::resized();
     plotter.setSize (getLocalBounds());
 }
 } // namespace gui::waveshaper

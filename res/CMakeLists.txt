@@ -1,12 +1,14 @@
 include(../modules/cmake/CMakeRC.cmake)
 
-file(GLOB SVG_FILES gui_assets/*.svg)
+file(GLOB SVG_FILES gui_assets/Vector/*.svg)
+file(GLOB TTF_FILES gui_assets/Fonts/*.ttf)
 #message(STATUS "SVG files: ${SVG_FILES}")
 cmrc_add_resource_library(gui-resources
     ALIAS ChowMultiTool::gui-resources
     NAMESPACE gui
     WHENCE gui_assets
     ${SVG_FILES}
+    ${TTF_FILES}
 )
 
 set_target_properties(gui-resources

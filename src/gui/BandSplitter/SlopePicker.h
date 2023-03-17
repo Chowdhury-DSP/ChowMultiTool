@@ -2,6 +2,7 @@
 
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "state/PluginState.h"
+#include "gui/Shared/Fonts.h"
 
 namespace gui::band_splitter
 {
@@ -20,6 +21,8 @@ private:
     dsp::band_splitter::Params& params;
     chowdsp::ParameterAttachment<chowdsp::ChoiceParameter> slopeAttach { *params.slope, state, [this] (int)
                                                                          { repaint(); } };
+
+    gui::SharedFonts fonts;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SlopePicker)
 };
