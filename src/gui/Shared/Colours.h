@@ -16,7 +16,7 @@ namespace gui::band_splitter::colours
 {
 using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFF3399BB };
-const auto thumbColour = juce::Colour { 0xFFA18336 };
+const auto thumbColour = juce::Colour { 0xFFF0A202 };
 } // namespace gui::band_splitter::colours
 
 namespace gui::waveshaper::colours

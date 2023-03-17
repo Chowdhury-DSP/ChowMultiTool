@@ -6,7 +6,7 @@ namespace gui::band_splitter
 {
 namespace
 {
-    constexpr int numBands = 2;
+    constexpr int numBands = 4;
     constexpr int minFrequency = 18;
     constexpr int maxFrequency = 22'000;
 } // namespace
@@ -72,9 +72,12 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                       .minMagnitudeDB = -60.0f,
                                       .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
-      cutoffSlider (*bandSplitParams.cutoff, *this, pluginState)
+      cutoffSlider (*bandSplitParams.cutoff, *this, pluginState),
+      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState)
 {
     addAndMakeVisible (cutoffSlider);
+    addChildComponent (cutoff2Slider);
+    cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
 
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
         setFilterActive (bandIndex, true);
@@ -87,12 +90,24 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                               {
                                                   updateCutoffFrequency();
                                               }),
+            pluginState.addParameterListener (*bandSplitterParams.cutoff2,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this]
+                                              {
+                                                  updateCutoffFrequency();
+                                              }),
             pluginState.addParameterListener (*bandSplitterParams.slope,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
                                                   updateFilterSlope();
-                                              })
+                                              }),
+            pluginState.addParameterListener (*bandSplitterParams.threeBandOnOff,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this]
+                                              {
+                                                  cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
+                                              }),
         };
 
     updateFilterSlope();
@@ -102,7 +117,8 @@ void BandSplitterPlot::updateCutoffFrequency()
 {
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        setCutoffParameter (bandIndex, bandSplitterParams.cutoff->get());
+        const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
+        setCutoffParameter (bandIndex, cutoffParam->get());
         updateFilterPlotPath (bandIndex);
     }
 }
@@ -130,10 +146,13 @@ void BandSplitterPlot::updateFilterSlope()
     const auto [lowBandFilterType, highBandFilterType] = getFilterTypes();
     setFilterType (0, lowBandFilterType);
     setFilterType (1, highBandFilterType);
+    setFilterType (2, lowBandFilterType);
+    setFilterType (3, highBandFilterType);
 
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        setCutoffParameter (bandIndex, bandSplitterParams.cutoff->get());
+        const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
+        setCutoffParameter (bandIndex, cutoffParam->get());
         setQParameter (bandIndex, 0.5f);
         updateFilterPlotPath (bandIndex);
     }
@@ -156,11 +175,20 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
     g.setColour (colours::plotColour);
     g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
     g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
+
+    if (bandSplitterParams.threeBandOnOff->get())
+    {
+        g.strokePath (getPath (2), juce::PathStrokeType { 2.0f });
+        g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
+    }
 }
 
 void BandSplitterPlot::resized()
 {
     chowdsp::EQ::EqualizerPlot::resized();
-    cutoffSlider.setBounds (getLocalBounds());
+
+    const auto bounds = getLocalBounds();
+    cutoffSlider.setBounds (bounds);
+    cutoff2Slider.setBounds (bounds);
 }
 } // namespace gui::band_splitter
