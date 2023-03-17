@@ -1,6 +1,7 @@
 #pragma once
 
-#include "WaveshaperColours.h"
+#include "gui/Shared/Colours.h"
+#include "gui/Shared/Fonts.h"
 #include "state/PluginState.h"
 
 namespace gui::waveshaper
@@ -18,11 +19,12 @@ private:
     {
         void paint (juce::Graphics& g) override
         {
-            g.setFont (juce::Font { juce::String { "Roboto" }, 0.6f * (float) getHeight(), juce::Font::FontStyleFlags::bold });
+            g.setFont (juce::Font (fonts->robotoBold).withHeight (0.6f * (float) getHeight()));
             g.setColour (colours::linesColour);
             g.drawFittedText (getText(), getLocalBounds(), juce::Justification::centred, 1);
         }
         void resized() override {}
+        gui::SharedFonts fonts;
     };
 
     SimpleBox shapeMenu;

@@ -27,7 +27,7 @@ Toolbar::~Toolbar()
 void Toolbar::setupUndoRedoButtons()
 {
     const auto fs = cmrc::gui::get_filesystem();
-    const auto undoSVG = fs.open ("undo-solid.svg");
+    const auto undoSVG = fs.open ("Vector/undo-solid.svg");
     undoButton.setImages (juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size()).get());
 
     addAndMakeVisible (undoButton);
@@ -36,7 +36,7 @@ void Toolbar::setupUndoRedoButtons()
         state.undoManager->undo();
     };
 
-    const auto redoSVG = fs.open ("redo-solid.svg");
+    const auto redoSVG = fs.open ("Vector/redo-solid.svg");
     redoButton.setImages (juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size()).get());
     addAndMakeVisible (redoButton);
     redoButton.onClick = [this]

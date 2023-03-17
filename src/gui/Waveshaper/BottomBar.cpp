@@ -19,11 +19,12 @@ void BottomBar::paint (juce::Graphics& g)
     };
 
     auto backgroundGrad = verticalGrad (colours::boxColour.withAlpha (0.0f), colours::boxColour);
-    backgroundGrad.addColour (0.5, colours::boxColour.withAlpha (0.25f));
-    g.setGradientFill (backgroundGrad);
+//    backgroundGrad.addColour (0.5, colours::boxColour.withAlpha (0.25f));
+    g.setGradientFill (std::move (backgroundGrad));
     g.fillAll();
 
-    g.setColour (colours::linesColour);
+    g.setGradientFill (verticalGrad (colours::linesColour.withAlpha (0.75f), colours::linesColour)); // (colours::linesColour);
+//    g.setColour (colours::linesColour);
     const auto halfWidthPos = (float) getWidth() * 0.5f;
     g.drawLine (juce::Line { juce::Point { halfWidthPos, 0.0f }, juce::Point { halfWidthPos, (float) getHeight() } }, 1.0f);
 }

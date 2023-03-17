@@ -1,5 +1,5 @@
 #include "SlopePicker.h"
-#include "BandSplitterColours.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::band_splitter
 {
@@ -26,7 +26,7 @@ void SlopePicker::paint (juce::Graphics& g)
     g.setGradientFill (verticalGrad (juce::Colours::black.withAlpha (0.0f), juce::Colours::black));
     g.fillAll();
 
-    g.setFont (juce::Font { juce::String { "Roboto" }, 0.6f * (float) getHeight(), juce::Font::FontStyleFlags::bold });
+    g.setFont (juce::Font (fonts->robotoBold).withHeight (0.6f * (float) getHeight()));
     magic_enum::enum_for_each<dsp::band_splitter::Slope> (
         [&] (auto slopeTag)
         {
@@ -39,7 +39,7 @@ void SlopePicker::paint (juce::Graphics& g)
 
             g.setColour (colours::linesColour);
             g.drawFittedText (params.slope->choices[(int) *magic_enum::enum_index ((dsp::band_splitter::Slope) slopeTag)],
-                              slopeSectionBounds.toNearestInt(),
+                              slopeSectionBounds.translated (0.0f, 0.1f * (float) getHeight()).toNearestInt(),
                               juce::Justification::centred,
                               1);
         });

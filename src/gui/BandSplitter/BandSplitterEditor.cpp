@@ -1,5 +1,5 @@
 #include "BandSplitterEditor.h"
-#include "BandSplitterColours.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::band_splitter
 {

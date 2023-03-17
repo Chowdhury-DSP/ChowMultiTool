@@ -1,5 +1,5 @@
 #include "WaveshaperEditor.h"
-#include "WaveshaperColours.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::waveshaper
 {
