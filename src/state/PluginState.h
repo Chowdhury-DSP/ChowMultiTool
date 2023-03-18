@@ -11,6 +11,7 @@ namespace eq
 namespace waveshaper
 {
     struct Params;
+    struct ExtraState;
 }
 namespace signal_gen
 {
@@ -59,6 +60,14 @@ struct PluginParams : chowdsp::ParamHolder
     std::unique_ptr<dsp::brickwall::Params> brickwallParams;
     std::unique_ptr<dsp::svf::Params> svfParams;
 };
+
+struct PluginExtraState : chowdsp::NonParamState
+{
+    PluginExtraState();
+    ~PluginExtraState();
+
+    std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
+};
 } // namespace state
 
-using State = chowdsp::PluginStateImpl<state::PluginParams>;
+using State = chowdsp::PluginStateImpl<state::PluginParams, state::PluginExtraState>;

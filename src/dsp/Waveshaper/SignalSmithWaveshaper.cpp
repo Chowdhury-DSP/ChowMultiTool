@@ -2,7 +2,7 @@
 
 namespace dsp::waveshaper
 {
-static constexpr auto TOL = chowdsp::ScientificRatio<1, -5>::value<double>;
+static constexpr auto TOL = 1.0e-1; // chowdsp::ScientificRatio<1, -5>::value<double>;
 
 [[nodiscard]] inline auto nlFunc (const xsimd::batch<double>& x, double k, double M, double k_sq) noexcept
 {

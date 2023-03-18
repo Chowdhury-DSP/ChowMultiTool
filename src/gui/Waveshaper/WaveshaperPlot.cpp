@@ -8,6 +8,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
         .xMin = -1.5f,
         .xMax = 1.5f,
     }),
+      drawArea (*pluginState.nonParams.waveshaperExtraState),
+      shapeParam (*wsParams.shapeParam),
       gainAttach (*wsParams.gainParam, pluginState, *this)
 {
     wsParams.doForAllParameters (
@@ -25,12 +27,27 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 };
         });
 
-    plotter.generatePlotCallback = [&plotter = this->plotter, &params = std::as_const (wsParams)]()
+    plotter.generatePlotCallback = [this, &params = std::as_const (wsParams)]()
         -> std::pair<std::vector<float>, std::vector<float>>
     {
+        using dsp::waveshaper::Shapes;
         static constexpr auto fs = 16000.0;
         static constexpr int numSamples = 4096;
         static constexpr int sineFreq = 90.0f;
+
+        const auto linearGain = juce::Decibels::decibelsToGain (params.gainParam->get());
+        plotter.params.xMin = -linearGain;
+        plotter.params.xMax = linearGain;
+        plotter.params.yMin = -1.1f;
+        plotter.params.yMax = 1.1f;
+
+        if (shapeParam.get() == Shapes::Free_Draw)
+        {
+            plotter.params = drawArea.getPlotParams();
+            plotter.params.xMin = -linearGain;
+            plotter.params.xMax = linearGain;
+            return {};
+        }
 
         static constexpr auto spec = juce::dsp::ProcessSpec { fs, (uint32_t) numSamples, 1 };
 
@@ -44,26 +61,19 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
         chowdsp::BufferView<float> xBuffer { xData.data(), numSamples };
         sine.processBlock (xBuffer);
-
-        const auto linearGain = juce::Decibels::decibelsToGain (params.gainParam->get());
         chowdsp::BufferMath::applyGain (xBuffer, linearGain);
-        plotter.params.xMin = -linearGain;
-        plotter.params.xMax = linearGain;
-        plotter.params.yMin = -1.1f;
-        plotter.params.yMax = 1.1f;
 
-        using dsp::waveshaper::Shapes;
-        if (params.shapeParam->get() == Shapes::Tanh_Clip)
+        if (shapeParam.get() == Shapes::Tanh_Clip)
         {
             for (auto [x, y] : chowdsp::zip (xData, yData))
                 y = std::tanh (x);
         }
-        else if (params.shapeParam->get() == Shapes::Hard_Clip)
+        else if (shapeParam.get() == Shapes::Hard_Clip)
         {
             for (auto [x, y] : chowdsp::zip (xData, yData))
                 y = std::clamp (x, -1.0f, 1.0f);
         }
-        else if (params.shapeParam->get() == Shapes::Cubic_Clip)
+        else if (shapeParam.get() == Shapes::Cubic_Clip)
         {
             using chowdsp::Power::ipow;
             for (auto [x, y] : chowdsp::zip (xData, yData))
@@ -72,7 +82,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 y = x_clamp - ipow<3> (x_clamp) * (1.0f / 3.0f);
             }
         }
-        else if (params.shapeParam->get() == Shapes::Nonic_Clip)
+        else if (shapeParam.get() == Shapes::Nonic_Clip)
         {
             using chowdsp::Power::ipow;
             for (auto [x, y] : chowdsp::zip (xData, yData))
@@ -81,7 +91,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
                 y = x_clamp - ipow<9> (x_clamp) * (1.0f / 9.0f);
             }
         }
-        else if (params.shapeParam->get() == Shapes::Full_Wave_Rectify)
+        else if (shapeParam.get() == Shapes::Full_Wave_Rectify)
         {
             plotter.params.yMin = -linearGain;
             plotter.params.yMax = linearGain;
@@ -90,7 +100,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
             for (auto [x, y] : chowdsp::zip (xData, yData))
                 y = std::max (x, 0.0f);
         }
-        else if (params.shapeParam->get() == Shapes::Wave_Multiply)
+        else if (shapeParam.get() == Shapes::Wave_Multiply)
         {
             plotter.params.yMin = -1.25f;
             plotter.params.yMax = 1.25f;
@@ -105,7 +115,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
             juce::FloatVectorOperations::multiply (yData.data(), juce::Decibels::decibelsToGain (16.0f), numSamples);
         }
-        else if (params.shapeParam->get() == Shapes::West_Coast)
+        else if (shapeParam.get() == Shapes::West_Coast)
         {
             struct WCFolderCell
             {
@@ -140,7 +150,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
             juce::FloatVectorOperations::multiply (yData.data(), juce::Decibels::decibelsToGain (-10.0f), numSamples);
         }
-        else if (params.shapeParam->get() == Shapes::Fold_Fuzz)
+        else if (shapeParam.get() == Shapes::Fold_Fuzz)
         {
             plotter.params.yMin = 1.25f * -linearGain;
             plotter.params.yMax = 1.25f * linearGain;
@@ -160,6 +170,25 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     setTextBoxStyle (NoTextBox, false, 0, 0);
     setSliderStyle (LinearHorizontal);
     setMouseCursor (juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
+    addChildComponent (drawArea);
+}
+
+void WaveshaperPlot::toggleDrawMode (bool isDrawMode)
+{
+    drawMode = isDrawMode;
+
+    drawArea.setVisible (drawMode);
+
+    if (drawMode)
+    {
+        plotter.params = drawArea.getPlotParams();
+    }
+    else
+    {
+        plotter.setSize (getLocalBounds());
+    }
+
+    repaint();
 }
 
 void WaveshaperPlot::paint (juce::Graphics& g)
@@ -193,12 +222,21 @@ void WaveshaperPlot::paint (juce::Graphics& g)
 
     // plot
     g.setColour (colours::plotColour);
-    g.strokePath (plotter.getPath(), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
+    if (shapeParam.get() == dsp::waveshaper::Shapes::Free_Draw)
+    {
+        if (! drawMode)
+            g.strokePath (drawArea.getDrawnPath (plotter.params), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
+    }
+    else
+    {
+        g.strokePath (plotter.getPath(), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
+    }
 }
 
 void WaveshaperPlot::resized()
 {
     juce::Slider::resized();
     plotter.setSize (getLocalBounds());
+    drawArea.setBounds (getLocalBounds());
 }
 } // namespace gui::waveshaper
