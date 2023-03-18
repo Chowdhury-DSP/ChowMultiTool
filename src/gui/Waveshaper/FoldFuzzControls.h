@@ -14,8 +14,6 @@ public:
     void resized() override;
 
 private:
-    chowdsp::ScopedCallback shapeChangeCallback;
-
     juce::Slider foldSlider, fuzzSlider;
     chowdsp::SliderAttachment foldAttach, fuzzAttach;
 

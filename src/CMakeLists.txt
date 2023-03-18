@@ -11,6 +11,7 @@ target_sources(ChowMultiTool PRIVATE
 
     dsp/Waveshaper/WaveshaperProcessor.cpp
     dsp/Waveshaper/SignalSmithWaveshaper.cpp
+    dsp/Waveshaper/SplineWaveshaper.cpp
 
     dsp/EQ/EQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
@@ -24,6 +25,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/Waveshaper/WaveshaperEditor.cpp
     gui/Waveshaper/WaveshaperPlot.cpp
+    gui/Waveshaper/WaveshaperDrawer.cpp
     gui/Waveshaper/BottomBar.cpp
     gui/Waveshaper/FoldFuzzControls.cpp
 

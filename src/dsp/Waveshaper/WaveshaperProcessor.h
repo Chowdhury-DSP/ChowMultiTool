@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SignalSmithWaveshaper.h"
+#include "SplineWaveshaper.h"
 
 namespace dsp::waveshaper
 {
@@ -14,6 +15,7 @@ enum class Shapes
     West_Coast = 32,
     Wave_Multiply = 64,
     Fold_Fuzz = 128,
+    Free_Draw = 256,
 };
 
 enum class OversamplingRatio
@@ -85,10 +87,15 @@ struct Params : chowdsp::ParamHolder
     };
 };
 
+struct ExtraState
+{
+    SplineState splineState { "waveshaper_spline", {} };
+};
+
 class WaveshaperProcessor
 {
 public:
-    WaveshaperProcessor (chowdsp::PluginState& state, Params& wsParams);
+    WaveshaperProcessor (chowdsp::PluginState& state, Params& wsParams, ExtraState& wsExtraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
@@ -120,6 +127,7 @@ private:
     chowdsp::WestCoastWavefolder<double> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<double, 6> waveMultiplyFolder { &lookupTableCache.get() };
     SignalSmithWaveshaper ssWaveshaper;
+    SplineWaveshaper splineShaper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };
