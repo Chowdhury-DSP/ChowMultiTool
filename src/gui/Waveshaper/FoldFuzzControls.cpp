@@ -7,15 +7,6 @@ FoldFuzzControls::FoldFuzzControls (State& pluginState, dsp::waveshaper::Params&
     : foldAttach (*wsParams.kParam, pluginState, foldSlider),
       fuzzAttach (*wsParams.MParam, pluginState, fuzzSlider)
 {
-    shapeChangeCallback = pluginState.addParameterListener (
-        *wsParams.shapeParam,
-        chowdsp::ParameterListenerThread::MessageThread,
-        [this]
-        {
-            if (auto* parent = getParentComponent())
-                parent->resized();
-        });
-
     foldSlider.setSliderStyle (juce::Slider::LinearVertical);
     foldSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 15);
     addAndMakeVisible (foldSlider);

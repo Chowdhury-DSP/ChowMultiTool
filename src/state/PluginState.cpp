@@ -34,6 +34,15 @@ PluginParams::PluginParams()
 
 PluginParams::~PluginParams() = default;
 
+PluginExtraState::PluginExtraState()
+{
+    waveshaperExtraState = std::make_unique<dsp::waveshaper::ExtraState>();
+
+    addStateValues ({ &waveshaperExtraState->splineState });
+}
+
+PluginExtraState::~PluginExtraState() = default;
+
 const juce::StringArray PluginParams::toolChoices = []
 {
     juce::StringArray choices { "None" };

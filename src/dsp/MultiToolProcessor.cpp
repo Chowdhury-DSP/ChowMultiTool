@@ -7,7 +7,7 @@ namespace detail
     template <class U, class F>
     struct tool_maker_t
     {
-        operator U()
+        operator U() // NOLINT
         {
             return f();
         }
@@ -27,7 +27,9 @@ namespace detail
             tool_maker<eq::EQProcessor> ([&params]
                                          { return eq::EQProcessor { *params.eqParams }; }),
             tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState, &params]
-                                                         { return waveshaper::WaveshaperProcessor { pluginState, *params.waveshaperParams }; }),
+                                                         { return waveshaper::WaveshaperProcessor { pluginState,
+                                                                                                    *params.waveshaperParams,
+                                                                                                    *pluginState.nonParams.waveshaperExtraState }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
             tool_maker<pultec::PultecEQProcessor> ([&params]
