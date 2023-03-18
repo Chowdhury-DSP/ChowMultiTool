@@ -1,8 +1,8 @@
 #pragma once
 
+#include "WaveshaperDrawer.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
 #include "state/PluginState.h"
-#include "WaveshaperDrawer.h"
 
 namespace gui::waveshaper
 {

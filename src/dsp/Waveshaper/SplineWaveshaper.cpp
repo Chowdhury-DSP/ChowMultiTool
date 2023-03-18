@@ -156,7 +156,7 @@ std::unique_ptr<SplineADAA> createADAASpline (const Spline& spline)
     for (size_t i = 1; i < spline.size(); ++i)
     {
         auto& ss = splineADAA->second[i];
-        ss.c0 += evaluateSplineADAA (splineADAA->second[i-1], ss.x) - evaluateSplineADAA (ss, ss.x);
+        ss.c0 += evaluateSplineADAA (splineADAA->second[i - 1], ss.x) - evaluateSplineADAA (ss, ss.x);
     }
 
     return splineADAA;

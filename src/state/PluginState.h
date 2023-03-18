@@ -12,7 +12,7 @@ namespace waveshaper
 {
     struct Params;
     struct ExtraState;
-}
+} // namespace waveshaper
 namespace signal_gen
 {
     struct Params;
