@@ -1,4 +1,5 @@
 #include "BrickwallPlot.h"
+#include "gui/Shared/Colours.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace
@@ -32,8 +33,16 @@ BrickwallPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
 
 void BrickwallPlot::InternalSlider::paint (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::gold.withAlpha (0.5f));
-    g.fillRect (getThumbBounds());
+    const auto thumbBounds = getThumbBounds();
+    const auto thumbBoundsFloat = thumbBounds.toFloat();
+    juce::ColourGradient grad { colours::thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getX(), thumbBoundsFloat.getHeight() * 0.5f },
+                                colours::thumbColour.withAlpha (0.4f),
+                                juce::Point { thumbBoundsFloat.getRight(), thumbBoundsFloat.getHeight() * 0.5f },
+                                false };
+    grad.addColour (0.5, colours::thumbColour.withAlpha (0.8f));
+    g.setGradientFill (std::move (grad));
+    g.fillRect (thumbBounds);
 }
 
 bool BrickwallPlot::InternalSlider::hitTest (int x, int y)
@@ -53,7 +62,7 @@ double BrickwallPlot::InternalSlider::valueToProportionOfLength (double value)
 
 juce::Rectangle<int> BrickwallPlot::InternalSlider::getThumbBounds() const
 {
-    static constexpr auto lowMult = 0.8f;
+    static constexpr auto lowMult = 0.9f;
     static constexpr auto highMult = 1.0f / lowMult;
     const auto cutoffBarXStart = juce::roundToInt (plotBase.getXCoordinateForFrequency (cutoffParam.get() * lowMult));
     const auto cutoffBarXEnd = juce::roundToInt (plotBase.getXCoordinateForFrequency (cutoffParam.get() * highMult));
@@ -115,11 +124,20 @@ void BrickwallPlot::paint (juce::Graphics& g)
 
 void BrickwallPlot::paintOverChildren (juce::Graphics& g)
 {
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
+                                                         g,
+                                                         { 100.0f, 1'000.0f, 10'000.0f },
+                                                         colours::majorLinesColour,
+                                                         colours::minorLinesColour);
+    gui::drawMagnitudeLines (*this,
+                             g,
+                             { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f },
+                             { 0.0f },
+                             colours::majorLinesColour,
+                             colours::minorLinesColour);
 
-    g.setColour (juce::Colours::red);
-    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
+    g.setColour (colours::plotColour);
+    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
 }
 
 void BrickwallPlot::resized()
