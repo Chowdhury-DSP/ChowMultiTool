@@ -31,6 +31,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/Brickwall/BrickwallEditor.cpp
     gui/Brickwall/BrickwallPlot.cpp
+    gui/Brickwall/BottomBar.cpp
 
     gui/PultecEQ/PultecEditor.cpp
     gui/PultecEQ/PultecPlot.cpp
@@ -48,6 +49,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/Shared/DotSlider.cpp
     gui/Shared/Fonts.cpp
+    gui/Shared/SimpleBox.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

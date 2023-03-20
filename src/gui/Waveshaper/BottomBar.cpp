@@ -1,5 +1,6 @@
 #include "BottomBar.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::waveshaper
 {
@@ -8,7 +9,11 @@ BottomBar::BottomBar (State& pluginState, dsp::waveshaper::Params& wsParams)
       osAttach (wsParams.oversampleParam, pluginState, oversampleMenu)
 {
     addAndMakeVisible (shapeMenu);
+    shapeMenu.getLookAndFeel().setColour (juce::PopupMenu::highlightedBackgroundColourId, colours::boxColour.withAlpha (0.75f));
+
     addAndMakeVisible (oversampleMenu);
+    oversampleMenu.getLookAndFeel().setColour (juce::PopupMenu::highlightedBackgroundColourId, colours::boxColour.withAlpha (0.75f));
+    oversampleMenu.extraText = "Oversample: ";
 }
 
 void BottomBar::paint (juce::Graphics& g)
