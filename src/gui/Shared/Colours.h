@@ -31,4 +31,4 @@ namespace gui::brickwall::colours
 using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFC03221 };
 const auto thumbColour = juce::Colour { 0xFF4B8F8C };
-} // namespace gui::band_splitter::colours
+} // namespace gui::brickwall::colours

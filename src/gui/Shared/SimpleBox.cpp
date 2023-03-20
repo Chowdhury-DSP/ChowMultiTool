@@ -31,4 +31,4 @@ void SimpleBox::paint (juce::Graphics& g)
     g.setColour (findColour (juce::ComboBox::textColourId));
     g.drawFittedText (extraText + getText(), getLocalBounds(), juce::Justification::centred, 1);
 }
-}
+} // namespace gui

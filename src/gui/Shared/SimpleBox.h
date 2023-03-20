@@ -23,4 +23,4 @@ struct SimpleBox : juce::ComboBox
     gui::SharedFonts fonts;
     juce::String extraText;
 };
-}
+} // namespace gui

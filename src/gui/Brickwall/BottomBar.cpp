@@ -43,4 +43,4 @@ void BottomBar::resized()
     filterTypeMenu.setBounds (bounds.removeFromLeft (oneThirdWidth));
     slopeMenu.setBounds (bounds);
 }
-}
+} // namespace gui::brickwall
