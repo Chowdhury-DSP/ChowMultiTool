@@ -89,7 +89,7 @@ struct Params : chowdsp::ParamHolder
 
 struct ExtraState
 {
-    SplineState splineState { "waveshaper_spline", {} };
+    spline::SplineState splineState { "waveshaper_spline" };
 };
 
 class WaveshaperProcessor
@@ -127,7 +127,7 @@ private:
     chowdsp::WestCoastWavefolder<double> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<double, 6> waveMultiplyFolder { &lookupTableCache.get() };
     SignalSmithWaveshaper ssWaveshaper;
-    SplineWaveshaper splineShaper;
+    spline::SplineWaveshaper splineShaper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };

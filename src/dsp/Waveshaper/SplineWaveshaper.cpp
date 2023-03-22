@@ -1,32 +1,26 @@
 #include "SplineWaveshaper.h"
 
-namespace dsp::waveshaper
+namespace dsp::waveshaper::spline
 {
-SplineState::SplineState (std::string_view valueName, Spline defaultVal)
+SplineState::SplineState (std::string_view valueName)
     : StateValueBase (valueName),
-      defaultValue (std::move (defaultVal)),
       currentValue (defaultValue)
 {
 }
 
 /** Sets a new value */
-void SplineState::set (Spline v)
+void SplineState::set (const SplinePoints& v)
 {
-    bool areEqual = true;
-    areEqual &= v.size() == currentValue.size();
-    for (auto [current, next] : chowdsp::zip (v, currentValue))
-        areEqual &= current == next;
-
-    if (areEqual)
+    if (v == currentValue)
         return;
 
-    currentValue = std::move (v);
+    currentValue = v;
     changeBroadcaster();
 }
 
-SplineState& SplineState::operator= (Spline v)
+SplineState& SplineState::operator= (const SplinePoints& v)
 {
-    set (std::move (v));
+    set (v);
     return *this;
 }
 
@@ -40,31 +34,37 @@ void SplineState::deserialize (chowdsp::JSONSerializer::DeserializedType deseria
     deserialize<chowdsp::JSONSerializer> (deserial, *this);
 }
 
-Spline createSpline (std::vector<juce::Point<float>> points)
+SplinePoints getDefaultSplinePoints()
 {
-    points.insert (points.begin(), points.front().withX (splineBounds.xMin));
-    points.push_back (points.back().withX (splineBounds.xMax));
-    //        points.insert (points.begin(), { xMin, yMin });
-    //        points.push_back ({ xMax, yMax });
+    static constexpr auto scaler = float (numDrawPoints - 1) / (splineBounds.xMax - splineBounds.xMin);
+    static constexpr auto offset = -splineBounds.xMin * scaler;
 
-    const auto n = points.size() - 1;
+    SplinePoints points;
+    for (auto [index, point] : chowdsp::enumerate (points))
+    {
+        point.x = ((float) index - offset) / scaler;
+        point.y = std::tanh (point.x);
+    }
+    return points;
+}
+
+Spline createSpline (const SplinePoints& points)
+{
+    static constexpr auto n = size_t (numDrawPoints - 1);
+
     Spline set;
-    set.resize (n, {});
 
-    std::vector<double> h;
-    h.reserve (n);
+    std::array<double, n> h {};
     for (size_t i = 0; i < n; ++i)
-        h.push_back (double (points[i + 1].x - points[i].x));
+        h[i] = double (points[i + 1].x - points[i].x);
 
-    std::vector<double> alpha;
-    alpha.reserve (n);
-    alpha.push_back (0);
+    std::array<double, n> alpha {};
     for (size_t i = 1; i < n; ++i)
-        alpha.push_back (double (3 * (points[i + 1].y - points[i].y) / h[i] - 3 * (points[i].y - points[i - 1].y) / h[i - 1]));
+        alpha[i] = double (3 * (points[i + 1].y - points[i].y) / h[i] - 3 * (points[i].y - points[i - 1].y) / h[i - 1]);
 
-    std::vector<double> l (n + 1);
-    std::vector<double> mu (n + 1);
-    std::vector<double> z (n + 1);
+    std::array<double, (size_t) numDrawPoints> l {};
+    std::array<double, (size_t) numDrawPoints> mu {};
+    std::array<double, (size_t) numDrawPoints> z {};
     l[0] = 1.0;
     mu[0] = 0.0;
     z[0] = 0.0;
@@ -101,13 +101,9 @@ double evaluateSpline (const Spline& spline, double x)
 {
     x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
 
-    size_t splineSetIndex = 0;
-    for (size_t ii = splineSetIndex + 1; ii < spline.size(); ++ii)
-    {
-        if (x < spline[ii].x)
-            break;
-        splineSetIndex = ii;
-    }
+    static constexpr auto scaler = double (numDrawPoints - 1) / double (splineBounds.xMax - splineBounds.xMin);
+    static constexpr auto offset = (double) -splineBounds.xMin * scaler;
+    const auto splineSetIndex = juce::truncatePositiveToUnsignedInt (scaler * x + offset);
 
     const auto& ss = spline[splineSetIndex];
     return chowdsp::Polynomials::estrin<3> ({ ss.d, ss.c, ss.b, ss.a }, x - ss.x);
@@ -122,27 +118,21 @@ double evaluateSplineADAA (const SplineADAASection& ss, double x)
     return ss.c0 + ss.c1 * x + ss.c2 * xSq + ss.c3 * xCb + ss.c4 * xQ;
 }
 
-double evaluateSplineADAA (const std::vector<SplineADAASection>& spline, double x)
+double evaluateSplineADAA (const std::array<SplineADAASection, numDrawPoints - 1>& spline, double x)
 {
     x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
 
-    size_t splineSetIndex = 0;
-    for (size_t ii = splineSetIndex + 1; ii < spline.size(); ++ii)
-    {
-        if (x < spline[ii].x)
-            break;
-        splineSetIndex = ii;
-    }
+    static constexpr auto scaler = double (numDrawPoints - 1) / double (splineBounds.xMax - splineBounds.xMin);
+    static constexpr auto offset = (double) -splineBounds.xMin * scaler;
+    const auto splineSetIndex = juce::truncatePositiveToUnsignedInt (scaler * x + offset);
 
     return evaluateSplineADAA (spline[splineSetIndex], x);
 }
 
-std::unique_ptr<SplineADAA> createADAASpline (const Spline& spline)
+std::unique_ptr<SplineADAA> createADAASpline (const SplinePoints& splinePoints)
 {
     auto splineADAA = std::make_unique<SplineADAA>();
-
-    splineADAA->first = spline;
-    splineADAA->second.resize (spline.size(), {});
+    const auto& spline = splineADAA->first = createSpline (splinePoints);
     for (auto [adaa, sp] : chowdsp::zip (splineADAA->second, spline))
     {
         adaa.c0 = sp.c * chowdsp::Power::ipow<3> (sp.x) / 3.0;
@@ -169,12 +159,16 @@ SplineWaveshaper::SplineWaveshaper (SplineState& state)
     splineState.changeBroadcaster.connect (
         [this]
         {
+            // kill old splines that might be hanging around
+            SplinePtr deadSpline {};
+            while (liveToDeadQueue.try_dequeue (deadSpline))
+                deadSpline.kill();
+
+            // load new spline!
             SplinePtr uiSpline;
             uiSpline.ptr = createADAASpline (splineState.get()).release();
             uiToLiveQueue.enqueue (uiSpline);
         });
-
-    startTimer (100);
 }
 
 SplineWaveshaper::~SplineWaveshaper()
@@ -183,13 +177,6 @@ SplineWaveshaper::~SplineWaveshaper()
     while (liveToDeadQueue.try_dequeue (deadSpline))
         deadSpline.kill();
     while (uiToLiveQueue.try_dequeue (deadSpline))
-        deadSpline.kill();
-}
-
-void SplineWaveshaper::timerCallback()
-{
-    SplinePtr deadSpline {};
-    while (liveToDeadQueue.try_dequeue (deadSpline))
         deadSpline.kill();
 }
 
@@ -222,9 +209,6 @@ void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) 
     if (spline == nullptr)
         return;
 
-    if (spline->first.empty() || spline->second.empty())
-        return;
-
     for (auto [idx, channel] : chowdsp::buffer_iters::channels (buffer))
     {
         chowdsp::ScopedValue _x1 { x1[(size_t) idx] };
@@ -250,4 +234,4 @@ void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) 
 
     dcBlocker.processBlock (buffer);
 }
-} // namespace dsp::waveshaper
+} // namespace dsp::waveshaper::spline
