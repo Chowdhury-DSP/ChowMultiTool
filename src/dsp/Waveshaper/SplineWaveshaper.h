@@ -114,4 +114,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineWaveshaper)
 };
-} // namespace dsp::waveshaper
+} // namespace dsp::waveshaper::spline

@@ -234,4 +234,4 @@ void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) 
 
     dcBlocker.processBlock (buffer);
 }
-} // namespace dsp::waveshaper
+} // namespace dsp::waveshaper::spline
