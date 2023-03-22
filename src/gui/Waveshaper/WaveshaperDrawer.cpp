@@ -3,8 +3,7 @@
 
 namespace gui::waveshaper
 {
-using namespace dsp::waveshaper;
-
+using namespace spline;
 constexpr auto dotDim = 0.035f;
 
 float valueToXCoord (float value, float width)
@@ -40,11 +39,12 @@ juce::Point<float> coordsToPoint (juce::Point<float> coords, float width, float 
 WaveshaperDrawer::WaveshaperDrawer (dsp::waveshaper::ExtraState& extraState)
     : splineState (extraState.splineState)
 {
+    points = getDefaultSplinePoints();
 }
 
 chowdsp::WaveshaperPlotParams WaveshaperDrawer::getPlotParams()
 {
-    return dsp::waveshaper::splineBounds;
+    return splineBounds;
 }
 
 void WaveshaperDrawer::paint (juce::Graphics& g)
@@ -60,27 +60,14 @@ void WaveshaperDrawer::paint (juce::Graphics& g)
         drawCircle (*mousePos);
     }
 
-    const auto floatWidth = (float) getWidth();
-    const auto floatHeight = (float) getHeight();
-
     g.setColour (colours::plotColour);
-    for (auto [idx, point] : chowdsp::enumerate (points))
-    {
-        drawCircle (pointToCoords (point, floatWidth, floatHeight));
-    }
-
-    if (! splineState.get().empty())
-    {
-        const auto splinePath = getDrawnPath();
-        g.strokePath (splinePath, juce::PathStrokeType { juce::PathStrokeType::curved });
-    }
+    const auto splinePath = getDrawnPath();
+    g.strokePath (splinePath, juce::PathStrokeType { juce::PathStrokeType::curved });
 }
 
 juce::Path WaveshaperDrawer::getDrawnPath (std::optional<chowdsp::WaveshaperPlotParams>&& params) const
 {
-    const auto& splineInfo = splineState.get();
-    if (splineInfo.empty())
-        return {};
+    const auto splineInfo = createSpline (splineState.get());
 
     if (! params.has_value())
         params.emplace (getPlotParams());
@@ -109,31 +96,59 @@ void WaveshaperDrawer::visibilityChanged()
 {
     if (isVisible())
     {
-        points.clear();
-        splineState.set ({});
+        points = getDefaultSplinePoints();
+        splineState.set (points);
     }
+}
+
+void WaveshaperDrawer::setSplinePoint (juce::Point<float> point)
+{
+    static constexpr auto scaler = float (numDrawPoints - 1) / (splineBounds.xMax - splineBounds.xMin);
+    static constexpr auto offset = -splineBounds.xMin * scaler;
+
+    const auto pointIndex = std::min ((size_t) juce::truncatePositiveToUnsignedInt (xCoordToValue (point.x, (float) getWidth()) * scaler + offset),
+                                      (size_t) numDrawPoints - 1);
+    points[pointIndex].y = yCoordToValue (point.y, (float) getHeight());
+    splineState.set (points);
 }
 
 void WaveshaperDrawer::mouseDown (const juce::MouseEvent& e)
 {
-    mousePos.reset();
+    lastMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
+    setSplinePoint (lastMouseDragPoint);
+    repaint();
+}
 
-    const auto pos = e.getEventRelativeTo (this).getPosition().toFloat();
-    if (points.empty() || pos.x > valueToXCoord (points.back().x, (float) getWidth()))
+void WaveshaperDrawer::mouseDrag (const juce::MouseEvent& e)
+{
+    const auto newMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
+    if (lastMouseDragPoint.x < newMouseDragPoint.x)
     {
-        points.emplace_back (coordsToPoint (pos, (float) getWidth(), (float) getHeight()));
-        splineState.set (createSpline (points));
+        for (float x = lastMouseDragPoint.x; x <= newMouseDragPoint.x; x += 0.1f)
+        {
+            float pct = (x - lastMouseDragPoint.x) / (newMouseDragPoint.x - lastMouseDragPoint.x);
+            setSplinePoint ({ x, juce::jmap (pct, lastMouseDragPoint.y, newMouseDragPoint.y) });
+        }
     }
+    else if (newMouseDragPoint.x < lastMouseDragPoint.x)
+    {
+        for (float x = lastMouseDragPoint.x; x >= newMouseDragPoint.x; x -= 0.1f)
+        {
+            float pct = (x - lastMouseDragPoint.x) / (newMouseDragPoint.x - lastMouseDragPoint.x);
+            setSplinePoint ({ x, juce::jmap (pct, lastMouseDragPoint.y, newMouseDragPoint.y) });
+        }
+    }
+
+    lastMouseDragPoint = newMouseDragPoint;
+    mousePos.emplace (lastMouseDragPoint);
+
     repaint();
 }
 
 void WaveshaperDrawer::mouseMove (const juce::MouseEvent& e)
 {
     const auto pos = e.getEventRelativeTo (this).getPosition().toFloat();
-    if (points.empty() || pos.x > valueToXCoord (points.back().x, (float) getWidth()))
-        mousePos.emplace (pos);
-    else
-        mousePos.reset();
+    mousePos.emplace (pos);
 
     repaint();
 }

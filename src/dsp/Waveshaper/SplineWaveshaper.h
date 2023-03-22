@@ -2,8 +2,10 @@
 
 #include <pch.h>
 
-namespace dsp::waveshaper
+namespace dsp::waveshaper::spline
 {
+constexpr int numDrawPoints = 600;
+
 struct SplineSection
 {
     double a;
@@ -23,27 +25,30 @@ struct SplineADAASection
     double x;
 };
 
-PFR_FUNCTIONS_FOR (SplineSection);
+using SplinePoints = std::array<juce::Point<float>, numDrawPoints>;
+using Spline = std::array<SplineSection, numDrawPoints - 1>;
+using SplineADAA = std::pair<Spline, std::array<SplineADAASection, numDrawPoints - 1>>;
 
-using Spline = std::vector<SplineSection>;
-using SplineADAA = std::pair<Spline, std::vector<SplineADAASection>>;
+SplinePoints getDefaultSplinePoints();
+Spline createSpline (const SplinePoints& points);
+double evaluateSpline (const Spline& spline, double x);
 
 struct SplineState : chowdsp::StateValueBase
 {
-    SplineState (std::string_view valueName, Spline defaultVal);
-    Spline get() const noexcept { return currentValue; }
-    operator Spline() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
+    explicit SplineState (std::string_view valueName);
+    SplinePoints get() const noexcept { return currentValue; }
+    operator SplinePoints() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
 
     /** Sets a new value */
-    void set (Spline v);
-    SplineState& operator= (Spline v);
+    void set (const SplinePoints& v);
+    SplineState& operator= (const SplinePoints& v);
 
     void reset() override { set (defaultValue); }
 
     void serialize (chowdsp::JSONSerializer::SerializedType& serial) const override;
     void deserialize (chowdsp::JSONSerializer::DeserializedType deserial) override;
 
-    const Spline defaultValue;
+    const SplinePoints defaultValue = getDefaultSplinePoints();
 
 private:
     template <typename Serializer>
@@ -56,12 +61,12 @@ private:
     template <typename Serializer>
     static void deserialize (typename Serializer::DeserializedType deserial, SplineState& value)
     {
-        Spline val {};
+        SplinePoints val {};
         chowdsp::Serialization::deserialize<Serializer> (deserial, val);
         value.set (val);
     }
 
-    Spline currentValue;
+    SplinePoints currentValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineState)
 };
@@ -73,14 +78,11 @@ constexpr chowdsp::WaveshaperPlotParams splineBounds {
     .yMax = 1.1f,
 };
 
-Spline createSpline (std::vector<juce::Point<float>> points);
-double evaluateSpline (const Spline& spline, double x);
-
-class SplineWaveshaper : private juce::Timer
+class SplineWaveshaper
 {
 public:
     explicit SplineWaveshaper (SplineState& splineState);
-    ~SplineWaveshaper() override;
+    ~SplineWaveshaper();
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
@@ -88,8 +90,6 @@ public:
     void processBlock (const chowdsp::BufferView<double>& buffer) noexcept;
 
 private:
-    void timerCallback() override;
-
     SplineState& splineState;
     std::unique_ptr<SplineADAA> spline;
 
@@ -107,7 +107,6 @@ private:
                 ptr = nullptr;
             }
         }
-
         SplineADAA* ptr = nullptr;
     };
     moodycamel::ReaderWriterQueue<SplinePtr, 4> uiToLiveQueue;
