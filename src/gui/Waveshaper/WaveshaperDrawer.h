@@ -4,6 +4,8 @@
 
 namespace gui::waveshaper
 {
+namespace spline = dsp::waveshaper::spline;
+
 class WaveshaperDrawer : public juce::Component
 {
 public:
@@ -15,15 +17,18 @@ public:
     juce::Path getDrawnPath (std::optional<chowdsp::WaveshaperPlotParams>&& params = {}) const;
 
 private:
+    void setSplinePoint (juce::Point<float> point);
     void visibilityChanged() override;
     void mouseDown (const juce::MouseEvent& e) override;
+    void mouseDrag (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;
     void mouseExit (const juce::MouseEvent& e) override;
 
-    dsp::waveshaper::SplineState& splineState;
+    spline::SplineState& splineState;
 
-    std::vector<juce::Point<float>> points;
+    spline::SplinePoints points;
     std::optional<juce::Point<float>> mousePos;
+    juce::Point<float> lastMouseDragPoint {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperDrawer)
 };
