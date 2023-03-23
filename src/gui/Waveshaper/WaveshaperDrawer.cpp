@@ -36,8 +36,9 @@ juce::Point<float> coordsToPoint (juce::Point<float> coords, float width, float 
     return { xCoordToValue (coords.x, width), yCoordToValue (coords.y, height) };
 }
 
-WaveshaperDrawer::WaveshaperDrawer (dsp::waveshaper::ExtraState& extraState)
-    : splineState (extraState.splineState)
+WaveshaperDrawer::WaveshaperDrawer (dsp::waveshaper::ExtraState& extraState, juce::UndoManager& undoManager)
+    : splineState (extraState.splineState),
+      um (undoManager)
 {
     points = getDefaultSplinePoints();
 }
@@ -96,8 +97,51 @@ void WaveshaperDrawer::visibilityChanged()
 {
     if (isVisible())
     {
+        prevPoints = points;
         points = getDefaultSplinePoints();
         splineState.set (points);
+    }
+    else
+    {
+        struct UndoableFreeDraw : juce::UndoableAction
+        {
+            explicit UndoableFreeDraw (WaveshaperDrawer& d)
+                : drawer (d), points (drawer.prevPoints)
+            {
+            }
+
+            WaveshaperDrawer& drawer;
+            spline::SplinePoints points;
+            bool firstTime = true;
+
+            bool perform() override
+            {
+                if (firstTime)
+                {
+                    firstTime = false;
+                    return true;
+                }
+
+                const auto temp = drawer.splineState.get();
+                drawer.splineState.set (points);
+                points = temp;
+
+                if (auto* parent = drawer.getParentComponent())
+                    parent->repaint();
+
+                return true;
+            }
+
+            bool undo() override
+            {
+                return perform();
+            }
+
+            int getSizeInUnits() override { return (int) sizeof (*this); }
+        };
+
+        um.beginNewTransaction ("Waveshaper Free-Draw");
+        um.perform (new UndoableFreeDraw { *this });
     }
 }
 

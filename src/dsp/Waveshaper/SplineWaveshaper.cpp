@@ -163,6 +163,8 @@ SplineWaveshaper::SplineWaveshaper (SplineState& state)
             SplinePtr deadSpline {};
             while (liveToDeadQueue.try_dequeue (deadSpline))
                 deadSpline.kill();
+            while (uiToLiveQueue.try_dequeue (deadSpline))
+                deadSpline.kill();
 
             // load new spline!
             SplinePtr uiSpline;
@@ -183,7 +185,7 @@ SplineWaveshaper::~SplineWaveshaper()
 void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
 {
     dcBlocker.prepare (spec);
-    dcBlocker.calcCoefs (30.0f, chowdsp::CoefficientCalculators::butterworthQ<double>, spec.sampleRate);
+    dcBlocker.calcCoefs (1.0, spec.sampleRate);
 
     x1.resize (spec.numChannels, 0.0);
 

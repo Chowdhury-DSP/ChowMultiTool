@@ -9,7 +9,7 @@ namespace spline = dsp::waveshaper::spline;
 class WaveshaperDrawer : public juce::Component
 {
 public:
-    explicit WaveshaperDrawer (dsp::waveshaper::ExtraState& wsExtraState);
+    WaveshaperDrawer (dsp::waveshaper::ExtraState& wsExtraState, juce::UndoManager& um);
 
     void paint (juce::Graphics& g) override;
 
@@ -25,8 +25,10 @@ private:
     void mouseExit (const juce::MouseEvent& e) override;
 
     spline::SplineState& splineState;
+    juce::UndoManager& um;
 
     spline::SplinePoints points;
+    spline::SplinePoints prevPoints;
     std::optional<juce::Point<float>> mousePos;
     juce::Point<float> lastMouseDragPoint {};
 

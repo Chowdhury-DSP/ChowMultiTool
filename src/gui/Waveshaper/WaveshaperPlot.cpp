@@ -8,7 +8,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
         .xMin = -1.5f,
         .xMax = 1.5f,
     }),
-      drawArea (*pluginState.nonParams.waveshaperExtraState),
+      drawArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       shapeParam (*wsParams.shapeParam),
       gainAttach (*wsParams.gainParam, pluginState, *this)
 {
