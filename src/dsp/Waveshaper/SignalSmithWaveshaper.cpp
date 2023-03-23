@@ -2,7 +2,7 @@
 
 namespace dsp::waveshaper
 {
-static constexpr auto TOL = 1.0e-1; // chowdsp::ScientificRatio<1, -5>::value<double>;
+static constexpr auto TOL = chowdsp::ScientificRatio<1, -2>::value<double>;
 
 [[nodiscard]] inline auto nlFunc (const xsimd::batch<double>& x, double k, double M, double k_sq) noexcept
 {
@@ -61,56 +61,45 @@ void SignalSmithWaveshaper::processBlock (const chowdsp::BufferView<xsimd::batch
         chowdsp::ScopedValue<xsimd::batch<double>> _x1 { x1[(size_t) ch] };
         chowdsp::ScopedValue<xsimd::batch<double>> _x2 { x2[(size_t) ch] };
 
-        const auto calcD1 = [&k_smooth_data, &M_smooth_data] (const xsimd::batch<double>& x0,
-                                                              const xsimd::batch<double>& x1_,
-                                                              const xsimd::batch<double>& _ad2_x0,
-                                                              const xsimd::batch<double>& _ad2_x1,
-                                                              double k_sq,
-                                                              double M_sq,
-                                                              size_t n)
-        {
-            const auto illCondition = xsimd::abs (x0 - x1_) < TOL;
-            return xsimd::select (illCondition,
-                                  nlFunc_AD1 (0.5 * (x0 + x1_), k_smooth_data[n], M_smooth_data[n], k_sq, M_sq),
-                                  (_ad2_x0 - _ad2_x1) / (x0 - x1_));
-        };
-
-        const auto fallback = [&_x1, &_x2, &k_smooth_data, &M_smooth_data] (const xsimd::batch<double>& x,
-                                                                            const xsimd::batch<double>& _ad2_x1,
-                                                                            double k_sq,
-                                                                            double M_sq,
-                                                                            double k_o_M_term,
-                                                                            size_t n)
-        {
-            const auto xBar = 0.5 * (x + _x2.get());
-            const auto delta = xBar - _x1.get();
-            const auto illCondition = xsimd::abs (delta) < TOL;
-            return xsimd::select (illCondition,
-                                  nlFunc (0.5 * (xBar + _x1.get()), k_smooth_data[n], M_smooth_data[n], k_sq),
-                                  (2.0 / delta) * (nlFunc_AD1 (xBar, k_smooth_data[n], M_smooth_data[n], k_sq, M_sq) + (_ad2_x1 - nlFunc_AD2 (xBar, M_smooth_data[n], k_sq, M_sq, k_o_M_term)) / delta));
-        };
-
         for (auto [n, x] : chowdsp::enumerate (data))
         {
-            const auto illCondition = xsimd::abs (x - _x2.get()) < TOL;
-
             const auto M_sq = chowdsp::Power::ipow<2> (M_smooth_data[n]);
             const auto k_sq = chowdsp::Power::ipow<2> (k_smooth_data[n]);
             const auto k_o_M_term = k_smooth_data[n] / ((M_sq + 9.0) * (M_sq + 4.0));
 
-            const auto _ad2_x0 = nlFunc_AD2 (x, M_smooth_data[n], k_sq, M_sq, k_o_M_term);
-            const auto _ad2_x1 = nlFunc_AD2 (_x1.get(), M_smooth_data[n], k_sq, M_sq, k_o_M_term);
-            const auto _ad2_x2 = nlFunc_AD2 (_x2.get(), M_smooth_data[n], k_sq, M_sq, k_o_M_term);
+            const auto ill_condition_x_x2 = xsimd::abs (x - _x2.get()) < TOL;
 
-            const auto d1 = calcD1 (x, _x1.get(), _ad2_x0, _ad2_x1, k_sq, M_sq, n);
-            const auto d2 = calcD1 (_x1.get(), _x2.get(), _ad2_x1, _ad2_x2, k_sq, M_sq, n);
-            const auto y = xsimd::select (illCondition, fallback (x, _ad2_x1, k_sq, M_sq, k_o_M_term, n), (2.0 / (x - _x2.get())) * (d1 - d2));
+            // fallback for x - x2 ill-condition
+            const auto y_fallback_x_x2 = [&] (auto this_n, auto this_x)
+            {
+                const auto x_bar = 0.5 * (this_x + _x2.get());
+                const auto delta = x_bar - _x1.get();
+                const auto ill_condition_xbar_x1 = xsimd::abs (delta) < TOL;
+
+                return xsimd::select (ill_condition_xbar_x1,
+                                      nlFunc (0.5 * (x_bar + _x1.get()), k_smooth_data[this_n], M_smooth_data[this_n], k_sq),
+                                      (2.0 / delta) * (nlFunc_AD1 (x_bar, k_smooth_data[this_n], M_smooth_data[this_n], k_sq, M_sq) + (nlFunc_AD2 (_x1.get(), M_smooth_data[this_n], k_sq, M_sq, k_o_M_term) - nlFunc_AD2 (x_bar, M_smooth_data[this_n], k_sq, M_sq, k_o_M_term)) / delta));
+            }(n, x);
+
+            const auto adaa1_internal = [&](auto this_n, auto this_x, auto this_x1) -> auto
+            {
+                const auto y_ic = nlFunc_AD1 (0.5 * (this_x + this_x1), k_smooth_data[this_n], M_smooth_data[this_n], k_sq, M_sq);
+                const auto y_ad0 = nlFunc_AD2 (this_x, M_smooth_data[this_n], k_sq, M_sq, k_o_M_term);
+                const auto y_ad1 = nlFunc_AD2 (this_x1, M_smooth_data[this_n], k_sq, M_sq, k_o_M_term);
+                const auto y_no_ic = (y_ad0 - y_ad1) / (this_x - this_x1);
+
+                const auto illCondition = xsimd::abs (this_x - this_x1) < TOL;
+                return xsimd::select (illCondition, y_ic, y_no_ic);
+            };
+            const auto term1 = adaa1_internal (n, x, _x1.get());
+            const auto term2 = adaa1_internal (n, _x1.get(), _x2.get());
+            const auto y_ideal = (2.0 / (x - _x2.get())) * (term1 - term2);
 
             // update state
             _x2.get() = _x1.get();
             _x1.get() = x;
 
-            x = y;
+            x = xsimd::select (ill_condition_x_x2, y_fallback_x_x2, y_ideal);
         }
     }
 }

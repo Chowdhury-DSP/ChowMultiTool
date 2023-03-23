@@ -95,7 +95,7 @@ private:
 
     std::vector<double> x1;
 
-    chowdsp::SecondOrderHPF<double> dcBlocker;
+    chowdsp::FirstOrderHPF<double> dcBlocker;
 
     struct SplinePtr
     {
