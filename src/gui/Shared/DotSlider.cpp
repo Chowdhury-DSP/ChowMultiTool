@@ -118,33 +118,46 @@ void DotSliderGroup::resized()
         slider->setBounds (getBoundsInParent());
 }
 
-void DotSliderGroup::addSlider (std::unique_ptr<DotSlider>&& slider)
+void DotSliderGroup::setSliders (std::vector<DotSlider*>&& newSliders)
 {
-    slider->setInterceptsMouseClicks (false, false);
-    sliders.emplace_back (std::move (slider));
+    sliders = std::move (newSliders);
+    for (auto* slider : sliders)
+        slider->setInterceptsMouseClicks (false, false);
 }
 
 void DotSliderGroup::mouseDown (const juce::MouseEvent& e)
 {
     for (auto& slider : sliders)
-        slider->mouseDown (e);
+    {
+        if (slider->checkModifierKeys (e.mods))
+            slider->mouseDown (e);
+    }
 }
 
 void DotSliderGroup::mouseDrag (const juce::MouseEvent& e)
 {
     for (auto& slider : sliders)
-        slider->mouseDrag (e);
+    {
+        if (slider->checkModifierKeys (e.mods))
+            slider->mouseDrag (e);
+    }
 }
 
 void DotSliderGroup::mouseUp (const juce::MouseEvent& e)
 {
     for (auto& slider : sliders)
-        slider->mouseUp (e);
+    {
+        if (slider->checkModifierKeys (e.mods))
+            slider->mouseUp (e);
+    }
 }
 
 void DotSliderGroup::mouseDoubleClick (const juce::MouseEvent& e)
 {
     for (auto& slider : sliders)
-        slider->mouseDoubleClick (e);
+    {
+        if (slider->checkModifierKeys (e.mods))
+            slider->mouseDoubleClick (e);
+    }
 }
 } // namespace gui
