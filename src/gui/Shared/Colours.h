@@ -32,3 +32,10 @@ using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFC03221 };
 const auto thumbColour = juce::Colour { 0xFF4B8F8C };
 } // namespace gui::brickwall::colours
+
+namespace gui::eq::colours
+{
+using namespace gui::colours;
+const auto plotColour = juce::Colour { 0xFFC03221 };
+const auto thumbColour = juce::Colour { 0xFF4B8F8C };
+} // namespace gui::eq::colours
