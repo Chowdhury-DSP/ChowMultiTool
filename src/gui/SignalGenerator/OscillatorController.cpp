@@ -3,30 +3,29 @@
 namespace gui::signal_gen
 {
 OscillatorController::OscillatorController (State& state)
-    : plotSignalGen (*state.params.signalGenParams)
+    : plotSignalGen (*state.params.signalGenParams),
+      gainSlider (*state.params.signalGenParams->gain,
+                  state,
+                  plot,
+                  SpectrumDotSlider::Orientation::MagnitudeOriented),
+      freqSlider (*state.params.signalGenParams->frequency,
+                  state,
+                  plot,
+                  SpectrumDotSlider::Orientation::FrequencyOriented)
 {
-    auto gainSlider = std::make_unique<SpectrumDotSlider> (*state.params.signalGenParams->gain,
-                                                           state,
-                                                           plot,
-                                                           SpectrumDotSlider::Orientation::MagnitudeOriented);
-    gainSlider->getXCoordinate = [this, &state]
+    gainSlider.getXCoordinate = [this, &state]
     {
         return plot.getXCoordinateForFrequency (state.params.signalGenParams->frequency->get());
     };
-    addAndMakeVisible (gainSlider.get());
+    addAndMakeVisible (gainSlider);
 
-    auto freqSlider = std::make_unique<SpectrumDotSlider> (*state.params.signalGenParams->frequency,
-                                                           state,
-                                                           plot,
-                                                           SpectrumDotSlider::Orientation::FrequencyOriented);
-    freqSlider->getYCoordinate = [this, &state]
+    freqSlider.getYCoordinate = [this, &state]
     {
         return plot.getYCoordinateForDecibels (state.params.signalGenParams->gain->get());
     };
-    addAndMakeVisible (freqSlider.get());
+    addAndMakeVisible (freqSlider);
 
-    sliders.addSlider (std::move (gainSlider));
-    sliders.addSlider (std::move (freqSlider));
+    sliders.setSliders ({ &gainSlider, &freqSlider });
     addAndMakeVisible (sliders);
 
     plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });

@@ -20,6 +20,7 @@ private:
 
     dsp::signal_gen::SignalGeneratorProcessor plotSignalGen;
 
+    SpectrumDotSlider gainSlider, freqSlider;
     DotSliderGroup sliders;
 
     chowdsp::ScopedCallbackList parameterChangeListeners;
