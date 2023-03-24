@@ -1,8 +1,8 @@
 #pragma once
 
-#include "state/PluginState.h"
-#include "dsp/EQ/EQProcessor.h"
 #include "EQBandBox.h"
+#include "dsp/EQ/EQProcessor.h"
+#include "state/PluginState.h"
 
 namespace gui::eq
 {
@@ -19,4 +19,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BottomBar)
 };
-}
+} // namespace gui::eq

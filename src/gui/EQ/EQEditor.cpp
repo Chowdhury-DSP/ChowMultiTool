@@ -12,7 +12,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams)
 
     addAndMakeVisible (plot);
     addAndMakeVisible (bottomBar.get());
-//    addAndMakeVisible (paramsView);
+    //    addAndMakeVisible (paramsView);
 }
 
 void EQEditor::paint (juce::Graphics& g)
