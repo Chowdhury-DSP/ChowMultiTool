@@ -156,30 +156,8 @@ std::unique_ptr<SplineADAA> createADAASpline (const SplinePoints& splinePoints)
 SplineWaveshaper::SplineWaveshaper (SplineState& state)
     : splineState (state)
 {
-    splineState.changeBroadcaster.connect (
-        [this]
-        {
-            // kill old splines that might be hanging around
-            SplinePtr deadSpline {};
-            while (liveToDeadQueue.try_dequeue (deadSpline))
-                deadSpline.kill();
-            while (uiToLiveQueue.try_dequeue (deadSpline))
-                deadSpline.kill();
-
-            // load new spline!
-            SplinePtr uiSpline;
-            uiSpline.ptr = createADAASpline (splineState.get()).release();
-            uiToLiveQueue.enqueue (uiSpline);
-        });
-}
-
-SplineWaveshaper::~SplineWaveshaper()
-{
-    SplinePtr deadSpline {};
-    while (liveToDeadQueue.try_dequeue (deadSpline))
-        deadSpline.kill();
-    while (uiToLiveQueue.try_dequeue (deadSpline))
-        deadSpline.kill();
+    splineState.changeBroadcaster.connect ([this]
+                                           { splineUIToAudioPipeline.write (createADAASpline (splineState.get())); });
 }
 
 void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
@@ -189,7 +167,8 @@ void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
 
     x1.resize (spec.numChannels, 0.0);
 
-    spline = createADAASpline (splineState.get());
+    splineUIToAudioPipeline.write (createADAASpline (splineState.get()));
+    splineUIToAudioPipeline.read();
 }
 
 void SplineWaveshaper::reset()
@@ -199,15 +178,7 @@ void SplineWaveshaper::reset()
 
 void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) noexcept
 {
-    SplinePtr splineFromUI {};
-    if (uiToLiveQueue.try_dequeue (splineFromUI))
-    {
-        SplinePtr deadSpline {};
-        deadSpline.ptr = spline.release();
-        spline.reset (splineFromUI.ptr);
-        liveToDeadQueue.try_enqueue (deadSpline);
-    }
-
+    const auto* spline = splineUIToAudioPipeline.read();
     if (spline == nullptr)
         return;
 

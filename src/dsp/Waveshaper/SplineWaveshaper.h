@@ -82,7 +82,6 @@ class SplineWaveshaper
 {
 public:
     explicit SplineWaveshaper (SplineState& splineState);
-    ~SplineWaveshaper();
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
@@ -91,26 +90,11 @@ public:
 
 private:
     SplineState& splineState;
-    std::unique_ptr<SplineADAA> spline;
 
     std::vector<double> x1;
-
     chowdsp::FirstOrderHPF<double> dcBlocker;
 
-    struct SplinePtr
-    {
-        void kill()
-        {
-            if (ptr != nullptr)
-            {
-                delete ptr;
-                ptr = nullptr;
-            }
-        }
-        SplineADAA* ptr = nullptr;
-    };
-    moodycamel::ReaderWriterQueue<SplinePtr, 4> uiToLiveQueue;
-    moodycamel::ReaderWriterQueue<SplinePtr, 4> liveToDeadQueue;
+    chowdsp::UIToAudioPipeline<SplineADAA> splineUIToAudioPipeline;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineWaveshaper)
 };
