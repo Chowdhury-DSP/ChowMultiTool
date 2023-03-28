@@ -173,6 +173,7 @@ void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
 
 void SplineWaveshaper::reset()
 {
+    std::fill (x1.begin(), x1.end(), 0.0f);
     dcBlocker.reset();
 }
 

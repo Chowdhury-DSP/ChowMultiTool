@@ -1,12 +1,11 @@
 #pragma once
 
-#include "dsp/EQ/EQProcessor.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
+#include "EQChyron.h"
 
 namespace gui::eq
 {
-constexpr auto numBands = dsp::eq::EQToolParams::numBands;
 class EQPlot : public chowdsp::EQ::EqualizerPlotWithParameters<numBands>
 {
 public:
@@ -14,8 +13,11 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void mouseDown (const juce::MouseEvent& e) override;
 
 private:
+    void setSelectedBand (int bandIndex);
+
     struct QDotSlider : SpectrumDotSlider
     {
         using SpectrumDotSlider::SpectrumDotSlider;
@@ -24,10 +26,18 @@ private:
         double valueToProportionOfLength (double value) override;
     };
 
+    struct EQBandSliderGroup : DotSliderGroup
+    {
+        bool isSelected = false;
+        void paint (juce::Graphics& g) override;
+    };
+
     std::array<std::optional<SpectrumDotSlider>, numBands> freqSliders;
     std::array<std::optional<SpectrumDotSlider>, numBands> gainSliders;
     std::array<std::optional<QDotSlider>, numBands> qSliders;
-    std::array<DotSliderGroup, numBands> sliderGroups;
+    std::array<EQBandSliderGroup, numBands> sliderGroups;
+
+    EQChyron chyron;
 
     chowdsp::ScopedCallbackList callbacks;
 

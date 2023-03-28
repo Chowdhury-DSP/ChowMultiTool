@@ -17,6 +17,8 @@ void DotSlider::paint (juce::Graphics& g)
 
 bool DotSlider::hitTest (int x, int y)
 {
+    if (! isVisible())
+        return false;
     return getThumbBounds().contains ((float) x, (float) y);
 }
 

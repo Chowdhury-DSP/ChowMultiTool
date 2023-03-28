@@ -9,6 +9,7 @@ BottomBar::BottomBar (State& pluginState, dsp::eq::EQToolParams& params)
     {
         addAndMakeVisible (box);
         box.initialise (pluginState, params.eqParams.eqParams[idx].onOffParam, params.eqParams.eqParams[idx].typeParam);
+        box.getLookAndFeel().setColour (juce::PopupMenu::highlightedBackgroundColourId, colours::thumbColours[idx].withAlpha (0.75f));
     }
 }
 
@@ -30,12 +31,20 @@ void BottomBar::paint (juce::Graphics& g)
     g.setGradientFill (verticalGrad (juce::Colours::black.withAlpha (0.0f), juce::Colours::black));
     g.fillAll();
 
-    g.setGradientFill (verticalGrad (colours::thumbColour.withAlpha (0.0f), colours::thumbColour));
-    g.fillAll();
-
-    g.setGradientFill (verticalGrad (colours::linesColour.withAlpha (0.75f), colours::linesColour));
     const auto fracWidthPos = (float) getWidth() / (float) dsp::eq::EQToolParams::numBands;
-    for (size_t i = 1; i < dsp::eq::EQToolParams::numBands; ++i)
-        g.drawLine (juce::Line { juce::Point { (float) i * fracWidthPos, 0.0f }, juce::Point { (float) i * fracWidthPos, (float) getHeight() } }, 1.0f);
+    for (size_t i = 0; i < dsp::eq::EQToolParams::numBands; ++i)
+    {
+        const auto startX = float (i) * fracWidthPos;
+        const auto endX = float (i + 1) * fracWidthPos;
+
+        g.setGradientFill (verticalGrad (colours::thumbColours[i].withAlpha (0.0f), colours::thumbColours[i]));
+        g.fillRect (juce::Rectangle<float> { startX, 0.0f, endX - startX, (float) getHeight() });
+
+        if (i < (dsp::eq::EQToolParams::numBands - 1))
+        {
+            g.setGradientFill (verticalGrad (colours::linesColour.withAlpha (0.75f), colours::linesColour));
+            g.drawLine (juce::Line { juce::Point { endX, 0.0f }, juce::Point { endX, (float) getHeight() } }, 1.0f);
+        }
+    }
 }
 } // namespace gui::eq

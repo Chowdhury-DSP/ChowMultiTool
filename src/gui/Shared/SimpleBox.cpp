@@ -18,7 +18,7 @@ juce::Font SimpleBox::LNF::getPopupMenuFont()
 
 SimpleBox::SimpleBox()
 {
-    setLookAndFeel (lnfs->getLookAndFeel<LNF>());
+    setLookAndFeel (&lnf);
 }
 SimpleBox::~SimpleBox()
 {

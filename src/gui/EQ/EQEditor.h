@@ -3,10 +3,8 @@
 #include "EQPlot.h"
 
 // @TODO:
-// - colours
-// - some notion of "selected" band
-// - "chiron" in the bottom corner to show params for selected band
-// - Icon button for linear phase
+// - Figure out type-in values for chyron
+// - Better controls for Q values
 
 namespace gui::eq
 {
@@ -22,6 +20,17 @@ private:
     EQPlot plot;
     std::unique_ptr<juce::Component> bottomBar;
     chowdsp::ParametersView paramsView;
+
+    struct LinearPhaseButton : juce::Button
+    {
+        LinearPhaseButton();
+        void paintButton (juce::Graphics& g, bool, bool) override;
+        std::unique_ptr<juce::Drawable> lpIconOn;
+        std::unique_ptr<juce::Drawable> lpIconOff;
+    } linearPhaseButton;
+    chowdsp::ButtonAttachment linearPhaseAttach;
+
+    juce::TooltipWindow tooltips;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQEditor)
 };

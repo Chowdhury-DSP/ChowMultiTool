@@ -19,7 +19,7 @@ struct SimpleBox : juce::ComboBox
     void paint (juce::Graphics& g) override;
     void resized() override {}
 
-    chowdsp::SharedLNFAllocator lnfs;
+    LNF lnf;
     gui::SharedFonts fonts;
     juce::String extraText;
 };

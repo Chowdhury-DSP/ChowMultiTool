@@ -1,66 +1,10 @@
 #include "EQPlot.h"
+#include "EQGUIHelpers.h"
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::eq
 {
-chowdsp::EQ::EQPlotFilterType getFilterType (int typeIndex)
-{
-    using Type = chowdsp::EQ::EQPlotFilterType;
-    switch (typeIndex)
-    {
-        case 0:
-            return Type::HPF1; // 6 dB
-        case 1:
-            return Type::HPF2; // 12 dB
-        case 2:
-            return Type::HPF3; // 18 dB
-        case 3:
-            return Type::HPF4; // 24 dB
-        case 4:
-            return Type::HPF8; // 48 dB
-
-        case 5:
-            return Type::LowShelf;
-        case 6:
-            return Type::Bell;
-        case 7:
-            return Type::Notch;
-        case 8:
-            return Type::HighShelf;
-
-        case 9:
-            return Type::LPF1;
-        case 10:
-            return Type::LPF2;
-        case 11:
-            return Type::LPF3;
-        case 12:
-            return Type::LPF4;
-        case 13:
-            return Type::LPF8;
-
-        default:
-            return {};
-    }
-}
-
-constexpr bool hasGainParam (chowdsp::EQ::EQPlotFilterType filterType)
-{
-    using Type = chowdsp::EQ::EQPlotFilterType;
-    if (filterType == Type::LPF1 || filterType == Type::LPF2 || filterType == Type::LPF3 || filterType == Type::LPF4
-        || filterType == Type::LPF8 || filterType == Type::Notch || filterType == Type::HPF1 || filterType == Type::HPF2
-        || filterType == Type::HPF3 || filterType == Type::HPF4 || filterType == Type::HPF8)
-        return false;
-    return true;
-}
-
-constexpr bool hasQParam (chowdsp::EQ::EQPlotFilterType filterType)
-{
-    using Type = chowdsp::EQ::EQPlotFilterType;
-    return filterType != Type::LPF1 && filterType != Type::HPF1;
-}
-
 juce::Rectangle<float> EQPlot::QDotSlider::getThumbBounds() const noexcept
 {
     const auto dim = plotBase.getLocalBounds().proportionOfWidth (0.025f);
@@ -82,19 +26,36 @@ double EQPlot::QDotSlider::valueToProportionOfLength (double value)
     return (double) qRange.convertTo0to1 ((float) value);
 }
 
+void EQPlot::EQBandSliderGroup::paint (juce::Graphics& g)
+{
+    if (isSelected && ! sliders.empty())
+    {
+        g.setColour (sliders[0]->findColour (juce::Slider::thumbColourId));
+        g.drawEllipse (sliders[0]->getThumbBounds().expanded (2.0f), 1.0f);
+    }
+}
+
 constexpr int minFrequency = 18;
 constexpr int maxFrequency = 22'000;
 
 EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters)
     : chowdsp::EQ::EqualizerPlotWithParameters<numBands> (pluginState.getParameterListeners(),
                                                           eqParameters,
-                                                          &getFilterType,
+                                                          &helpers::getFilterType,
                                                           chowdsp::SpectrumPlotParams {
                                                               .minFrequencyHz = minFrequency,
-                                                              .maxFrequencyHz = maxFrequency })
+                                                              .maxFrequencyHz = maxFrequency,
+                                                              .minMagnitudeDB = -23.0f,
+                                                              .maxMagnitudeDB = 20.0f }),
+      chyron (pluginState, eqParameters)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
+        const auto setSliderActive = [] (juce::Slider& slider, bool shouldBeActive)
+        {
+            slider.setVisible (shouldBeActive);
+        };
+
         freqSliders[i].emplace (*eqParameters.eqParams[i].freqParam,
                                 pluginState,
                                 *this,
@@ -102,11 +63,12 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         addChildComponent (*freqSliders[i]);
         freqSliders[i]->getYCoordinate = [this, i, &eqParameters]
         {
-            return getYCoordinateForDecibels (hasGainParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
+            return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
                                                   ? eqParameters.eqParams[i].gainParam->get()
                                                   : 0.0f);
         };
-        freqSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get());
+        freqSliders[i]->setColour (juce::Slider::thumbColourId, colours::thumbColours[i]);
+        setSliderActive (*freqSliders[i], eqParameters.eqParams[i].onOffParam->get());
 
         gainSliders[i].emplace (*eqParameters.eqParams[i].gainParam,
                                 pluginState,
@@ -117,7 +79,8 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         {
             return getXCoordinateForFrequency (eqParameters.eqParams[i].freqParam->get());
         };
-        gainSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasGainParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
+        gainSliders[i]->setColour (juce::Slider::thumbColourId, colours::thumbColours[i]);
+        setSliderActive (*gainSliders[i], eqParameters.eqParams[i].onOffParam->get() && helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
 
         qSliders[i].emplace (*eqParameters.eqParams[i].qParam,
                              pluginState,
@@ -129,7 +92,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         addChildComponent (*qSliders[i]);
         qSliders[i]->getYCoordinate = [this, i, &eqParameters]
         {
-            return getYCoordinateForDecibels (hasGainParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
+            return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
                                                   ? eqParameters.eqParams[i].gainParam->get()
                                                   : 0.0f);
         };
@@ -137,24 +100,52 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         {
             return getXCoordinateForFrequency (eqParameters.eqParams[i].freqParam->get());
         };
-        qSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasQParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
+        qSliders[i]->setColour (juce::Slider::thumbColourId, colours::thumbColours[i]);
+        setSliderActive (*qSliders[i], eqParameters.eqParams[i].onOffParam->get() && helpers::hasQParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
 
         callbacks += {
             pluginState.addParameterListener (*eqParameters.eqParams[i].onOffParam,
                                               chowdsp::ParameterListenerThread::MessageThread,
-                                              [this, i, &eqParameters]
+                                              [this, i, &eqParameters, setSliderActive]
                                               {
-                                                  freqSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get());
-                                                  gainSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasGainParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
-                                                  qSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasQParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
+                                                  const auto isOn = eqParameters.eqParams[i].onOffParam->get();
+                                                  const auto filterType = helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex());
+                                                  setSliderActive (*freqSliders[i], isOn);
+                                                  setSliderActive (*gainSliders[i], isOn && helpers::hasGainParam (filterType));
+                                                  setSliderActive (*qSliders[i], isOn && helpers::hasQParam (filterType));
+                                                  setSelectedBand (isOn ? (int) i : -1);
                                                   repaint();
                                               }),
             pluginState.addParameterListener (*eqParameters.eqParams[i].typeParam,
                                               chowdsp::ParameterListenerThread::MessageThread,
-                                              [this, i, &eqParameters]
+                                              [this, i, &eqParameters, setSliderActive]
                                               {
-                                                  gainSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasGainParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
-                                                  qSliders[i]->setVisible (eqParameters.eqParams[i].onOffParam->get() && hasQParam (getFilterType (eqParameters.eqParams[i].typeParam->getIndex())));
+                                                  const auto isOn = eqParameters.eqParams[i].onOffParam->get();
+                                                  const auto filterType = helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex());
+                                                  setSliderActive (*gainSliders[i], isOn && helpers::hasGainParam (filterType));
+                                                  setSliderActive (*qSliders[i], isOn && helpers::hasQParam (filterType));
+                                                  setSelectedBand (isOn ? (int) i : -1);
+                                                  repaint();
+                                              }),
+            pluginState.addParameterListener (*eqParameters.eqParams[i].freqParam,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this, i]
+                                              {
+                                                  setSelectedBand ((int) i);
+                                                  repaint();
+                                              }),
+            pluginState.addParameterListener (*eqParameters.eqParams[i].qParam,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this, i]
+                                              {
+                                                  setSelectedBand ((int) i);
+                                                  repaint();
+                                              }),
+            pluginState.addParameterListener (*eqParameters.eqParams[i].gainParam,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this, i]
+                                              {
+                                                  setSelectedBand ((int) i);
                                                   repaint();
                                               }),
         };
@@ -162,6 +153,20 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         sliderGroups[i].setSliders ({ &(*freqSliders[i]), &(*gainSliders[i]), &(*qSliders[i]) });
         addAndMakeVisible (sliderGroups[i]);
     }
+
+    addAndMakeVisible (chyron);
+
+    setSelectedBand (-1);
+}
+
+void EQPlot::setSelectedBand (int bandIndex)
+{
+    for (auto [idx, slider] : chowdsp::enumerate (sliderGroups))
+    {
+        slider.isSelected = (int) idx == bandIndex;
+        slider.repaint();
+    }
+    chyron.setSelectedBand (bandIndex);
 }
 
 void EQPlot::paint (juce::Graphics& g)
@@ -173,12 +178,12 @@ void EQPlot::paint (juce::Graphics& g)
                                                          colours::minorLinesColour);
     gui::drawMagnitudeLines (*this,
                              g,
-                             { -20.0f, -10.0f, 0.0f, 10.0f, 20.0f },
+                             { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f },
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);
 
-    g.setColour (juce::Colours::yellow);
+    g.setColour (colours::linesColour);
     g.strokePath (getMasterFilterPath(), juce::PathStrokeType { 2.5f });
 }
 
@@ -187,5 +192,18 @@ void EQPlot::resized()
     EqualizerPlotWithParameters::resized();
     for (auto& group : sliderGroups)
         group.setBounds (getLocalBounds());
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.125f);
+    const auto chyronHeight = proportionOfWidth (0.07f);
+    chyron.setBounds (getWidth() - pad - chyronWidth,
+                      getHeight() - pad - chyronHeight - proportionOfHeight (0.075f),
+                      chyronWidth,
+                      chyronHeight);
+}
+
+void EQPlot::mouseDown (const juce::MouseEvent&)
+{
+    setSelectedBand (-1);
 }
 } // namespace gui::eq
