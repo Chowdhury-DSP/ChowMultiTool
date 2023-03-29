@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-namespace dsp::pultec
+namespace dsp::analog_eq
 {
 namespace wdft = chowdsp::wdft;
 
@@ -155,4 +155,4 @@ private:
     wdft::WDFParallelT<float, decltype (Ra), decltype (SR)> Pvin { Ra, SR };
     wdft::IdealVoltageSourceT<float, decltype (Pvin)> Vin { Pvin };
 };
-} // namespace dsp::pultec
+} // namespace dsp::analog_eq

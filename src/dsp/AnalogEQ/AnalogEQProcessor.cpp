@@ -1,20 +1,20 @@
-#include "PultecEQProcessor.h"
+#include "AnalogEQProcessor.h"
 
-namespace dsp::pultec
+namespace dsp::analog_eq
 {
-void PultecEQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
+void AnalogEQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     for (auto& model : wdf)
         model.prepare ((float) spec.sampleRate);
 }
 
-void PultecEQProcessor::reset()
+void AnalogEQProcessor::reset()
 {
     for (auto& model : wdf)
         model.reset();
 }
 
-void PultecEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
+void AnalogEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
     const auto getMagParam = [] (const chowdsp::FloatParameter* param, bool isBoosting)
     {
@@ -42,4 +42,4 @@ void PultecEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 
     chowdsp::BufferMath::applyGain (buffer, juce::Decibels::decibelsToGain (22.4f));
 }
-} // namespace dsp::pultec
+} // namespace dsp::analog_eq

@@ -5,7 +5,7 @@
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "dsp/Brickwall/BrickwallProcessor.h"
 #include "dsp/EQ/EQProcessor.h"
-#include "dsp/PultecEQ/PultecEQProcessor.h"
+#include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "dsp/SVF/SVFProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
@@ -16,7 +16,7 @@ using ToolTypes = types_list::TypesList<
     eq::EQProcessor,
     waveshaper::WaveshaperProcessor,
     signal_gen::SignalGeneratorProcessor,
-    pultec::PultecEQProcessor,
+    analog_eq::AnalogEQProcessor,
     band_splitter::BandSplitterProcessor,
     brickwall::BrickwallProcessor,
     svf::SVFProcessor>;

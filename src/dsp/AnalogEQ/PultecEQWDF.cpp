@@ -1,6 +1,6 @@
 #include "PultecEQWDF.h"
 
-namespace dsp::pultec
+namespace dsp::analog_eq
 {
 void PultecEqWDF::prepare (float sampleRate)
 {

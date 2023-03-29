@@ -1,8 +1,8 @@
-#include "PultecEditor.h"
+#include "AnalogEQEditor.h"
 
-namespace gui::pultec
+namespace gui::analog_eq
 {
-PultecEditor::PultecEditor (State& pluginState, dsp::pultec::Params& params)
+AnalogEQEditor::AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params)
     : paramsView (pluginState, params),
       plot (pluginState, params)
 {
@@ -10,7 +10,7 @@ PultecEditor::PultecEditor (State& pluginState, dsp::pultec::Params& params)
     addAndMakeVisible (plot);
 }
 
-void PultecEditor::resized()
+void AnalogEQEditor::resized()
 {
     auto bounds = getLocalBounds();
     plot.setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)).reduced (5));

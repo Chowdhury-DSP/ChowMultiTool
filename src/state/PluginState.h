@@ -17,7 +17,7 @@ namespace signal_gen
 {
     struct Params;
 }
-namespace pultec
+namespace analog_eq
 {
     struct Params;
 }
@@ -55,7 +55,7 @@ struct PluginParams : chowdsp::ParamHolder
     std::unique_ptr<dsp::eq::EQToolParams> eqParams;
     std::unique_ptr<dsp::waveshaper::Params> waveshaperParams;
     std::unique_ptr<dsp::signal_gen::Params> signalGenParams;
-    std::unique_ptr<dsp::pultec::Params> pultecEQParams;
+    std::unique_ptr<dsp::analog_eq::Params> analogEQParams;
     std::unique_ptr<dsp::band_splitter::Params> bandSplitParams;
     std::unique_ptr<dsp::brickwall::Params> brickwallParams;
     std::unique_ptr<dsp::svf::Params> svfParams;

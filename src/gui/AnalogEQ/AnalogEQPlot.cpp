@@ -1,8 +1,8 @@
-#include "PultecPlot.h"
+#include "AnalogEQPlot.h"
 #include "gui/Shared/DotSlider.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
-namespace gui::pultec
+namespace gui::analog_eq
 {
 namespace
 {
@@ -13,7 +13,7 @@ namespace
     constexpr int maxFrequency = 22'000;
 } // namespace
 
-PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
+AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecParams)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -106,15 +106,15 @@ PultecPlot::PultecPlot (State& pluginState, dsp::pultec::Params& pultecParams)
     updatePlot();
 }
 
-PultecPlot::~PultecPlot() = default;
+AnalogEQPlot::~AnalogEQPlot() = default;
 
-void PultecPlot::updatePlot()
+void AnalogEQPlot::updatePlot()
 {
     filterPlotter.updateFilterPlot();
     repaint();
 }
 
-void PultecPlot::paint (juce::Graphics& g)
+void AnalogEQPlot::paint (juce::Graphics& g)
 {
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
     gui::drawMagnitudeLines (*this, g, { -30.0f, -20.0f, -10.0f, 10.0f, 20.0f, 30.0f });
@@ -123,7 +123,7 @@ void PultecPlot::paint (juce::Graphics& g)
     g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
 }
 
-void PultecPlot::resized()
+void AnalogEQPlot::resized()
 {
     updatePlot();
 
@@ -133,4 +133,4 @@ void PultecPlot::resized()
     highBoostControl->setBounds (getLocalBounds());
     highCutControl->setBounds (getLocalBounds());
 }
-} // namespace gui::pultec
+} // namespace gui::analog_eq

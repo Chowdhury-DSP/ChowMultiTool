@@ -3,7 +3,7 @@
 #include "Brickwall/BrickwallEditor.h"
 #include "ChowMultiTool.h"
 #include "EQ/EQEditor.h"
-#include "PultecEQ/PultecEditor.h"
+#include "AnalogEQ/AnalogEQEditor.h"
 #include "SVF/SVFEditor.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
@@ -68,8 +68,8 @@ void PluginEditor::refreshEditor()
                 editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams);
             else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
                 editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState);
-            else if constexpr (std::is_same_v<ToolType, dsp::pultec::PultecEQProcessor>)
-                editorComponent = std::make_unique<pultec::PultecEditor> (pluginState, *pluginState.params.pultecEQParams);
+            else if constexpr (std::is_same_v<ToolType, dsp::analog_eq::AnalogEQProcessor>)
+                editorComponent = std::make_unique<analog_eq::AnalogEQEditor> (pluginState, *pluginState.params.analogEQParams);
             else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
                 editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams);
             else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)

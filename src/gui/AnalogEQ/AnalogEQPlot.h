@@ -1,17 +1,17 @@
 #pragma once
 
-#include "dsp/PultecEQ/PultecEQProcessor.h"
+#include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "state/PluginState.h"
 
-namespace gui::pultec
+namespace gui::analog_eq
 {
 class DotSlider;
 
-class PultecPlot : public chowdsp::SpectrumPlotBase
+class AnalogEQPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    PultecPlot (State& pluginState, dsp::pultec::Params& params);
-    ~PultecPlot() override;
+    AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& params);
+    ~AnalogEQPlot() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -20,7 +20,7 @@ private:
     void updatePlot();
 
     chowdsp::GenericFilterPlotter filterPlotter;
-    dsp::pultec::PultecEQProcessor pultecEQ;
+    dsp::analog_eq::AnalogEQProcessor pultecEQ;
 
     chowdsp::ScopedCallbackList callbacks;
 
@@ -45,6 +45,6 @@ private:
     //    Dot highBoostFreqDot;
     //    Dot highCutFreqDot;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PultecPlot)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQPlot)
 };
-} // namespace gui::pultec
+} // namespace gui::analog_eq

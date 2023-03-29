@@ -6,8 +6,8 @@ target_sources(ChowMultiTool PRIVATE
 
     dsp/MultiToolProcessor.cpp
 
-    dsp/PultecEQ/PultecEQWDF.cpp
-    dsp/PultecEQ/PultecEQProcessor.cpp
+    dsp/AnalogEQ/PultecEQWDF.cpp
+    dsp/AnalogEQ/AnalogEQProcessor.cpp
 
     dsp/Waveshaper/WaveshaperProcessor.cpp
     dsp/Waveshaper/SignalSmithWaveshaper.cpp
@@ -38,8 +38,8 @@ target_sources(ChowMultiTool PRIVATE
     gui/Brickwall/BrickwallPlot.cpp
     gui/Brickwall/BottomBar.cpp
 
-    gui/PultecEQ/PultecEditor.cpp
-    gui/PultecEQ/PultecPlot.cpp
+    gui/AnalogEQ/AnalogEQEditor.cpp
+    gui/AnalogEQ/AnalogEQPlot.cpp
 
     gui/BandSplitter/BandSplitterEditor.cpp
     gui/BandSplitter/BandSplitterPlot.cpp

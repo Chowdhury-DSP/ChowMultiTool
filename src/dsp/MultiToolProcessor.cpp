@@ -32,8 +32,8 @@ namespace detail
                                                                                                     *pluginState.nonParams.waveshaperExtraState }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
-            tool_maker<pultec::PultecEQProcessor> ([&params]
-                                                   { return pultec::PultecEQProcessor { *params.pultecEQParams }; }),
+            tool_maker<analog_eq::AnalogEQProcessor> ([&params]
+                                                      { return analog_eq::AnalogEQProcessor { *params.analogEQParams }; }),
             tool_maker<band_splitter::BandSplitterProcessor> ([&params]
                                                               { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
             tool_maker<brickwall::BrickwallProcessor> ([&params]
