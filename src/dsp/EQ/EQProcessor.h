@@ -113,6 +113,8 @@ public:
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
+    int getLatencySamples() const;
+
 private:
     const EQToolParams& params;
 

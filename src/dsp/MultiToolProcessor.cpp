@@ -49,6 +49,37 @@ MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, Stat
       params (pluginState.params),
       tools (detail::generate_tools (pluginState))
 {
+    for (auto param : std::initializer_list<const juce::RangedAudioParameter*> { params.toolParam.get(),
+                                                                                 params.eqParams->linearPhaseMode.get() })
+    {
+        latencyChangeCallbacks += {
+            pluginState.addParameterListener (*param,
+                                              chowdsp::ParameterListenerThread::MessageThread,
+                                              [this]
+                                              { recalculateLatency(); }),
+        };
+    }
+}
+
+void MultiToolProcessor::recalculateLatency()
+{
+    const auto toolChoice = params.toolParam->getIndex() - 1;
+    if (toolChoice < 0) // no tool!
+    {
+        plugin.setLatencySamples (0);
+        return;
+    }
+
+    chowdsp::TupleHelpers::visit_at (tools,
+                                     (size_t) toolChoice,
+                                     [this] (auto& tool)
+                                     {
+                                         using ToolType [[maybe_unused]] = std::decay_t<decltype (tool)>;
+                                         if constexpr (std::is_same_v<ToolType, eq::EQProcessor>)
+                                             plugin.setLatencySamples (tool.getLatencySamples());
+                                         else
+                                             plugin.setLatencySamples (0);
+                                     });
 }
 
 void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)
@@ -56,6 +87,7 @@ void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     chowdsp::TupleHelpers::forEachInTuple ([&spec] (auto& tool, size_t)
                                            { tool.prepare (spec); },
                                            tools);
+    recalculateLatency();
 }
 
 void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)

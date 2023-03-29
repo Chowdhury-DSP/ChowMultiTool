@@ -40,4 +40,11 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
         chowdsp::BufferMath::copyBufferData (doubleBuffer, buffer);
     }
 }
+
+int EQProcessor::getLatencySamples() const
+{
+    return params.linearPhaseMode->get()
+               ? linPhaseEQ.getLatencySamples()
+               : 0;
+}
 } // namespace dsp::eq

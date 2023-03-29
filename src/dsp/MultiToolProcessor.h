@@ -30,8 +30,11 @@ public:
     void processBlock (juce::AudioBuffer<float>& buffer);
 
 private:
+    void recalculateLatency();
+
     juce::AudioProcessor& plugin;
     state::PluginParams& params;
+    chowdsp::ScopedCallbackList latencyChangeCallbacks;
 
     ToolTypes::Types tools;
 
