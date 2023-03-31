@@ -69,7 +69,7 @@ struct Params : chowdsp::ParamHolder
 class BrickwallProcessor
 {
 public:
-    explicit BrickwallProcessor (Params& brickwallParams) : params (brickwallParams) {}
+    explicit BrickwallProcessor (const Params& brickwallParams) : params (brickwallParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();

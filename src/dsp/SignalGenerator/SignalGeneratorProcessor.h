@@ -44,7 +44,7 @@ struct Params : chowdsp::ParamHolder
 class SignalGeneratorProcessor
 {
 public:
-    explicit SignalGeneratorProcessor (Params& signalGenParams) : params (signalGenParams) {}
+    explicit SignalGeneratorProcessor (const Params& signalGenParams) : params (signalGenParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();

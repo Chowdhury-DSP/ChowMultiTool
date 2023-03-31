@@ -110,7 +110,7 @@ struct Params : public chowdsp::ParamHolder
 class SVFProcessor
 {
 public:
-    explicit SVFProcessor (Params& svfParams) : params (svfParams) {}
+    explicit SVFProcessor (const Params& svfParams) : params (svfParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();

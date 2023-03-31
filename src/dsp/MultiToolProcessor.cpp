@@ -26,10 +26,12 @@ namespace detail
         return {
             tool_maker<eq::EQProcessor> ([&params]
                                          { return eq::EQProcessor { *params.eqParams }; }),
-            tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState, &params]
-                                                         { return waveshaper::WaveshaperProcessor { pluginState,
-                                                                                                    *params.waveshaperParams,
-                                                                                                    *pluginState.nonParams.waveshaperExtraState }; }),
+            tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState]
+                                                         { return waveshaper::WaveshaperProcessor {
+                                                               pluginState,
+                                                               *pluginState.params.waveshaperParams,
+                                                               *pluginState.nonParams.waveshaperExtraState
+                                                           }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
             tool_maker<analog_eq::AnalogEQProcessor> ([&params]

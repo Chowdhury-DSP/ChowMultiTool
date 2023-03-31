@@ -68,7 +68,7 @@ struct Params : chowdsp::ParamHolder
 class AnalogEQProcessor
 {
 public:
-    explicit AnalogEQProcessor (Params& pultecParams) : params (pultecParams) {}
+    explicit AnalogEQProcessor (const Params& pultecParams) : params (pultecParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();

@@ -51,7 +51,7 @@ struct Params : chowdsp::ParamHolder
 class BandSplitterProcessor
 {
 public:
-    explicit BandSplitterProcessor (Params& bandSplitParams) : params (bandSplitParams) {}
+    explicit BandSplitterProcessor (const Params& bandSplitParams) : params (bandSplitParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<const float>& bufferIn,

@@ -108,7 +108,7 @@ struct EQToolParams : chowdsp::ParamHolder
 class EQProcessor
 {
 public:
-    explicit EQProcessor (EQToolParams& eqParams) : params (eqParams) {}
+    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
