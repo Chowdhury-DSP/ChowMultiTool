@@ -12,7 +12,6 @@ class OscillatorController : public juce::Component
 public:
     explicit OscillatorController (State& state);
 
-    void paint (juce::Graphics& g) override;
     void resized() override;
 
 private:

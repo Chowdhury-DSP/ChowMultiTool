@@ -1,5 +1,6 @@
 #include "OscillatorPlot.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::signal_gen
 {
@@ -37,7 +38,7 @@ OscillatorPlot::OscillatorPlot()
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -66.0f,
+        .minMagnitudeDB = -80.0f,
         .maxMagnitudeDB = 6.0f,
     })
 {
@@ -46,9 +47,8 @@ OscillatorPlot::OscillatorPlot()
 
 void OscillatorPlot::paint (juce::Graphics& g)
 {
-    g.setColour (juce::Colours::white);
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1'000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
+    gui::drawMagnitudeLines (*this, g, { -72.0f, -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
 
     juce::Path plotPath {};
     static constexpr auto fftFreqs = getFFTFreqs<(size_t) fftSize / 2 + 1> (analysisFs);
@@ -94,11 +94,11 @@ void OscillatorPlot::paint (juce::Graphics& g)
 
     plotPath.lineTo (juce::Point { getWidth(), getHeight() }.toFloat());
 
-    g.setColour (juce::Colours::red);
+    g.setColour (colours::plotColour);
     g.strokePath (plotPath, juce::PathStrokeType { 2.0f });
 }
 
-void OscillatorPlot::updatePlot()
+void OscillatorPlot::updatePlot (float gainParamDB)
 {
     plotBuffer.clear();
     plotUpdateCallback (chowdsp::BufferView<float> { plotBuffer, 0, fft.getSize() });
@@ -112,6 +112,8 @@ void OscillatorPlot::updatePlot()
             return chowdsp::SIMDUtils::gainToDecibels (x * x) - 96.0f;
         });
     freqSmooth (plotBuffer.getReadPointer (0), fftBinsSmoothDB.data(), (int) fftBinsSmoothDB.size()); //, 1.0f / 4.0f);
+    const auto maxMagnitudeDB = juce::FloatVectorOperations::findMaximum (fftBinsSmoothDB.data(), fftBinsSmoothDB.size());
+    juce::FloatVectorOperations::add (fftBinsSmoothDB.data(), gainParamDB - maxMagnitudeDB, fftBinsSmoothDB.size());
 
     repaint();
 }

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "BandSplitterPlot.h"
-#include "SlopePicker.h"
+//#include "SlopePicker.h"
+#include "gui/Shared/ChoicePicker.h"
 
 namespace gui::band_splitter
 {
@@ -15,7 +16,7 @@ public:
 
 private:
     BandSplitterPlot bandSplitterPlot;
-    SlopePicker slopePicker;
+    ChoicePicker<dsp::band_splitter::Slope> slopePicker;
 
     struct BandsButton : juce::Button
     {

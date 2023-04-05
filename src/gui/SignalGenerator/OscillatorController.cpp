@@ -1,4 +1,5 @@
 #include "OscillatorController.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::signal_gen
 {
@@ -17,12 +18,14 @@ OscillatorController::OscillatorController (State& state)
     {
         return plot.getXCoordinateForFrequency (state.params.signalGenParams->frequency->get());
     };
+    gainSlider.setColour (juce::Slider::thumbColourId, colours::thumbColour);
     addAndMakeVisible (gainSlider);
 
     freqSlider.getYCoordinate = [this, &state]
     {
         return plot.getYCoordinateForDecibels (state.params.signalGenParams->gain->get());
     };
+    freqSlider.setColour (juce::Slider::thumbColourId, colours::thumbColour);
     addAndMakeVisible (freqSlider);
 
     sliders.setSliders ({ &gainSlider, &freqSlider });
@@ -37,36 +40,24 @@ OscillatorController::OscillatorController (State& state)
         plotSignalGen.reset();
         plotSignalGen.processBlock (buffer);
     };
-    plot.updatePlot();
 
     auto& params = state.params.signalGenParams;
+    plot.updatePlot (params->gain->get());
+
     static constexpr auto listenerThread = chowdsp::ParameterListenerThread::MessageThread;
     parameterChangeListeners += {
-        state.addParameterListener (*params->frequency, listenerThread, [this]
-                                    { plot.updatePlot(); }),
-        state.addParameterListener (*params->gain, listenerThread, [this]
-                                    { plot.updatePlot(); }),
-        state.addParameterListener (*params->oscillatorChoice, listenerThread, [this]
-                                    { plot.updatePlot(); }),
+        state.addParameterListener (*params->frequency, listenerThread, [this, &params]
+                                    { plot.updatePlot (params->gain->get()); }),
+        state.addParameterListener (*params->gain, listenerThread, [this, &params]
+                                    { plot.updatePlot (params->gain->get()); }),
+        state.addParameterListener (*params->oscillatorChoice, listenerThread, [this, &params]
+                                    { plot.updatePlot (params->gain->get()); }),
     };
-}
-
-void OscillatorController::paint (juce::Graphics& g)
-{
-    g.fillAll (juce::Colours::black);
-
-    //    g.setColour (juce::Colours::red);
-    //    plot.drawPlot (g);
 }
 
 void OscillatorController::resized()
 {
     plot.setBounds (getLocalBounds());
-
-    //    auto bounds = getLocalBounds();
-    //    gainSlider->setBounds (bounds.removeFromTop (proportionOfHeight (0.5f)));
-    //    freqSlider->setBounds (bounds);
-
     sliders.setBounds (getLocalBounds());
 }
 } // namespace gui::signal_gen
