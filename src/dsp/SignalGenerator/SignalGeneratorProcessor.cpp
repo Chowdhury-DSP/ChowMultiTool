@@ -2,19 +2,23 @@
 
 namespace dsp::signal_gen
 {
+static constexpr int oversampleRatio = 2;
+
 void SignalGeneratorProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
-    const auto monoSpec = juce::dsp::ProcessSpec { spec.sampleRate, spec.maximumBlockSize, 1 };
-    chowdsp::TupleHelpers::forEachInTuple ([&monoSpec] (auto& oscillator, size_t)
-                                           { oscillator.prepare (monoSpec); },
+    chowdsp::TupleHelpers::forEachInTuple ([&spec] (auto& oscillator, size_t)
+                                           { oscillator.prepare ({ 2.0 * spec.sampleRate, 2 * spec.maximumBlockSize, 1 }); },
                                            oscillators);
 
     gain.setGainDecibels (params.gain->getCurrentValue());
     gain.setRampDurationSeconds (0.05);
-    gain.prepare (monoSpec);
+    gain.prepare ({ spec.sampleRate, spec.maximumBlockSize, 1 });
 
-    freqParamSmoothed.prepare (spec.sampleRate, (int) spec.maximumBlockSize);
+    freqParamSmoothed.prepare (oversampleRatio * spec.sampleRate, oversampleRatio * (int) spec.maximumBlockSize);
     freqParamSmoothed.setRampLength (0.05);
+
+    downsampler.prepare ({ oversampleRatio * spec.sampleRate, oversampleRatio * spec.maximumBlockSize, 1 }, oversampleRatio);
+    upsampledBuffer.setMaxSize (1, oversampleRatio * (int) spec.maximumBlockSize);
 
     nyquistHz = (float) spec.sampleRate / 2.0f;
 }
@@ -25,6 +29,8 @@ void SignalGeneratorProcessor::reset()
 
     gain.setGainDecibels (params.gain->getCurrentValue());
     gain.reset();
+
+    downsampler.reset();
 
     chowdsp::TupleHelpers::visit_at (oscillators,
                                      static_cast<size_t> (params.oscillatorChoice->get()),
@@ -39,37 +45,37 @@ void SignalGeneratorProcessor::processBlock (const chowdsp::BufferView<float>& b
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    // do processing in mono
-    auto monoBuffer = chowdsp::BufferView<float> { buffer, 0, -1, 0, 1 };
-    monoBuffer.clear();
-
-    freqParamSmoothed.process (juce::jmin (params.frequency->getCurrentValue(), nyquistHz), numSamples);
+    // Generate signal up-sampled
+    upsampledBuffer.setCurrentSize (1, oversampleRatio * numSamples);
+    upsampledBuffer.clear();
+    freqParamSmoothed.process (juce::jmin (params.frequency->getCurrentValue(), nyquistHz), oversampleRatio * numSamples);
     chowdsp::TupleHelpers::visit_at (oscillators,
                                      static_cast<size_t> (params.oscillatorChoice->getIndex()),
-                                     [this, &monoBuffer, numSamples] (auto& oscillator)
+                                     [this] (auto& oscillator)
                                      {
                                          if (freqParamSmoothed.isSmoothing())
                                          {
                                              const auto* freqHzData = freqParamSmoothed.getSmoothedBuffer();
-                                             auto* data = monoBuffer.getWritePointer (0);
-                                             for (int n = 0; n < numSamples; ++n)
+                                             for (auto [n, x] : chowdsp::enumerate (upsampledBuffer.getWriteSpan (0)))
                                              {
                                                  oscillator.setFrequency (freqHzData[n]);
-                                                 data[n] = oscillator.processSample();
+                                                 x = oscillator.processSample();
                                              }
                                          }
                                          else
                                          {
                                              oscillator.setFrequency (freqParamSmoothed.getCurrentValue());
-                                             oscillator.processBlock (monoBuffer);
+                                             oscillator.processBlock (upsampledBuffer);
                                          }
                                      });
 
+    // downsample to DAW sample rate
+    auto downsampledBuffer = downsampler.process (upsampledBuffer);
     gain.setGainDecibels (params.gain->getCurrentValue());
-    gain.process (monoBuffer);
+    gain.process (downsampledBuffer);
 
-    // back from mono to multi-channel
-    for (int ch = 1; ch < numChannels; ++ch)
-        chowdsp::BufferMath::copyBufferChannels (buffer, buffer, 0, ch);
+    // split from mono to multi-channel
+    for (int ch = 0; ch < numChannels; ++ch)
+        chowdsp::BufferMath::copyBufferChannels (downsampledBuffer, buffer, 0, ch);
 }
 } // namespace dsp::signal_gen

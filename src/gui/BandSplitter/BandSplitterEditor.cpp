@@ -25,12 +25,16 @@ void BandSplitterEditor::BandsButton::paintButton (juce::Graphics& g, bool, bool
 
 BandSplitterEditor::BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params)
     : bandSplitterPlot (pluginState, params),
-      slopePicker (pluginState),
+      slopePicker (pluginState, *params.slope),
       bandsButton (*params.threeBandOnOff, pluginState)
 {
     addAndMakeVisible (bandSplitterPlot);
     addAndMakeVisible (slopePicker);
     addAndMakeVisible (bandsButton);
+
+    slopePicker.linesColour = colours::linesColour;
+    slopePicker.thumbColour = colours::thumbColour;
+    slopePicker.plotColour = colours::plotColour;
 }
 
 void BandSplitterEditor::paint (juce::Graphics& g)
