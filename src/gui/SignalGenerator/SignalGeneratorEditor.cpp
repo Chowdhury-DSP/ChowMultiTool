@@ -4,7 +4,7 @@
 namespace gui::signal_gen
 {
 SignalGeneratorEditor::SignalGeneratorEditor (State& state)
-      : oscController (state),
+    : oscController (state),
       oscillatorChoice (state, state.params.signalGenParams->oscillatorChoice)
 {
     addAndMakeVisible (oscController);

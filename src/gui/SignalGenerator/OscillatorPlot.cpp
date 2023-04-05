@@ -1,6 +1,6 @@
 #include "OscillatorPlot.h"
-#include "gui/Shared/FrequencyPlotHelpers.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::signal_gen
 {

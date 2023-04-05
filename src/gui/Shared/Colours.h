@@ -51,4 +51,4 @@ namespace gui::signal_gen::colours
 using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFB72A38 };
 const auto thumbColour = juce::Colour { 0xFFBFB48F };
-} // namespace gui::band_splitter::colours
+} // namespace gui::signal_gen::colours

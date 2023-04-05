@@ -1,8 +1,8 @@
 #pragma once
 
 #include "OscillatorController.h"
-#include "state/PluginState.h"
 #include "gui/Shared/ChoicePicker.h"
+#include "state/PluginState.h"
 
 namespace gui::signal_gen
 {

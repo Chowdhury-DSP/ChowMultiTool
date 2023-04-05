@@ -1,8 +1,8 @@
 #pragma once
 
+#include "dsp/EQ/EQProcessor.h"
 #include "gui/Shared/Fonts.h"
 #include "state/PluginState.h"
-#include "dsp/EQ/EQProcessor.h"
 
 namespace gui::eq
 {

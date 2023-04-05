@@ -60,4 +60,4 @@ constexpr bool hasQParam (chowdsp::EQ::EQPlotFilterType filterType)
     using Type = chowdsp::EQ::EQPlotFilterType;
     return filterType != Type::LPF1 && filterType != Type::HPF1;
 }
-}
+} // namespace gui::eq::helpers
