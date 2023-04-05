@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OscillatorController.h"
+#include "gui/Shared/ChoicePicker.h"
 #include "state/PluginState.h"
 
 namespace gui::signal_gen
@@ -14,10 +15,8 @@ public:
     void resized() override;
 
 private:
-    juce::ComboBox oscillatorChoiceBox;
-    chowdsp::ComboBoxAttachment oscillatorChoiceAttachment;
-
     OscillatorController oscController;
+    ChoicePicker<dsp::signal_gen::Oscillator> oscillatorChoice;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SignalGeneratorEditor)
 };

@@ -51,4 +51,4 @@ void PultecEqWDF::setParameters (float treble_boost, float treble_boost_q, float
     C_treble_boost.setCapacitanceValue (treble_boost_cap_val);
     L_treble_boost.setInductanceValue (treble_boost_ind_val);
 }
-} // namespace dsp::pultec
+} // namespace dsp::analog_eq

@@ -11,7 +11,7 @@ public:
 
     void paint (juce::Graphics& g) override;
 
-    void updatePlot();
+    void updatePlot (float gainParamDB);
 
     static constexpr auto analysisFs = 48000.0f;
 #if JUCE_DEBUG

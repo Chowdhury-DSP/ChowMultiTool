@@ -1,8 +1,8 @@
 #pragma once
 
+#include "EQChyron.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
-#include "EQChyron.h"
 
 namespace gui::eq
 {

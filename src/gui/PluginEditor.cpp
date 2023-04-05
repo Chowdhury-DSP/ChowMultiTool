@@ -1,10 +1,11 @@
 #include "PluginEditor.h"
+#include "AnalogEQ/AnalogEQEditor.h"
 #include "BandSplitter/BandSplitterEditor.h"
 #include "Brickwall/BrickwallEditor.h"
 #include "ChowMultiTool.h"
 #include "EQ/EQEditor.h"
-#include "AnalogEQ/AnalogEQEditor.h"
 #include "SVF/SVFEditor.h"
+#include "Shared/Colours.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
 #include "Waveshaper/WaveshaperEditor.h"
 
@@ -84,7 +85,12 @@ void PluginEditor::refreshEditor()
 
 void PluginEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::black);
+    g.setGradientFill (juce::ColourGradient { colours::backgroundLight,
+                                              juce::Point { 0.0f, 0.0f },
+                                              colours::backgroundDark,
+                                              juce::Point { (float) getWidth() * 0.35f, (float) getHeight() * 0.5f },
+                                              false });
+    g.fillAll();
 }
 
 void PluginEditor::resized()

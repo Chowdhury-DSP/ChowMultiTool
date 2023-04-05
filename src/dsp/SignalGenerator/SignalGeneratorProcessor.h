@@ -60,6 +60,8 @@ private:
         chowdsp::TriangleWave<float>>
         oscillators;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> freqParamSmoothed;
+    chowdsp::Buffer<float> upsampledBuffer;
+    chowdsp::Downsampler<float, chowdsp::EllipticFilter<8>> downsampler;
     chowdsp::Gain<float> gain;
 
     float nyquistHz = 48000.0f / 2.0f;

@@ -2,10 +2,10 @@
 
 #include "state/PluginState.h"
 
+#include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "dsp/Brickwall/BrickwallProcessor.h"
 #include "dsp/EQ/EQProcessor.h"
-#include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "dsp/SVF/SVFProcessor.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"

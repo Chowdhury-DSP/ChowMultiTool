@@ -1,6 +1,6 @@
 #include "EQChyron.h"
-#include "gui/Shared/Colours.h"
 #include "EQGUIHelpers.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::eq
 {

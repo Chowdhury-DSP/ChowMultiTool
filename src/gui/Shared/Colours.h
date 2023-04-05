@@ -45,3 +45,10 @@ const juce::Colour thumbColours[8] = { juce::Colour { 0xFFce2a1e },
                                        juce::Colour { 0xFF803147 }.brighter (0.1f),
                                        juce::Colour { 0xFF000a8e }.brighter (0.4f) };
 } // namespace gui::eq::colours
+
+namespace gui::signal_gen::colours
+{
+using namespace gui::colours;
+const auto plotColour = juce::Colour { 0xFFB72A38 };
+const auto thumbColour = juce::Colour { 0xFFBFB48F };
+} // namespace gui::signal_gen::colours
