@@ -71,6 +71,42 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineState)
 };
 
+struct UndoableSplineSet : juce::UndoableAction
+{
+    explicit UndoableSplineSet (SplineState& splineState,
+                                SplinePoints newPoints,
+                                juce::Component* uiSource)
+        : state (splineState), points (newPoints), source (uiSource)
+    {
+    }
+
+    SplineState& state;
+    SplinePoints points;
+    juce::Component::SafePointer<juce::Component> source;
+    bool firstTime = true;
+
+    bool perform() override
+    {
+        if (firstTime)
+        {
+            firstTime = false;
+            return true;
+        }
+
+        const auto temp = state.get();
+        state.set (points);
+        points = temp;
+
+        if (auto* comp = source.getComponent())
+            comp->repaint();
+
+        return true;
+    }
+
+    bool undo() override { return perform(); }
+    int getSizeInUnits() override { return (int) sizeof (*this); }
+};
+
 constexpr chowdsp::WaveshaperPlotParams splineBounds {
     .xMin = -4.0f,
     .xMax = 4.0f,
