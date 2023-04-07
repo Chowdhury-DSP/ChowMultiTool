@@ -20,13 +20,13 @@ private:
     std::unique_ptr<juce::Component> bottomBar;
     FoldFuzzControls foldFuzzControls;
 
-    struct FreeDrawButton : juce::Button
+    struct CustomizeButton : juce::Button
     {
-        FreeDrawButton();
+        explicit CustomizeButton (const std::string& iconTag);
         void paintButton (juce::Graphics& g, bool, bool) override;
-        std::unique_ptr<juce::Drawable> pencilIconOn;
-        std::unique_ptr<juce::Drawable> pencilIconOff;
-    } freeDrawButton;
+        std::unique_ptr<juce::Drawable> iconOn;
+        std::unique_ptr<juce::Drawable> iconOff;
+    } freeDrawButton { "Vector/pencil-solid.svg" }, mathButton { "Vector/calculator-solid.svg" };
 
     chowdsp::ScopedCallbackList callbacks;
 

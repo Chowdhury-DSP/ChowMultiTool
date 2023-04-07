@@ -6,7 +6,8 @@ const auto MRange = chowdsp::ParamUtils::createNormalisableRange (5.0f, 50.0f, 1
 
 WaveshaperProcessor::WaveshaperProcessor (chowdsp::PluginState& state, Params& wsParams, ExtraState& wsExtraState)
     : params (wsParams),
-      splineShaper (wsExtraState.splineState)
+      freeDrawShaper (wsExtraState.freeDrawState),
+      mathShaper (wsExtraState.mathState)
 {
     osChangeCallback = state.addParameterListener (*params.oversampleParam,
                                                    chowdsp::ParameterListenerThread::MessageThread,
@@ -30,7 +31,8 @@ void WaveshaperProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     fullWaveRectifier.prepare ((int) spec.numChannels);
     westCoastFolder.prepare ((int) spec.numChannels);
     waveMultiplyFolder.prepare ((int) spec.numChannels);
-    splineShaper.prepare (spec);
+    freeDrawShaper.prepare (spec);
+    mathShaper.prepare (spec);
 
     static constexpr auto maxOSRatio = static_cast<int> (magic_enum::enum_values<OversamplingRatio>().back());
     doubleBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize * maxOSRatio);
@@ -111,7 +113,11 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
     }
     else if (params.shapeParam->get() == Shapes::Free_Draw)
     {
-        splineShaper.processBlock (doubleBuffer);
+        freeDrawShaper.processBlock (doubleBuffer);
+    }
+    else if (params.shapeParam->get() == Shapes::Math)
+    {
+        mathShaper.processBlock (doubleBuffer);
     }
 
     chowdsp::BufferMath::copyBufferData (doubleBuffer, *osBufferView);

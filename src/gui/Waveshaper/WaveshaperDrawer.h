@@ -13,18 +13,17 @@ public:
 
     void paint (juce::Graphics& g) override;
 
-    static chowdsp::WaveshaperPlotParams getPlotParams();
     juce::Path getDrawnPath (std::optional<chowdsp::WaveshaperPlotParams>&& params = {}) const;
 
 private:
-    void setSplinePoint (juce::Point<float> point);
     void visibilityChanged() override;
+    void setSplinePoint (juce::Point<float> point);
     void mouseDown (const juce::MouseEvent& e) override;
     void mouseDrag (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;
     void mouseExit (const juce::MouseEvent& e) override;
 
-    spline::SplineState& splineState;
+    spline::SplineState& freeDrawState;
     juce::UndoManager& um;
 
     spline::SplinePoints points;

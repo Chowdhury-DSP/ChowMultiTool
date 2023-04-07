@@ -17,7 +17,6 @@ Please get in touch via GitHub Issues, or some other method.
 
 ## Tools:
 
-Unfinished:
 - EQ
 - Signal Generator
 - Waveshaper
@@ -44,6 +43,11 @@ $ cd ChowMultiTool
 $ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release
 ```
+
+## Credits
+
+- Extra Icons - [FontAwesome](https://fontawesome.com/)
+- Math expression parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
 
 ## License
 
