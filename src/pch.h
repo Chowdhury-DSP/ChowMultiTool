@@ -25,6 +25,7 @@
 
 // Other third-party libraries
 #include <chowdsp_wdf/chowdsp_wdf.h>
+#include <exprtk.hpp>
 
 // Resources
 #include <cmrc/cmrc.hpp>

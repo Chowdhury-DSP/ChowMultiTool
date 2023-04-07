@@ -65,6 +65,8 @@ target_compile_definitions(juce_plugin_modules
 )
 
 target_include_directories(juce_plugin_modules
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/exprtk
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
 )

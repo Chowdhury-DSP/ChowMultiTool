@@ -4,28 +4,28 @@
 
 namespace gui::waveshaper
 {
-WaveshaperEditor::FreeDrawButton::FreeDrawButton()
+WaveshaperEditor::CustomizeButton::CustomizeButton (const std::string& iconTag)
     : juce::Button ("Free-Draw")
 {
     const auto fs = cmrc::gui::get_filesystem();
-    const auto pencilSVG = fs.open ("Vector/pencil-solid.svg");
-    const auto pencilIcon = juce::Drawable::createFromImageData (pencilSVG.begin(), pencilSVG.size());
-    pencilIconOn = pencilIcon->createCopy();
-    pencilIconOn->replaceColour (juce::Colours::black, colours::plotColour);
-    pencilIconOff = pencilIcon->createCopy();
-    pencilIconOff->replaceColour (juce::Colours::black, colours::linesColour);
+    const auto svg = fs.open (iconTag);
+    const auto icon = juce::Drawable::createFromImageData (svg.begin(), svg.size());
+    iconOn = icon->createCopy();
+    iconOn->replaceColour (juce::Colours::black, colours::plotColour);
+    iconOff = icon->createCopy();
+    iconOff->replaceColour (juce::Colours::black, colours::linesColour);
 
     setClickingTogglesState (true);
 }
 
-void WaveshaperEditor::FreeDrawButton::paintButton (juce::Graphics& g, bool, bool)
+void WaveshaperEditor::CustomizeButton::paintButton (juce::Graphics& g, bool, bool)
 {
     g.setColour (juce::Colours::black.withAlpha (0.75f));
     g.fillRoundedRectangle (getLocalBounds().toFloat(), 0.1f * (float) getHeight());
 
     const auto pad = proportionOfWidth (0.2f);
-    const auto& pencilIcon = getToggleState() ? pencilIconOn : pencilIconOff;
-    pencilIcon->drawWithin (g, getLocalBounds().reduced (pad).toFloat(), juce::RectanglePlacement::stretchToFit, 1.0f);
+    const auto& icon = getToggleState() ? iconOn : iconOff;
+    icon->drawWithin (g, getLocalBounds().reduced (pad).toFloat(), juce::RectanglePlacement::stretchToFit, 1.0f);
 }
 
 WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams)
@@ -46,6 +46,11 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
     freeDrawButton.onStateChange = [this]
     { plot.toggleDrawMode (freeDrawButton.getToggleState()); };
 
+    addChildComponent (mathButton);
+    mathButton.setVisible (wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Math);
+    mathButton.onStateChange = [this]
+    { plot.toggleMathMode (mathButton.getToggleState()); };
+
     callbacks += {
         pluginState.addParameterListener (
             *wsParams.shapeParam,
@@ -64,6 +69,11 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
                 freeDrawButton.setVisible (isFreeDrawMode);
                 if (! isFreeDrawMode)
                     freeDrawButton.setToggleState (false, juce::sendNotification);
+
+                const auto isMathMode = wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Math;
+                mathButton.setVisible (isMathMode);
+                if (! isMathMode)
+                    mathButton.setToggleState (false, juce::sendNotification);
             }),
     };
 }
@@ -81,6 +91,7 @@ void WaveshaperEditor::resized()
     const auto pad = proportionOfWidth (0.005f);
     const auto dim = proportionOfWidth (0.05f);
     freeDrawButton.setBounds (bounds.getWidth() - pad - dim, pad, dim, dim);
+    mathButton.setBounds (bounds.getWidth() - pad - dim, pad, dim, dim);
 }
 
 void WaveshaperEditor::paint (juce::Graphics& g)

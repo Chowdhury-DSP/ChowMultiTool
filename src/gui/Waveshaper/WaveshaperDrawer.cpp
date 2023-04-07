@@ -37,15 +37,10 @@ juce::Point<float> coordsToPoint (juce::Point<float> coords, float width, float 
 }
 
 WaveshaperDrawer::WaveshaperDrawer (dsp::waveshaper::ExtraState& extraState, juce::UndoManager& undoManager)
-    : splineState (extraState.splineState),
+    : freeDrawState (extraState.freeDrawState),
       um (undoManager)
 {
     points = getDefaultSplinePoints();
-}
-
-chowdsp::WaveshaperPlotParams WaveshaperDrawer::getPlotParams()
-{
-    return splineBounds;
 }
 
 void WaveshaperDrawer::paint (juce::Graphics& g)
@@ -68,10 +63,10 @@ void WaveshaperDrawer::paint (juce::Graphics& g)
 
 juce::Path WaveshaperDrawer::getDrawnPath (std::optional<chowdsp::WaveshaperPlotParams>&& params) const
 {
-    const auto splineInfo = createSpline (splineState.get());
+    const auto splineInfo = createSpline (freeDrawState.get());
 
     if (! params.has_value())
-        params.emplace (getPlotParams());
+        params.emplace (splineBounds);
 
     const auto floatWidth = (float) getWidth();
     const auto floatHeight = (float) getHeight();
@@ -99,49 +94,12 @@ void WaveshaperDrawer::visibilityChanged()
     {
         prevPoints = points;
         points = getDefaultSplinePoints();
-        splineState.set (points);
+        freeDrawState.set (points);
     }
     else
     {
-        struct UndoableFreeDraw : juce::UndoableAction
-        {
-            explicit UndoableFreeDraw (WaveshaperDrawer& d)
-                : drawer (d), points (drawer.prevPoints)
-            {
-            }
-
-            WaveshaperDrawer& drawer;
-            spline::SplinePoints points;
-            bool firstTime = true;
-
-            bool perform() override
-            {
-                if (firstTime)
-                {
-                    firstTime = false;
-                    return true;
-                }
-
-                const auto temp = drawer.splineState.get();
-                drawer.splineState.set (points);
-                points = temp;
-
-                if (auto* parent = drawer.getParentComponent())
-                    parent->repaint();
-
-                return true;
-            }
-
-            bool undo() override
-            {
-                return perform();
-            }
-
-            int getSizeInUnits() override { return (int) sizeof (*this); }
-        };
-
         um.beginNewTransaction ("Waveshaper Free-Draw");
-        um.perform (new UndoableFreeDraw { *this });
+        um.perform (new UndoableSplineSet { freeDrawState, prevPoints, getParentComponent() });
     }
 }
 
@@ -153,7 +111,7 @@ void WaveshaperDrawer::setSplinePoint (juce::Point<float> point)
     const auto pointIndex = std::min ((size_t) juce::truncatePositiveToUnsignedInt (xCoordToValue (point.x, (float) getWidth()) * scaler + offset),
                                       (size_t) numDrawPoints - 1);
     points[pointIndex].y = yCoordToValue (point.y, (float) getHeight());
-    splineState.set (points);
+    freeDrawState.set (points);
 }
 
 void WaveshaperDrawer::mouseDown (const juce::MouseEvent& e)
