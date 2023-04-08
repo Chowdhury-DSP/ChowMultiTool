@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Toolbar/Toolbar.h"
+#include "gui/Shared/ErrorMessageView.h"
 
 class ChowMultiTool;
 
@@ -14,6 +15,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
+    auto& getErrorMessageView() { return errorMessageView; }
+
 private:
     void mouseDoubleClick (const juce::MouseEvent&) override;
 
@@ -24,6 +27,7 @@ private:
 
     Toolbar toolbar;
     std::unique_ptr<juce::Component> editorComponent;
+    ErrorMessageView errorMessageView;
 
     chowdsp::ScopedCallback toolChangeCallback;
     juce::ComponentBoundsConstrainer constrainer;

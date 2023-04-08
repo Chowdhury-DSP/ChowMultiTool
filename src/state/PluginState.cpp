@@ -23,7 +23,7 @@ PluginParams::PluginParams()
     //    std::cout << sizeof (dsp::brickwall::Params) << std::endl;
     //    std::cout << sizeof (dsp::svf::Params) << std::endl;
 
-    eqParams.emplace();
+    eqParams = std::make_unique<dsp::eq::EQToolParams>();
     waveshaperParams.emplace();
     signalGenParams.emplace();
     analogEQParams.emplace();
