@@ -78,8 +78,8 @@ bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::Stri
         errorMessageView.setParametersYesNo (title, message);
         errorMessageView.setVisible (true);
 
-//        while (errorMessageView.result < 0)
-//            juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
+        //        while (errorMessageView.result < 0)
+        //            juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
 
         return errorMessageView.result > 0;
     }
@@ -146,4 +146,4 @@ void ErrorMessageView::resized()
     const auto noX = proportionOfWidth (0.525f);
     noButton.setBounds (noX, buttonY, buttonWidth, buttonHeight);
 }
-}
+} // namespace gui
