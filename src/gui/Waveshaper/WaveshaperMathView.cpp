@@ -1,5 +1,6 @@
 #include "WaveshaperMathView.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/ErrorMessageView.h"
 
 namespace gui::waveshaper
 {
@@ -59,7 +60,14 @@ void WaveshaperMathView::attemptToLoadNewMathShaper()
 
         if (std::isnan (result) || std::abs (result) > 20.0f)
         {
-            // TODO: show error message
+            ErrorMessageView::showErrorMessage ("Invalid Math Function!",
+                                                "The math function you have entered is invalid!\n\n"
+                                                "Make sure that your function:\n"
+                                                "- Has no typos\n"
+                                                "- Is in terms of only one variable \"x\"\n"
+                                                "- Returns a valid result for inputs in the range [-4, 4]",
+                                                "OK",
+                                                this);
             return;
         }
 
@@ -85,7 +93,7 @@ void WaveshaperMathView::visibilityChanged()
 
 void WaveshaperMathView::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::white.withAlpha (0.2f));
+    g.fillAll (juce::Colours::white.withAlpha (0.3f));
 }
 
 void WaveshaperMathView::resized()
