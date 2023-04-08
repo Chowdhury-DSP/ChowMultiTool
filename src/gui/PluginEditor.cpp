@@ -23,6 +23,7 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
       toolbar (plugin)
 {
     addAndMakeVisible (toolbar);
+    addChildComponent (errorMessageView);
 
     setResizeBehaviour();
 
@@ -97,6 +98,7 @@ void PluginEditor::resized()
 {
     auto bounds = getLocalBounds();
 
+    errorMessageView.setBounds (bounds);
     toolbar.setBounds (bounds.removeFromTop (proportionOfHeight (0.1f)));
 
     if (editorComponent != nullptr)

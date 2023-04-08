@@ -52,7 +52,7 @@ struct PluginParams : chowdsp::ParamHolder
         0
     };
 
-    chowdsp::LocalPointer<dsp::eq::EQToolParams, 8192> eqParams;
+    std::unique_ptr<dsp::eq::EQToolParams> eqParams;
     chowdsp::LocalPointer<dsp::waveshaper::Params, 256> waveshaperParams;
     chowdsp::LocalPointer<dsp::signal_gen::Params, 256> signalGenParams;
     chowdsp::LocalPointer<dsp::analog_eq::Params, 384> analogEQParams;
