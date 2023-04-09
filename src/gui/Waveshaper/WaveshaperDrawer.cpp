@@ -116,6 +116,7 @@ void WaveshaperDrawer::setSplinePoint (juce::Point<float> point)
 
 void WaveshaperDrawer::mouseDown (const juce::MouseEvent& e)
 {
+//    lastMouseDragTime = juce::Time::getMillisecondCounterHiRes();
     lastMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
     setSplinePoint (lastMouseDragPoint);
     repaint();
@@ -123,7 +124,16 @@ void WaveshaperDrawer::mouseDown (const juce::MouseEvent& e)
 
 void WaveshaperDrawer::mouseDrag (const juce::MouseEvent& e)
 {
-    const auto newMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
+//    const auto dragTime = juce::Time::getMillisecondCounterHiRes();
+//    if (dragTime - lastMouseDragTime < 2.0)
+//    {
+//        return;
+//    }
+//    lastMouseDragTime = dragTime;
+
+    auto newMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
+    newMouseDragPoint.x = juce::jlimit (0.0f, (float) getWidth(), newMouseDragPoint.x);
+    newMouseDragPoint.y = juce::jlimit (0.0f, (float) getHeight(), newMouseDragPoint.y);
     if (lastMouseDragPoint.x < newMouseDragPoint.x)
     {
         for (float x = lastMouseDragPoint.x; x <= newMouseDragPoint.x; x += 0.1f)

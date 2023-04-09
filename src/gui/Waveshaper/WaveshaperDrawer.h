@@ -30,6 +30,7 @@ private:
     spline::SplinePoints prevPoints;
     std::optional<juce::Point<float>> mousePos;
     juce::Point<float> lastMouseDragPoint {};
+//    double lastMouseDragTime = -1.0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperDrawer)
 };
