@@ -36,4 +36,4 @@ inline juce::Point<float> coordsToPoint (juce::Point<float> coords, float width,
 {
     return { xCoordToValue (coords.x, width), yCoordToValue (coords.y, height) };
 }
-}
+} // namespace gui::waveshaper::spline_view

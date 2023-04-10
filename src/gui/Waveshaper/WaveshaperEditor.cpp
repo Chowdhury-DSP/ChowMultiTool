@@ -100,7 +100,7 @@ void WaveshaperEditor::resized()
 
     const auto pad = proportionOfWidth (0.005f);
     const auto dim = proportionOfWidth (0.05f);
-    const auto editButtonBounds = juce::Rectangle {bounds.getWidth() - pad - dim, pad, dim, dim };
+    const auto editButtonBounds = juce::Rectangle { bounds.getWidth() - pad - dim, pad, dim, dim };
     freeDrawButton.setBounds (editButtonBounds);
     mathButton.setBounds (editButtonBounds);
     pointsButton.setBounds (editButtonBounds);

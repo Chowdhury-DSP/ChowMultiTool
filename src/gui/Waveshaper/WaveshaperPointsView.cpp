@@ -115,4 +115,4 @@ void WaveshaperPointsView::mouseExit (const juce::MouseEvent&)
     mousePos.reset();
     repaint();
 }
-}
+} // namespace gui::waveshaper
