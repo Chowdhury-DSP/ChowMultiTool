@@ -10,6 +10,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     }),
       drawArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       mathArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
+      pointsArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       shapeParam (*wsParams.shapeParam),
       gainAttach (*wsParams.gainParam, pluginState, *this)
 {
@@ -42,7 +43,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
         plotter.params.yMin = -1.1f;
         plotter.params.yMax = 1.1f;
 
-        if (shapeParam.get() == Shapes::Free_Draw || shapeParam.get() == Shapes::Math)
+        if (shapeParam.get() == Shapes::Free_Draw || shapeParam.get() == Shapes::Math || shapeParam.get() == Shapes::Spline)
         {
             plotter.params = spline::splineBounds;
             plotter.params.xMin = -linearGain;
@@ -173,6 +174,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     setMouseCursor (juce::MouseCursor::StandardCursorType::LeftRightResizeCursor);
     addChildComponent (drawArea);
     addChildComponent (mathArea);
+    addChildComponent (pointsArea);
 }
 
 void WaveshaperPlot::toggleDrawMode (bool isDrawMode)
@@ -198,6 +200,24 @@ void WaveshaperPlot::toggleMathMode (bool isMathMode)
     mathMode = isMathMode;
 
     mathArea.setVisible (mathMode);
+
+    if (mathMode)
+    {
+        plotter.params = spline::splineBounds;
+    }
+    else
+    {
+        plotter.setSize (getLocalBounds());
+    }
+
+    repaint();
+}
+
+void WaveshaperPlot::togglePointsMode (bool isPointsMode)
+{
+    pointsMode = isPointsMode;
+
+    pointsArea.setVisible (pointsMode);
 
     if (mathMode)
     {
@@ -251,6 +271,11 @@ void WaveshaperPlot::paint (juce::Graphics& g)
     {
         g.strokePath (mathArea.getDrawnPath (plotter.params), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
     }
+    else if (shapeParam.get() == dsp::waveshaper::Shapes::Spline)
+    {
+        if (! pointsMode)
+            g.strokePath (pointsArea.getDrawnPath (plotter.params), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
+    }
     else
     {
         g.strokePath (plotter.getPath(), juce::PathStrokeType { 2.0f, juce::PathStrokeType::JointStyle::curved });
@@ -263,5 +288,6 @@ void WaveshaperPlot::resized()
     plotter.setSize (getLocalBounds());
     drawArea.setBounds (getLocalBounds());
     mathArea.setBounds (getLocalBounds());
+    pointsArea.setBounds (getLocalBounds());
 }
 } // namespace gui::waveshaper

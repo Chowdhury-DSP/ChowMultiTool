@@ -1,123 +1,46 @@
 #pragma once
 
-#include <pch.h>
+#include "SplineHelpers.h"
 
 namespace dsp::waveshaper::spline
 {
-constexpr int numDrawPoints = 600;
+// Fixed size spline:
+using SplinePoints = std::array<juce::Point<float>, maxNumDrawPoints>;
+using Spline = std::array<SplineSection, maxNumDrawPoints - 1>;
+using SplineADAA = std::pair<Spline, std::array<SplineADAASection, maxNumDrawPoints - 1>>;
 
-struct SplineSection
+struct DefaultSplineCreator
 {
-    double a;
-    double b;
-    double c;
-    double d;
-    double x;
+    static SplinePoints call();
 };
 
-struct SplineADAASection
-{
-    double c0;
-    double c1;
-    double c2;
-    double c3;
-    double c4;
-    double x;
-};
-
-using SplinePoints = std::array<juce::Point<float>, numDrawPoints>;
-using Spline = std::array<SplineSection, numDrawPoints - 1>;
-using SplineADAA = std::pair<Spline, std::array<SplineADAASection, numDrawPoints - 1>>;
-
-SplinePoints getDefaultSplinePoints();
 Spline createSpline (const SplinePoints& points);
 double evaluateSpline (const Spline& spline, double x);
 
-struct SplineState : chowdsp::StateValueBase
+using SplineState = SplinePointsState<SplinePoints>;
+using UndoableSplineSet = UndoableSplinePointsSet<SplinePoints>;
+
+// Variable size spline:
+using VectorSplinePoints = std::vector<juce::Point<float>>;
+using VectorSpline = std::vector<SplineSection>;
+using VectorSplineADAA = std::pair<VectorSpline, std::vector<SplineADAASection>>;
+
+struct DefaultVectorSplineCreator
 {
-    explicit SplineState (std::string_view valueName);
-    SplinePoints get() const noexcept { return currentValue; }
-    operator SplinePoints() const noexcept { return get(); } // NOSONAR NOLINT(google-explicit-constructor): we want to be able to do implicit conversion
-
-    /** Sets a new value */
-    void set (const SplinePoints& v);
-    SplineState& operator= (const SplinePoints& v);
-
-    void reset() override { set (defaultValue); }
-
-    void serialize (chowdsp::JSONSerializer::SerializedType& serial) const override;
-    void deserialize (chowdsp::JSONSerializer::DeserializedType deserial) override;
-
-    const SplinePoints defaultValue = getDefaultSplinePoints();
-
-private:
-    template <typename Serializer>
-    static void serialize (typename Serializer::SerializedType& serial, const SplineState& value)
-    {
-        Serializer::addChildElement (serial, value.name);
-        Serializer::addChildElement (serial, chowdsp::Serialization::serialize<Serializer> (value.get()));
-    }
-
-    template <typename Serializer>
-    static void deserialize (typename Serializer::DeserializedType deserial, SplineState& value)
-    {
-        SplinePoints val {};
-        chowdsp::Serialization::deserialize<Serializer> (deserial, val);
-        value.set (val);
-    }
-
-    SplinePoints currentValue;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineState)
+    static VectorSplinePoints call();
 };
 
-struct UndoableSplineSet : juce::UndoableAction
-{
-    explicit UndoableSplineSet (SplineState& splineState,
-                                SplinePoints newPoints,
-                                juce::Component* uiSource)
-        : state (splineState), points (newPoints), source (uiSource)
-    {
-    }
+VectorSpline createSpline (const VectorSplinePoints& points);
+double evaluateSpline (const VectorSpline& spline, double x);
 
-    SplineState& state;
-    SplinePoints points;
-    juce::Component::SafePointer<juce::Component> source;
-    bool firstTime = true;
+using VectorSplineState = SplinePointsState<VectorSplinePoints>;
+using UndoableVectorSplineSet = UndoableSplinePointsSet<VectorSplinePoints>;
 
-    bool perform() override
-    {
-        if (firstTime)
-        {
-            firstTime = false;
-            return true;
-        }
-
-        const auto temp = state.get();
-        state.set (points);
-        points = temp;
-
-        if (auto* comp = source.getComponent())
-            comp->repaint();
-
-        return true;
-    }
-
-    bool undo() override { return perform(); }
-    int getSizeInUnits() override { return (int) sizeof (*this); }
-};
-
-constexpr chowdsp::WaveshaperPlotParams splineBounds {
-    .xMin = -4.0f,
-    .xMax = 4.0f,
-    .yMin = -1.1f,
-    .yMax = 1.1f,
-};
-
+template <typename SplinePointsType, typename SplineADAAType>
 class SplineWaveshaper
 {
 public:
-    explicit SplineWaveshaper (SplineState& splineState);
+    explicit SplineWaveshaper (SplinePointsState<SplinePointsType>& splineState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
@@ -125,12 +48,12 @@ public:
     void processBlock (const chowdsp::BufferView<double>& buffer) noexcept;
 
 private:
-    SplineState& splineState;
+    SplinePointsState<SplinePointsType>& splineState;
 
     std::vector<double> x1;
     chowdsp::FirstOrderHPF<double> dcBlocker;
 
-    chowdsp::UIToAudioPipeline<SplineADAA> splineUIToAudioPipeline;
+    chowdsp::UIToAudioPipeline<SplineADAAType> splineUIToAudioPipeline;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SplineWaveshaper)
 };

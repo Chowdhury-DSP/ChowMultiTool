@@ -38,8 +38,9 @@ void WaveshaperMathView::attemptToLoadNewMathShaper()
     if (mathBox.isEmpty())
         return;
 
-    static constexpr auto scaler = float (numDrawPoints - 1) / (splineBounds.xMax - splineBounds.xMin);
-    static constexpr auto offset = -splineBounds.xMin * scaler;
+    static constexpr auto scalerAndOffset = getSplineScalerAndOffset<float>();
+    static constexpr auto scaler = scalerAndOffset.first;
+    static constexpr auto offset = scalerAndOffset.second;
 
     float expressionX = 0.0f;
     exprtk::symbol_table<float> symbol_table;

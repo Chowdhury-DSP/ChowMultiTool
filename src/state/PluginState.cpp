@@ -47,7 +47,9 @@ PluginExtraState::PluginExtraState()
 {
     waveshaperExtraState = std::make_unique<dsp::waveshaper::ExtraState>();
 
-    addStateValues ({ &waveshaperExtraState->freeDrawState, &waveshaperExtraState->mathState });
+    addStateValues ({ &waveshaperExtraState->freeDrawState,
+                      &waveshaperExtraState->mathState,
+                      &waveshaperExtraState->pointsState });
 }
 
 PluginExtraState::~PluginExtraState() = default;

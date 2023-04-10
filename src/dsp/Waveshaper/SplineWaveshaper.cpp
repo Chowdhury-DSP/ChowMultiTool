@@ -2,42 +2,11 @@
 
 namespace dsp::waveshaper::spline
 {
-SplineState::SplineState (std::string_view valueName)
-    : StateValueBase (valueName),
-      currentValue (defaultValue)
+SplinePoints DefaultSplineCreator::call()
 {
-}
-
-/** Sets a new value */
-void SplineState::set (const SplinePoints& v)
-{
-    if (v == currentValue)
-        return;
-
-    currentValue = v;
-    changeBroadcaster();
-}
-
-SplineState& SplineState::operator= (const SplinePoints& v)
-{
-    set (v);
-    return *this;
-}
-
-void SplineState::serialize (chowdsp::JSONSerializer::SerializedType& serial) const
-{
-    serialize<chowdsp::JSONSerializer> (serial, *this);
-}
-
-void SplineState::deserialize (chowdsp::JSONSerializer::DeserializedType deserial)
-{
-    deserialize<chowdsp::JSONSerializer> (deserial, *this);
-}
-
-SplinePoints getDefaultSplinePoints()
-{
-    static constexpr auto scaler = float (numDrawPoints - 1) / (splineBounds.xMax - splineBounds.xMin);
-    static constexpr auto offset = -splineBounds.xMin * scaler;
+    static constexpr auto scalerAndOffset = getSplineScalerAndOffset<float>();
+    static constexpr auto scaler = scalerAndOffset.first;
+    static constexpr auto offset = scalerAndOffset.second;
 
     SplinePoints points;
     for (auto [index, point] : chowdsp::enumerate (points))
@@ -50,59 +19,23 @@ SplinePoints getDefaultSplinePoints()
 
 Spline createSpline (const SplinePoints& points)
 {
-    static constexpr auto n = size_t (numDrawPoints - 1);
-
-    Spline set;
-
+    static constexpr auto n = size_t (maxNumDrawPoints - 1);
     std::array<double, n> h {};
-    for (size_t i = 0; i < n; ++i)
-        h[i] = double (points[i + 1].x - points[i].x);
-
     std::array<double, n> alpha {};
-    for (size_t i = 1; i < n; ++i)
-        alpha[i] = double (3 * (points[i + 1].y - points[i].y) / h[i] - 3 * (points[i].y - points[i - 1].y) / h[i - 1]);
+    std::array<double, (size_t) maxNumDrawPoints> l {};
+    std::array<double, (size_t) maxNumDrawPoints> mu {};
+    std::array<double, (size_t) maxNumDrawPoints> z {};
 
-    std::array<double, (size_t) numDrawPoints> l {};
-    std::array<double, (size_t) numDrawPoints> mu {};
-    std::array<double, (size_t) numDrawPoints> z {};
-    l[0] = 1.0;
-    mu[0] = 0.0;
-    z[0] = 0.0;
-
-    for (size_t i = 1; i < n; ++i)
-    {
-        l[i] = 2 * double (points[i + 1].x - points[i - 1].x) - h[i - 1] * mu[i - 1];
-        mu[i] = h[i] / l[i];
-        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
-    }
-
-    l[n] = 1.0;
-    z[n] = 0.0;
-    double prevC = 0.0;
-
-    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshorten-64-to-32", "-Wsign-conversion")
-    for (int j = n - 1; j >= 0; --j) // NOLINT
-    {
-        set[j].a = (double) points[j].y;
-        set[j].c = z[j] - mu[j] * prevC;
-        set[j].b = ((double) points[j + 1].y - set[j].a) / h[j] - h[j] * (prevC + 2 * set[j].c) / 3;
-        set[j].d = (prevC - set[j].c) / 3 / h[j];
-        set[j].x = (double) points[j].x;
-
-        prevC = set[j].c;
-    }
-    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-
-    return set;
+    return createSpline<Spline> (points, h, alpha, l, mu, z);
 }
 
-// @TODO: we can definitely optimize this!
 double evaluateSpline (const Spline& spline, double x)
 {
     x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
 
-    static constexpr auto scaler = double (numDrawPoints - 1) / double (splineBounds.xMax - splineBounds.xMin);
-    static constexpr auto offset = (double) -splineBounds.xMin * scaler;
+    static constexpr auto scalerAndOffset = getSplineScalerAndOffset();
+    static constexpr auto scaler = scalerAndOffset.first;
+    static constexpr auto offset = scalerAndOffset.second;
     const auto splineSetIndex = juce::truncatePositiveToUnsignedInt (scaler * x + offset);
 
     const auto& ss = spline[splineSetIndex];
@@ -118,11 +51,11 @@ double evaluateSplineADAA (const SplineADAASection& ss, double x)
     return ss.c0 + ss.c1 * x + ss.c2 * xSq + ss.c3 * xCb + ss.c4 * xQ;
 }
 
-double evaluateSplineADAA (const std::array<SplineADAASection, numDrawPoints - 1>& spline, double x)
+double evaluateSplineADAA (const std::array<SplineADAASection, maxNumDrawPoints - 1>& spline, double x)
 {
     x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
 
-    static constexpr auto scaler = double (numDrawPoints - 1) / double (splineBounds.xMax - splineBounds.xMin);
+    static constexpr auto scaler = double (maxNumDrawPoints - 1) / double (splineBounds.xMax - splineBounds.xMin);
     static constexpr auto offset = (double) -splineBounds.xMin * scaler;
     const auto splineSetIndex = juce::truncatePositiveToUnsignedInt (scaler * x + offset);
 
@@ -152,15 +85,112 @@ std::unique_ptr<SplineADAA> createADAASpline (const SplinePoints& splinePoints)
     return splineADAA;
 }
 
+//========================================================================
+VectorSplinePoints DefaultVectorSplineCreator::call()
+{
+    //    VectorSplinePoints points {};
+    //    points.emplace_back (splineBounds.xMin, -1.0f);
+    //    points.emplace_back (splineBounds.xMax, 1.0f);
+    return {};
+}
+
+VectorSpline createSpline (const VectorSplinePoints& points)
+{
+    auto copyPoints = points;
+    if (copyPoints.empty())
+    {
+        copyPoints.emplace_back (splineBounds.xMin, -1.0f);
+        copyPoints.emplace_back (splineBounds.xMax, 1.0f);
+    }
+    else
+    {
+        copyPoints.insert (copyPoints.begin(), points.front().withX (splineBounds.xMin));
+        copyPoints.push_back (points.back().withX (splineBounds.xMax));
+    }
+
+    const auto numDrawPoints = copyPoints.size();
+    const auto n = size_t (numDrawPoints - 1);
+    std::vector<double> data {};
+    data.resize (2 * n + 3 * numDrawPoints);
+
+    std::span<double> h { data.data(), n };
+    std::span<double> alpha { data.data() + n, n };
+    std::span<double> l { data.data() + 2 * n, numDrawPoints };
+    std::span<double> mu { data.data() + 2 * n + numDrawPoints, numDrawPoints };
+    std::span<double> z { data.data() + 2 * n + 2 * numDrawPoints, numDrawPoints };
+
+    return createSpline<VectorSpline> (copyPoints, h, alpha, l, mu, z);
+}
+
+double evaluateSpline (const VectorSpline& spline, double x)
+{
+    x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
+
+    size_t splineSetIndex = 0;
+    for (size_t ii = splineSetIndex + 1; ii < spline.size(); ++ii)
+    {
+        if (x < spline[ii].x)
+            break;
+        splineSetIndex = ii;
+    }
+
+    const auto& ss = spline[splineSetIndex];
+    return chowdsp::Polynomials::estrin<3> ({ ss.d, ss.c, ss.b, ss.a }, x - ss.x);
+}
+
+double evaluateSplineADAA (const std::vector<SplineADAASection>& spline, double x)
+{
+    x = juce::jlimit ((double) splineBounds.xMin, (double) splineBounds.xMax, x);
+
+    size_t splineSetIndex = 0;
+    for (size_t ii = splineSetIndex + 1; ii < spline.size(); ++ii)
+    {
+        if (x < spline[ii].x)
+            break;
+        splineSetIndex = ii;
+    }
+
+    return evaluateSplineADAA (spline[splineSetIndex], x);
+}
+
+std::unique_ptr<VectorSplineADAA> createADAASpline (const VectorSplinePoints& splinePoints)
+{
+    if (splinePoints.empty())
+        return {};
+
+    auto splineADAA = std::make_unique<VectorSplineADAA>();
+    const auto& spline = splineADAA->first = createSpline (splinePoints);
+    splineADAA->second.resize (spline.size(), {});
+    for (auto [adaa, sp] : chowdsp::zip (splineADAA->second, splineADAA->first))
+    {
+        adaa.c0 = sp.c * chowdsp::Power::ipow<3> (sp.x) / 3.0;
+        adaa.c1 = sp.a - sp.b * sp.x;
+        adaa.c2 = sp.b * 0.5;
+        adaa.c3 = sp.c / 3.0;
+        adaa.c4 = sp.d * 0.25;
+        adaa.x = sp.x;
+    }
+
+    for (size_t i = 1; i < spline.size(); ++i)
+    {
+        auto& ss = splineADAA->second[i];
+        ss.c0 += evaluateSplineADAA (splineADAA->second[i - 1], ss.x) - evaluateSplineADAA (ss, ss.x);
+    }
+
+    return splineADAA;
+}
+
 //======================================
-SplineWaveshaper::SplineWaveshaper (SplineState& state)
+template <typename SplinePointsType, typename SplineADAAType>
+SplineWaveshaper<SplinePointsType, SplineADAAType>::SplineWaveshaper (SplinePointsState<SplinePointsType>& state)
     : splineState (state)
 {
     splineState.changeBroadcaster.connect ([this]
                                            { splineUIToAudioPipeline.write (createADAASpline (splineState.get())); });
 }
 
-void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
+template <typename SplinePointsType, typename SplineADAAType>
+void SplineWaveshaper<SplinePointsType, SplineADAAType>::prepare (const juce::dsp::ProcessSpec& spec)
 {
     dcBlocker.prepare (spec);
     dcBlocker.calcCoefs (1.0, spec.sampleRate);
@@ -171,16 +201,21 @@ void SplineWaveshaper::prepare (const juce::dsp::ProcessSpec& spec)
     splineUIToAudioPipeline.read();
 }
 
-void SplineWaveshaper::reset()
+template <typename SplinePointsType, typename SplineADAAType>
+void SplineWaveshaper<SplinePointsType, SplineADAAType>::reset()
 {
     std::fill (x1.begin(), x1.end(), 0.0f);
     dcBlocker.reset();
 }
 
-void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) noexcept
+template <typename SplinePointsType, typename SplineADAAType>
+void SplineWaveshaper<SplinePointsType, SplineADAAType>::processBlock (const chowdsp::BufferView<double>& buffer) noexcept
 {
     const auto* spline = splineUIToAudioPipeline.read();
     if (spline == nullptr)
+        return;
+
+    if (spline->first.empty() || spline->second.empty())
         return;
 
     for (auto [idx, channel] : chowdsp::buffer_iters::channels (buffer))
@@ -208,4 +243,7 @@ void SplineWaveshaper::processBlock (const chowdsp::BufferView<double>& buffer) 
 
     dcBlocker.processBlock (buffer);
 }
+
+template class SplineWaveshaper<SplinePoints, SplineADAA>;
+template class SplineWaveshaper<VectorSplinePoints, VectorSplineADAA>;
 } // namespace dsp::waveshaper::spline

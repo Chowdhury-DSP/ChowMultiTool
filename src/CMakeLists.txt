@@ -32,6 +32,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/Waveshaper/WaveshaperPlot.cpp
     gui/Waveshaper/WaveshaperDrawer.cpp
     gui/Waveshaper/WaveshaperMathView.cpp
+    gui/Waveshaper/WaveshaperPointsView.cpp
     gui/Waveshaper/BottomBar.cpp
     gui/Waveshaper/FoldFuzzControls.cpp
 

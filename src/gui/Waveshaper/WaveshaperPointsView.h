@@ -5,11 +5,10 @@
 namespace gui::waveshaper
 {
 namespace spline = dsp::waveshaper::spline;
-
-class WaveshaperDrawer : public juce::Component
+class WaveshaperPointsView : public juce::Component
 {
 public:
-    WaveshaperDrawer (dsp::waveshaper::ExtraState& wsExtraState, juce::UndoManager& um);
+    WaveshaperPointsView (dsp::waveshaper::ExtraState& wsExtraState, juce::UndoManager& um);
 
     void paint (juce::Graphics& g) override;
 
@@ -17,20 +16,17 @@ public:
 
 private:
     void visibilityChanged() override;
-    void setSplinePoint (juce::Point<float> point);
     void mouseDown (const juce::MouseEvent& e) override;
-    void mouseDrag (const juce::MouseEvent& e) override;
     void mouseMove (const juce::MouseEvent& e) override;
     void mouseExit (const juce::MouseEvent& e) override;
 
-    spline::SplineState& freeDrawState;
+    spline::VectorSplineState& splineState;
     juce::UndoManager& um;
 
-    spline::SplinePoints points;
-    spline::SplinePoints prevPoints;
+    spline::VectorSplinePoints points;
+    spline::VectorSplinePoints prevPoints;
     std::optional<juce::Point<float>> mousePos;
-    juce::Point<float> lastMouseDragPoint {};
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperDrawer)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperPointsView)
 };
 } // namespace gui::waveshaper

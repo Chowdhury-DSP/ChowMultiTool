@@ -51,6 +51,11 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
     mathButton.onStateChange = [this]
     { plot.toggleMathMode (mathButton.getToggleState()); };
 
+    addChildComponent (pointsButton);
+    pointsButton.setVisible (wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Spline);
+    pointsButton.onStateChange = [this]
+    { plot.togglePointsMode (pointsButton.getToggleState()); };
+
     callbacks += {
         pluginState.addParameterListener (
             *wsParams.shapeParam,
@@ -74,6 +79,11 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
                 mathButton.setVisible (isMathMode);
                 if (! isMathMode)
                     mathButton.setToggleState (false, juce::sendNotification);
+
+                const auto isPointsMode = wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Spline;
+                pointsButton.setVisible (isPointsMode);
+                if (! isPointsMode)
+                    pointsButton.setToggleState (false, juce::sendNotification);
             }),
     };
 }
@@ -90,8 +100,10 @@ void WaveshaperEditor::resized()
 
     const auto pad = proportionOfWidth (0.005f);
     const auto dim = proportionOfWidth (0.05f);
-    freeDrawButton.setBounds (bounds.getWidth() - pad - dim, pad, dim, dim);
-    mathButton.setBounds (bounds.getWidth() - pad - dim, pad, dim, dim);
+    const auto editButtonBounds = juce::Rectangle {bounds.getWidth() - pad - dim, pad, dim, dim };
+    freeDrawButton.setBounds (editButtonBounds);
+    mathButton.setBounds (editButtonBounds);
+    pointsButton.setBounds (editButtonBounds);
 }
 
 void WaveshaperEditor::paint (juce::Graphics& g)
