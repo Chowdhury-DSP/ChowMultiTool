@@ -26,7 +26,9 @@ private:
         void paintButton (juce::Graphics& g, bool, bool) override;
         std::unique_ptr<juce::Drawable> iconOn;
         std::unique_ptr<juce::Drawable> iconOff;
-    } freeDrawButton { "Vector/pencil-solid.svg" }, mathButton { "Vector/calculator-solid.svg" };
+    } freeDrawButton { "Vector/pencil-solid.svg" },
+        mathButton { "Vector/calculator-solid.svg" },
+        pointsButton { "Vector/eye-dropper-solid.svg" };
 
     chowdsp::ScopedCallbackList callbacks;
 

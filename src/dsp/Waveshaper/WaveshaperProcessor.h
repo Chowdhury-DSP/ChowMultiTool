@@ -17,6 +17,7 @@ enum class Shapes
     Fold_Fuzz = 128,
     Free_Draw = 256,
     Math = 512,
+    Spline = 1024,
 };
 
 enum class OversamplingRatio
@@ -90,8 +91,9 @@ struct Params : chowdsp::ParamHolder
 
 struct ExtraState
 {
-    spline::SplineState freeDrawState { "waveshaper_free_draw" };
-    spline::SplineState mathState { "waveshaper_math" };
+    spline::SplineState freeDrawState { "waveshaper_free_draw", spline::DefaultSplineCreator {} };
+    spline::SplineState mathState { "waveshaper_math", spline::DefaultSplineCreator {} };
+    spline::VectorSplineState pointsState { "waveshaper_points", spline::DefaultVectorSplineCreator {} };
 };
 
 class WaveshaperProcessor
@@ -129,8 +131,9 @@ private:
     chowdsp::WestCoastWavefolder<double> westCoastFolder { &lookupTableCache.get() };
     chowdsp::WaveMultiplier<double, 6> waveMultiplyFolder { &lookupTableCache.get() };
     SignalSmithWaveshaper ssWaveshaper;
-    spline::SplineWaveshaper freeDrawShaper;
-    spline::SplineWaveshaper mathShaper;
+    spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> freeDrawShaper;
+    spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> mathShaper;
+    spline::SplineWaveshaper<spline::VectorSplinePoints, spline::VectorSplineADAA> pointsShaper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };
