@@ -1,6 +1,9 @@
 #pragma once
 
 #include "SVFPlot.h"
+#include "SVFParamControls.h"
+#include "BottomBar.h"
+#include "gui/Shared/IconButton.h"
 
 namespace gui::svf
 {
@@ -10,10 +13,16 @@ public:
     SVFEditor (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation);
 
     void resized() override;
+    void paint (juce::Graphics& g) override;
 
 private:
-    chowdsp::ParametersView paramsView;
     SVFPlot plot;
+    SVFParamControls paramControls;
+    std::unique_ptr<BottomBar> bottomBar;
+
+    IconButton arpLimitButton;
+    chowdsp::ButtonAttachment arpLimitAttach;
+    chowdsp::ScopedCallback modeChangeCallback;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFEditor)
 };

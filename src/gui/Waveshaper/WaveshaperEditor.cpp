@@ -4,34 +4,13 @@
 
 namespace gui::waveshaper
 {
-WaveshaperEditor::CustomizeButton::CustomizeButton (const std::string& iconTag)
-    : juce::Button ("Free-Draw")
-{
-    const auto fs = cmrc::gui::get_filesystem();
-    const auto svg = fs.open (iconTag);
-    const auto icon = juce::Drawable::createFromImageData (svg.begin(), svg.size());
-    iconOn = icon->createCopy();
-    iconOn->replaceColour (juce::Colours::black, colours::plotColour);
-    iconOff = icon->createCopy();
-    iconOff->replaceColour (juce::Colours::black, colours::linesColour);
-
-    setClickingTogglesState (true);
-}
-
-void WaveshaperEditor::CustomizeButton::paintButton (juce::Graphics& g, bool, bool)
-{
-    g.setColour (juce::Colours::black.withAlpha (0.75f));
-    g.fillRoundedRectangle (getLocalBounds().toFloat(), 0.1f * (float) getHeight());
-
-    const auto pad = proportionOfWidth (0.2f);
-    const auto& icon = getToggleState() ? iconOn : iconOff;
-    icon->drawWithin (g, getLocalBounds().reduced (pad).toFloat(), juce::RectanglePlacement::stretchToFit, 1.0f);
-}
-
 WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams)
     : params (wsParams),
       plot (pluginState, wsParams),
-      foldFuzzControls (pluginState, wsParams)
+      foldFuzzControls (pluginState, wsParams),
+      freeDrawButton ("Vector/pencil-solid.svg", colours::plotColour, colours::linesColour),
+      mathButton ("Vector/calculator-solid.svg", colours::plotColour, colours::linesColour),
+      pointsButton ("Vector/eye-dropper-solid.svg", colours::plotColour, colours::linesColour)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, wsParams);
 

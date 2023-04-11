@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dsp/SVF/SVFProcessor.h"
+#include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
 
 namespace gui::svf
@@ -20,6 +21,8 @@ private:
 
     chowdsp::GenericFilterPlotter filterPlotter;
     dsp::svf::SVFProcessor processor;
+
+    SpectrumDotSlider freqSlider;
 
     chowdsp::ScopedCallbackList callbacks;
 

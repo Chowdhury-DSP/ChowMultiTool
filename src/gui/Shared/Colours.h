@@ -52,3 +52,10 @@ using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFB72A38 };
 const auto thumbColour = juce::Colour { 0xFFBFB48F };
 } // namespace gui::signal_gen::colours
+
+namespace gui::svf::colours
+{
+using namespace gui::colours;
+const auto plotColour = juce::Colour { 0xFFC70C0C };
+const auto boxColour = juce::Colour { 0xFF0b7189 };
+} // namespace gui::waveshaper::colours

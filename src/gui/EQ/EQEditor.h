@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EQPlot.h"
+#include "gui/Shared/IconButton.h"
 
 // @TODO:
 // - Figure out type-in values for chyron
@@ -21,13 +22,7 @@ private:
     std::unique_ptr<juce::Component> bottomBar;
     chowdsp::ParametersView paramsView;
 
-    struct LinearPhaseButton : juce::Button
-    {
-        LinearPhaseButton();
-        void paintButton (juce::Graphics& g, bool, bool) override;
-        std::unique_ptr<juce::Drawable> lpIconOn;
-        std::unique_ptr<juce::Drawable> lpIconOff;
-    } linearPhaseButton;
+    IconButton linearPhaseButton;
     chowdsp::ButtonAttachment linearPhaseAttach;
 
     juce::TooltipWindow tooltips { this, 300 };

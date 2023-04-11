@@ -1,4 +1,5 @@
 #include "SVFPlot.h"
+#include "gui/Shared/Colours.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::svf
@@ -6,21 +7,24 @@ namespace gui::svf
 namespace
 {
     constexpr double sampleRate = 48000.0f;
-    constexpr int fftOrder = 15;
+    constexpr int fftOrder = 16;
     constexpr int blockSize = 1 << fftOrder;
     constexpr int minFrequency = 18;
-    constexpr int maxFrequency = 22'000;
+    constexpr int maxFrequency = 20'000;
 } // namespace
 
 SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -30.0f,
+        .minMagnitudeDB = -45.0f,
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
-      processor (svfParams)
+      processor (svfParams),
+      freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented)
 {
+    addAndMakeVisible (freqSlider);
+
     processor.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
     {
@@ -61,15 +65,25 @@ void SVFPlot::updatePlot()
 
 void SVFPlot::paint (juce::Graphics& g)
 {
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -30.0f, -20.0f, -10.0f, 10.0f, 20.0f, 30.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
+                                                         g,
+                                                         { 100.0f, 1'000.0f, 10'000.0f },
+                                                         colours::majorLinesColour,
+                                                         colours::minorLinesColour);
+    gui::drawMagnitudeLines (*this,
+                             g,
+                             { -42.0f, -36.0f, -24.0f, -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f },
+                             { 0.0f },
+                             colours::majorLinesColour,
+                             colours::minorLinesColour);
 
-    g.setColour (juce::Colours::red);
-    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
+    g.setColour (colours::plotColour);
+    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.5f });
 }
 
 void SVFPlot::resized()
 {
     updatePlot();
+    freqSlider.setBounds (getLocalBounds());
 }
 } // namespace gui::svf

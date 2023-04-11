@@ -16,21 +16,49 @@ enum class PlainType
     Lowpass = 1,
     Highpass = 2,
     Bandpass = 4,
-    Allpass = 8,
-    Notch = 16,
-    Bell = 32,
-    LowShelf = 64,
-    HighShelf = 128,
-    Multi = 256,
+    MultiMode = 8,
 };
+}
 
+template <>
+constexpr magic_enum::customize::customize_t
+    magic_enum::customize::enum_name<chowdsp::WernerFilterType> (chowdsp::WernerFilterType value) noexcept
+{
+    using chowdsp::WernerFilterType;
+    switch (value)
+    {
+        case WernerFilterType::Lowpass2:
+            return "2nd-Order LPF";
+        case WernerFilterType::Bandpass2:
+            return "2nd-Order BPF";
+        case WernerFilterType::Highpass2:
+            return "2nd-Order HPF";
+        case WernerFilterType::Lowpass4:
+            return "4th-Order LPF";
+        case WernerFilterType::MultiMode:
+            return "Multi-Mode";
+    }
+    return default_tag;
+}
+
+template <>
+constexpr magic_enum::customize::customize_t
+    magic_enum::customize::enum_name<dsp::svf::PlainType> (dsp::svf::PlainType value) noexcept
+{
+    using dsp::svf::PlainType;
+    if (value == PlainType::MultiMode)
+        return "Multi-Mode";
+    return default_tag;
+}
+
+namespace dsp::svf
+{
 struct Params : public chowdsp::ParamHolder
 {
     Params()
     {
         add (cutoff,
              qParam,
-             gain,
              mode,
              type,
              plainType,
@@ -54,13 +82,6 @@ struct Params : public chowdsp::ParamHolder
         chowdsp::CoefficientCalculators::butterworthQ<float>,
         &chowdsp::ParamUtils::floatValToString,
         &chowdsp::ParamUtils::stringToFloatVal
-    };
-
-    chowdsp::GainDBParameter::Ptr gain {
-        juce::ParameterID { "svf_gain", ParameterVersionHints::version1_0_0 },
-        "SVF Gain",
-        juce::NormalisableRange { -18.0f, 18.0f },
-        0.0f,
     };
 
     chowdsp::PercentParameter::Ptr mode {
@@ -122,7 +143,6 @@ private:
     const Params& params;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> cutoffSmooth;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> qSmooth;
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> gainDBSmooth;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> modeSmooth;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> dampingSmooth;
 
@@ -130,11 +150,6 @@ private:
         chowdsp::SVFLowpass<>,
         chowdsp::SVFHighpass<>,
         chowdsp::SVFBandpass<>,
-        chowdsp::SVFAllpass<>,
-        chowdsp::SVFNotch<>,
-        chowdsp::SVFBell<>,
-        chowdsp::SVFHighShelf<>,
-        chowdsp::SVFLowShelf<>,
         chowdsp::SVFMultiMode<>>
         plainFilters;
 

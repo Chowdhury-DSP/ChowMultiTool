@@ -29,6 +29,7 @@ void FoldFuzzControls::paint (juce::Graphics& g)
 void FoldFuzzControls::resized()
 {
     auto bounds = getLocalBounds();
+    bounds.removeFromTop (proportionOfHeight (0.05f));
     foldSlider.setBounds (bounds.removeFromLeft (proportionOfWidth (0.5f)));
     fuzzSlider.setBounds (bounds);
 }

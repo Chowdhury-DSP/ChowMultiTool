@@ -2,6 +2,7 @@
 
 #include "FoldFuzzControls.h"
 #include "WaveshaperPlot.h"
+#include "gui/Shared/IconButton.h"
 
 namespace gui::waveshaper
 {
@@ -20,15 +21,9 @@ private:
     std::unique_ptr<juce::Component> bottomBar;
     FoldFuzzControls foldFuzzControls;
 
-    struct CustomizeButton : juce::Button
-    {
-        explicit CustomizeButton (const std::string& iconTag);
-        void paintButton (juce::Graphics& g, bool, bool) override;
-        std::unique_ptr<juce::Drawable> iconOn;
-        std::unique_ptr<juce::Drawable> iconOff;
-    } freeDrawButton { "Vector/pencil-solid.svg" },
-        mathButton { "Vector/calculator-solid.svg" },
-        pointsButton { "Vector/eye-dropper-solid.svg" };
+    IconButton freeDrawButton;
+    IconButton mathButton;
+    IconButton pointsButton;
 
     chowdsp::ScopedCallbackList callbacks;
 

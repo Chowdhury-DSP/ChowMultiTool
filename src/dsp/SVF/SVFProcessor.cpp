@@ -15,8 +15,6 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
     qSmooth.reset (spec.sampleRate, 0.025);
     qSmooth.setCurrentAndTargetValue (*params.qParam);
-    gainDBSmooth.reset (spec.sampleRate, 0.025);
-    gainDBSmooth.setCurrentAndTargetValue (*params.gain);
     modeSmooth.reset (spec.sampleRate, 0.025);
     modeSmooth.setCurrentAndTargetValue (*params.mode);
     dampingSmooth.reset (spec.sampleRate, 0.025);
@@ -33,7 +31,6 @@ void SVFProcessor::reset()
 
     cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
     qSmooth.setCurrentAndTargetValue (*params.qParam);
-    gainDBSmooth.setCurrentAndTargetValue (*params.gain);
     modeSmooth.setCurrentAndTargetValue (*params.mode);
     dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
 }
@@ -45,7 +42,6 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer) noexc
 {
     cutoffSmooth.setTargetValue (*params.cutoff);
     qSmooth.setTargetValue (*params.qParam);
-    gainDBSmooth.setTargetValue (*params.gain);
     modeSmooth.setTargetValue (*params.mode);
     dampingSmooth.setTargetValue (*params.wernerDamping);
 
@@ -68,7 +64,6 @@ void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) 
     const auto numSamples = buffer.getNumSamples();
     cutoffSmooth.skip (numSamples);
     qSmooth.skip (numSamples);
-    gainDBSmooth.skip (numSamples);
     modeSmooth.skip (numSamples);
     dampingSmooth.skip (numSamples);
 
@@ -78,9 +73,6 @@ void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) 
 
         filter.template setCutoffFrequency<false> (cutoffSmooth.getCurrentValue());
         filter.template setQValue<false> (qSmooth.getCurrentValue());
-
-        if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFBell<>, chowdsp::SVFLowShelf<>, chowdsp::SVFHighShelf<>>)
-            filter.template setGainDecibels<false> (gainDBSmooth.getCurrentValue());
 
         if constexpr (IsOneOfFilters<FilterType, chowdsp::SVFMultiMode<>>)
             filter.setMode (0.5f + 0.5f * modeSmooth.getCurrentValue());
