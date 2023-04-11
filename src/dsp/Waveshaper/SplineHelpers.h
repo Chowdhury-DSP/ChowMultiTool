@@ -51,11 +51,11 @@ Spline createSpline (std::span<const juce::Point<float>> points,
     const auto n = size_t (numDrawnPoints - 1);
 
     jassert (points.size() == numDrawnPoints);
-    jassert (h.size() == numDrawnPoints);
-    jassert (alpha.size() == numDrawnPoints);
-    jassert (l.size() == n);
-    jassert (mu.size() == n);
-    jassert (z.size() == n);
+    jassert (h.size() == n);
+    jassert (alpha.size() == n);
+    jassert (l.size() == numDrawnPoints);
+    jassert (mu.size() == numDrawnPoints);
+    jassert (z.size() == numDrawnPoints);
 
     Spline set;
     if constexpr (std::is_same_v<Spline, std::vector<SplineSection>>)

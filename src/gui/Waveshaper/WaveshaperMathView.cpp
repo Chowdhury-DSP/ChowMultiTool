@@ -99,6 +99,17 @@ void WaveshaperMathView::paint (juce::Graphics& g)
 
 void WaveshaperMathView::resized()
 {
+#if JUCE_IOS
+    const auto centre = getLocalBounds().getCentre();
+    mathBox.setBounds (juce::Rectangle { proportionOfWidth (0.8f), proportionOfHeight (0.1f) }
+                           .withCentre (centre)
+                           .withY (proportionOfHeight (0.1f)));
+    mathBox.setFont ((float) mathBox.getHeight() * 0.75f);
+
+    enterButton.setBounds (juce::Rectangle { proportionOfWidth (0.25f), proportionOfHeight (0.1f) }
+                               .withCentre (centre)
+                               .withY (mathBox.getBottom() + proportionOfHeight (0.1f)));
+#else
     const auto centre = getLocalBounds().getCentre();
     mathBox.setBounds (juce::Rectangle { proportionOfWidth (0.8f), proportionOfHeight (0.1f) }
                            .withCentre (centre));
@@ -107,6 +118,7 @@ void WaveshaperMathView::resized()
     enterButton.setBounds (juce::Rectangle { proportionOfWidth (0.25f), proportionOfHeight (0.1f) }
                                .withCentre (centre)
                                .withY (mathBox.getBottom() + proportionOfHeight (0.1f)));
+#endif
 }
 
 juce::Path WaveshaperMathView::getDrawnPath (std::optional<chowdsp::WaveshaperPlotParams>&& params) const

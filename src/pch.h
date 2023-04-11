@@ -21,11 +21,19 @@
 #include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wreturn-type")
 #include <melatonin_inspector/melatonin_inspector.h>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 // Other third-party libraries
 #include <chowdsp_wdf/chowdsp_wdf.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
+                                     "-Wsign-conversion",
+                                     "-Wimplicit-int-conversion",
+                                     "-Wshadow")
 #include <exprtk.hpp>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 // Resources
 #include <cmrc/cmrc.hpp>

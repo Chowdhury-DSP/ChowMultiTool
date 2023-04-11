@@ -51,6 +51,9 @@ juce_add_plugin(ChowMultiTool
     LV2URI https://github.com/Chowdhury-DSP/ChowMultiTool
     
     MICROPHONE_PERMISSION_ENABLED TRUE
+    REQUIRES_FULL_SCREEN TRUE
+    IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+    IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
 )
 
 if(CHOWMULTITOOL_BUILD_CLAP)
