@@ -32,6 +32,13 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
                                                                  chowdsp::ParameterListenerThread::MessageThread,
                                                                  [this]
                                                                  { refreshEditor(); });
+
+    juce::LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
+}
+
+PluginEditor::~PluginEditor()
+{
+    juce::LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
 void PluginEditor::setResizeBehaviour()

@@ -16,6 +16,12 @@ juce::Font SimpleBox::LNF::getPopupMenuFont()
     return fonts->robotoBold;
 }
 
+juce::PopupMenu::Options SimpleBox::LNF::getOptionsForComboBoxPopupMenu (juce::ComboBox& box, juce::Label& label)
+{
+    return chowdsp::ChowLNF::getOptionsForComboBoxPopupMenu (box, label)
+        .withStandardItemHeight (box.getHeight());
+}
+
 SimpleBox::SimpleBox()
 {
     setLookAndFeel (&lnf);

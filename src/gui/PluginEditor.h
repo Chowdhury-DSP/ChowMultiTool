@@ -11,6 +11,7 @@ class PluginEditor : public juce::AudioProcessorEditor
 {
 public:
     explicit PluginEditor (ChowMultiTool& plugin);
+    ~PluginEditor() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -31,6 +32,7 @@ private:
 
     chowdsp::ScopedCallback toolChangeCallback;
     juce::ComponentBoundsConstrainer constrainer;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     melatonin::Inspector inspector { *this, false };
 

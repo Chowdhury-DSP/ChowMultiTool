@@ -6,10 +6,11 @@ namespace gui
 {
 struct SimpleBox : juce::ComboBox
 {
-    struct LNF : juce::LookAndFeel_V4
+    struct LNF : chowdsp::ChowLNF
     {
         LNF();
         juce::Font getPopupMenuFont() override;
+        juce::PopupMenu::Options getOptionsForComboBoxPopupMenu (juce::ComboBox&, juce::Label&) override;
         gui::SharedFonts fonts;
     };
 
