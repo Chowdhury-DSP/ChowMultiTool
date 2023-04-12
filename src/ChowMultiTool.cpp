@@ -59,6 +59,16 @@ juce::AudioProcessorEditor* ChowMultiTool::createEditor()
     return new gui::PluginEditor { *this };
 }
 
+bool ChowMultiTool::remoteControlsPageFill (uint32_t pageIndex,
+                                            juce::String& sectionName,
+                                            uint32_t& pageID,
+                                            juce::String& pageName,
+                                            std::array<juce::AudioProcessorParameter *, CLAP_REMOTE_CONTROLS_COUNT>& params) noexcept
+{
+    remoteControls.pageFill (pageIndex, sectionName, pageID, pageName, params);
+    return true;
+}
+
 // This creates new instances of the plugin
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
