@@ -59,6 +59,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/Shared/Fonts.cpp
     gui/Shared/SimpleBox.cpp
     gui/Shared/ErrorMessageView.cpp
+    gui/Shared/TextSlider.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

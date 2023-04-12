@@ -5,41 +5,19 @@
 namespace gui::eq
 {
 EQChyron::EQChyron (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters)
-    : eqParams (eqParameters)
+    : state (pluginState),
+      eqParams (eqParameters)
 {
-    for (size_t i = 0; i < numBands; ++i)
-    {
-        callbacks += {
-            pluginState.addParameterListener (eqParameters.eqParams[i].onOffParam,
-                                              chowdsp::ParameterListenerThread::MessageThread,
-                                              [this]
-                                              { updateValues(); }),
-            pluginState.addParameterListener (eqParameters.eqParams[i].typeParam,
-                                              chowdsp::ParameterListenerThread::MessageThread,
-                                              [this]
-                                              { updateValues(); }),
-            pluginState.addParameterListener (eqParameters.eqParams[i].freqParam,
-                                              chowdsp::ParameterListenerThread::MessageThread,
-                                              [this]
-                                              { updateValues(); }),
-            pluginState.addParameterListener (eqParameters.eqParams[i].qParam,
-                                              chowdsp::ParameterListenerThread::MessageThread,
-                                              [this]
-                                              { updateValues(); }),
-            pluginState.addParameterListener (eqParameters.eqParams[i].gainParam,
-                                              chowdsp::ParameterListenerThread::MessageThread,
-                                              [this]
-                                              { updateValues(); }),
-        };
-    }
-
     updateValues();
 }
 
 void EQChyron::setSelectedBand (int newSelectedBand)
 {
+    setVisible (newSelectedBand >= 0);
+    if (selectedBand == newSelectedBand)
+        return;
+
     selectedBand = newSelectedBand;
-    setVisible (selectedBand >= 0);
     updateValues();
 }
 
@@ -47,9 +25,9 @@ void EQChyron::updateValues()
 {
     const auto reset = [this]
     {
-        freqValue.reset();
-        qValue.reset();
-        gainValue.reset();
+        freqSlider.reset();
+        qSlider.reset();
+        gainSlider.reset();
     };
 
     if (selectedBand < 0)
@@ -58,66 +36,78 @@ void EQChyron::updateValues()
         return;
     }
 
-    const auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
-    if (activeParams.onOffParam->get() == false)
+    auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
+    if (! activeParams.onOffParam->get())
     {
         reset();
         return;
     }
 
-    freqValue.emplace (activeParams.freqParam->getCurrentValueAsText());
+    freqSlider.emplace (state, activeParams.freqParam.get());
+    freqSlider->setName ("Cutoff");
+    addAndMakeVisible (*freqSlider);
 
     const auto filterType = helpers::getFilterType (activeParams.typeParam->getIndex());
     if (helpers::hasQParam (filterType))
-        qValue.emplace (activeParams.qParam->getCurrentValueAsText());
+    {
+        qSlider.emplace (state, activeParams.qParam.get());
+        qSlider->setName ("Q");
+        addAndMakeVisible (*qSlider);
+    }
     else
-        qValue.reset();
+    {
+        qSlider.reset();
+    }
 
     if (helpers::hasGainParam (filterType))
-        gainValue.emplace (activeParams.gainParam->getCurrentValueAsText());
+    {
+        gainSlider.emplace (state, activeParams.gainParam.get());
+        gainSlider->setName ("Gain");
+        addAndMakeVisible (*gainSlider);
+    }
     else
-        gainValue.reset();
+    {
+        gainSlider.reset();
+    }
+
+    resized();
+}
+
+void EQChyron::resized()
+{
+    auto bounds = getLocalBounds();
+    const auto sliderBounds = bounds.withHeight (proportionOfHeight (1.0f / 3.0f));
+
+    if (freqSlider.has_value())
+    {
+        if (qSlider.has_value() && gainSlider.has_value())
+        {
+            const auto fourthHeight = proportionOfHeight (1.0f / 4.0f);
+            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), fourthHeight }));
+            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * fourthHeight }));
+            gainSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 3 * fourthHeight }));
+        }
+        else if (qSlider.has_value())
+        {
+            const auto thirdHeight = proportionOfHeight (1.0f / 3.0f);
+            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), thirdHeight }));
+            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * thirdHeight }));
+        }
+        else
+        {
+            freqSlider->setBounds (sliderBounds.withCentre (bounds.getCentre()));
+        }
+    }
 }
 
 void EQChyron::paint (juce::Graphics& g)
 {
-    auto bounds = getLocalBounds();
+    const auto bounds = getLocalBounds();
 
     g.setColour (juce::Colours::black.withAlpha (0.75f));
     g.fillRoundedRectangle (bounds.toFloat(), 2.5f);
 
     g.setColour (colours::linesColour);
     g.drawRoundedRectangle (bounds.toFloat(), 2.5f, 1.0f);
-
-    g.setFont (juce ::Font { fonts->robotoBold }.withHeight (0.25f * (float) getHeight()));
-    if (freqValue.has_value())
-    {
-        if (qValue.has_value() && gainValue.has_value())
-        {
-            const auto thirdHeight = proportionOfHeight (1.0f / 3.0f);
-            const auto cutoffBounds = bounds.removeFromTop (thirdHeight).reduced (2, 0);
-            g.drawFittedText ("Cutoff: " + *freqValue, cutoffBounds, juce::Justification::centred, 1);
-
-            const auto qBounds = bounds.removeFromTop (thirdHeight).reduced (2, 0);
-            g.drawFittedText ("Q: " + *qValue, qBounds, juce::Justification::centred, 1);
-
-            const auto gainBounds = bounds.removeFromTop (thirdHeight).reduced (2, 0);
-            g.drawFittedText ("Gain: " + *gainValue, gainBounds, juce::Justification::centred, 1);
-        }
-        else if (qValue.has_value())
-        {
-            const auto halfHeight = proportionOfHeight (0.5f);
-            const auto cutoffBounds = bounds.removeFromTop (halfHeight).reduced (2, 0);
-            g.drawFittedText ("Cutoff: " + *freqValue, cutoffBounds, juce::Justification::centred, 1);
-
-            const auto qBounds = bounds.removeFromTop (halfHeight).reduced (2, 0);
-            g.drawFittedText ("Q: " + *qValue, qBounds, juce::Justification::centred, 1);
-        }
-        else
-        {
-            const auto cutoffBounds = bounds.reduced (2, 0);
-            g.drawFittedText ("Cutoff: " + *freqValue, cutoffBounds, juce::Justification::centred, 1);
-        }
-    }
 }
 } // namespace gui::eq

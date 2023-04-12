@@ -10,7 +10,7 @@ namespace
     constexpr int fftOrder = 16;
     constexpr int blockSize = 1 << fftOrder;
     constexpr int minFrequency = 18;
-    constexpr int maxFrequency = 20'000;
+    constexpr int maxFrequency = 20'200;
 } // namespace
 
 SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)

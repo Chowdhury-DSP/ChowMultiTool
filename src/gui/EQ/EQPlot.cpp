@@ -155,6 +155,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
     }
 
     addAndMakeVisible (chyron);
+    chyron.toFront (false);
 
     setSelectedBand (-1);
 }
@@ -194,8 +195,8 @@ void EQPlot::resized()
         group.setBounds (getLocalBounds());
 
     const auto pad = proportionOfWidth (0.005f);
-    const auto chyronWidth = proportionOfWidth (0.125f);
-    const auto chyronHeight = proportionOfWidth (0.07f);
+    const auto chyronWidth = proportionOfWidth (0.135f);
+    const auto chyronHeight = proportionOfWidth (0.085f);
     chyron.setBounds (getWidth() - pad - chyronWidth,
                       getHeight() - pad - chyronHeight - proportionOfHeight (0.075f),
                       chyronWidth,
