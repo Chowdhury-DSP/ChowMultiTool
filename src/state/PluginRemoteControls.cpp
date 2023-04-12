@@ -64,9 +64,7 @@ void RemoteControlsHelper::pageFill (uint32_t pageIndex,
         pageID = pageIndex;
 
         params.analogEQParams->doForAllParameters ([&paramPtrs] (juce::RangedAudioParameter& param, size_t idx)
-                                                   {
-                                                       paramPtrs[idx] = &param;
-                                                   });
+                                                   { paramPtrs[idx] = &param; });
     }
     else if (ToolTypes::IndexOf<dsp::band_splitter::BandSplitterProcessor> == (int) pageIndex)
     {

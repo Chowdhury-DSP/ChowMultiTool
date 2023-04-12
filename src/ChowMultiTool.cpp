@@ -63,7 +63,7 @@ bool ChowMultiTool::remoteControlsPageFill (uint32_t pageIndex,
                                             juce::String& sectionName,
                                             uint32_t& pageID,
                                             juce::String& pageName,
-                                            std::array<juce::AudioProcessorParameter *, CLAP_REMOTE_CONTROLS_COUNT>& params) noexcept
+                                            std::array<juce::AudioProcessorParameter*, CLAP_REMOTE_CONTROLS_COUNT>& params) noexcept
 {
     remoteControls.pageFill (pageIndex, sectionName, pageID, pageName, params);
     return true;

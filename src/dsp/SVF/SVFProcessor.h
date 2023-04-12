@@ -18,7 +18,7 @@ enum class PlainType
     Bandpass = 4,
     MultiMode = 8,
 };
-}
+} // namespace dsp::svf
 
 template <>
 constexpr magic_enum::customize::customize_t

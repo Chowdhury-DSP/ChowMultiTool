@@ -35,4 +35,4 @@ struct IconButton : juce::Button
     std::unique_ptr<juce::Drawable> iconOn;
     std::unique_ptr<juce::Drawable> iconOff;
 };
-}
+} // namespace gui

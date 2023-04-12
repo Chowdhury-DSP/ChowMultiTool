@@ -30,7 +30,8 @@ struct TextSliderLNF : chowdsp::ChowLNF
                 editor->setColour (juce::CaretComponent::caretColourId, juce::Colour (0xFFC954D4));
                 editor->setColour (juce::TextEditor::backgroundColourId, colours::backgroundDark);
                 editor->setJustification (juce::Justification::centred);
-                editor->applyFontToAllText (juce ::Font { fonts->robotoBold }.withHeight (0.75f * (float) label->getHeight()));}
+                editor->applyFontToAllText (juce ::Font { fonts->robotoBold }.withHeight (0.75f * (float) label->getHeight()));
+            }
         };
 
         return label;

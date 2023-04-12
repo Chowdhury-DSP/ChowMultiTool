@@ -87,4 +87,4 @@ void SVFParamControls::resized()
 
     qSlider.setBounds (bounds);
 }
-}
+} // namespace gui::svf

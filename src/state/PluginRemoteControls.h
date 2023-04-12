@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "clap-juce-extensions/clap-juce-extensions.h"
+#include <pch.h>
 
 namespace state
 {
