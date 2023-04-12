@@ -3,6 +3,7 @@ target_sources(ChowMultiTool PRIVATE
 
     state/PluginState.cpp
     state/PresetManager.cpp
+    state/PluginRemoteControls.cpp
 
     dsp/MultiToolProcessor.cpp
 

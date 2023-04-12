@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dsp/MultiToolProcessor.h"
+#include "state/PluginRemoteControls.h"
 #include "state/PluginState.h"
 
 class ChowMultiTool : public chowdsp::PluginBase<State>
@@ -15,6 +16,15 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
 
+    // CLAP extensions
+    bool supportsRemoteControls() const noexcept override { return true; }
+    uint32_t remoteControlsPageCount() noexcept override { return (uint32_t) remoteControls.getNumPages(); }
+    bool remoteControlsPageFill (uint32_t pageIndex,
+                                 juce::String& sectionName,
+                                 uint32_t& pageID,
+                                 juce::String& pageName,
+                                 std::array<juce::AudioProcessorParameter*, CLAP_REMOTE_CONTROLS_COUNT>& params) noexcept override;
+
 private:
     static BusesProperties createBusLayout();
 
@@ -22,6 +32,7 @@ private:
     chowdsp::SharedPluginSettings pluginSettings;
 
     dsp::MultiToolProcessor processor { *this, state };
+    state::RemoteControlsHelper remoteControls { state, state.params, this };
 
     juce::UndoManager undoManager { 500000 };
 
