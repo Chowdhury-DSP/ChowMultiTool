@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SVFPlot.h"
-#include "SVFParamControls.h"
 #include "BottomBar.h"
+#include "SVFParamControls.h"
+#include "SVFPlot.h"
 #include "gui/Shared/IconButton.h"
 
 namespace gui::svf

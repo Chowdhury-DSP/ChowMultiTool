@@ -2,8 +2,8 @@
 
 #include "dsp/EQ/EQProcessor.h"
 #include "gui/Shared/Fonts.h"
-#include "state/PluginState.h"
 #include "gui/Shared/TextSlider.h"
+#include "state/PluginState.h"
 
 namespace gui::eq
 {

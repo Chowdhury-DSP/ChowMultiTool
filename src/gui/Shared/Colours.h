@@ -58,4 +58,4 @@ namespace gui::svf::colours
 using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFC70C0C };
 const auto boxColour = juce::Colour { 0xFF0b7189 };
-} // namespace gui::waveshaper::colours
+} // namespace gui::svf::colours
