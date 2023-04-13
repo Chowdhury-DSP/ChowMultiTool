@@ -33,7 +33,7 @@ void SignalGeneratorProcessor::reset()
     downsampler.reset();
 
     chowdsp::TupleHelpers::visit_at (oscillators,
-                                     static_cast<size_t> (params.oscillatorChoice->get()),
+                                     static_cast<size_t> (params.oscillatorChoice->getIndex()),
                                      [] (auto& oscillator)
                                      {
                                          oscillator.reset();
