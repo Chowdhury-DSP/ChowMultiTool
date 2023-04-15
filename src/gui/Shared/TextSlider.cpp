@@ -62,20 +62,11 @@ void TextSlider::paint (juce::Graphics& g)
     g.drawFittedText (getName() + ": " + parameter->getCurrentValueAsText(), getLocalBounds(), juce::Justification::centred, 1);
 }
 
-void TextSlider::resized()
-{
-    juce::Slider::resized();
-    //    setTextBoxStyle (Slider::NoTextBox, false, 0, 0); // getHeight());
-}
-
 void TextSlider::mouseDown (const juce::MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        //            hostContextProvider.showParameterContextPopupMenu (
-        //                *parameter,
-        //                PopupMenu::Options(),
-        //                chowdsp::SharedLNFAllocator {} -> getLookAndFeel<ByodLNF>());
+        // @TODO: host context menu?
         return;
     }
 

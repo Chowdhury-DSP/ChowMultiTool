@@ -10,9 +10,9 @@ public:
     AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params);
 
     void resized() override;
+    void paint (juce::Graphics& g) override;
 
 private:
-    chowdsp::ParametersView paramsView;
     AnalogEQPlot plot;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQEditor)

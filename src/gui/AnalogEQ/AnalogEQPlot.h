@@ -2,6 +2,7 @@
 
 #include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "state/PluginState.h"
+#include "EQChyron.h"
 
 namespace gui::analog_eq
 {
@@ -17,6 +18,8 @@ public:
     void resized() override;
 
 private:
+    void mouseDown (const juce::MouseEvent& e) override;
+
     void updatePlot();
 
     chowdsp::GenericFilterPlotter filterPlotter;
@@ -29,21 +32,12 @@ private:
     std::unique_ptr<juce::Slider> lowCutControl;
     std::unique_ptr<juce::Slider> highBoostControl;
     std::unique_ptr<juce::Slider> highCutControl;
+    std::unique_ptr<juce::Slider> highBoostFreqControl;
+    std::unique_ptr<juce::Slider> highCutFreqControl;
+    std::unique_ptr<juce::Component> highBoostFullControl;
+    std::unique_ptr<juce::Component> highCutFullControl;
 
-    //    struct Dot : juce::Component
-    //    {
-    //        void paint (juce::Graphics& g) override
-    //        {
-    //            g.setColour (juce::Colours::red);
-    //            g.fillEllipse (getLocalBounds().toFloat());
-    //        }
-    //
-    //        std::function<void()> reposition;
-    //    };
-    //
-    //    Dot lowFreqDot;
-    //    Dot highBoostFreqDot;
-    //    Dot highCutFreqDot;
+    EQChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQPlot)
 };

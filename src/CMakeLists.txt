@@ -43,6 +43,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/AnalogEQ/AnalogEQEditor.cpp
     gui/AnalogEQ/AnalogEQPlot.cpp
+    gui/AnalogEQ/EQChyron.cpp
 
     gui/BandSplitter/BandSplitterEditor.cpp
     gui/BandSplitter/BandSplitterPlot.cpp

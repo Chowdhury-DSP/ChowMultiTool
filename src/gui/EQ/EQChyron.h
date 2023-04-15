@@ -29,10 +29,6 @@ private:
     std::optional<TextSlider> qSlider;
     std::optional<TextSlider> gainSlider;
 
-    std::optional<juce::String> freqValue;
-    std::optional<juce::String> qValue;
-    std::optional<juce::String> gainValue;
-
     chowdsp::ScopedCallbackList callbacks;
 
     SharedFonts fonts;

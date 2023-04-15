@@ -1,4 +1,5 @@
 #include "AnalogEQPlot.h"
+#include "gui/Shared/Colours.h"
 #include "gui/Shared/DotSlider.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
@@ -9,7 +10,7 @@ namespace
     constexpr double sampleRate = 48000.0f;
     constexpr int fftOrder = 15;
     constexpr int blockSize = 1 << fftOrder;
-    constexpr int minFrequency = 18;
+    constexpr int minFrequency = 16;
     constexpr int maxFrequency = 22'000;
 } // namespace
 
@@ -17,14 +18,15 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -20.0f,
-        .maxMagnitudeDB = 20.0f }),
+        .minMagnitudeDB = -21.0f,
+        .maxMagnitudeDB = 21.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
                                 .sampleRate = sampleRate,
                                 .freqSmoothOctaves = 1.0f / 12.0f,
                                 .fftOrder = fftOrder,
                             }),
-      pultecEQ (pultecParams)
+      pultecEQ (pultecParams),
+      chyron (pluginState, *pluginState.params.analogEQParams)
 {
     pultecEQ.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
@@ -85,11 +87,28 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                                                                  gui::SpectrumDotSlider::MagnitudeOriented);
     highBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
     static_cast<gui::SpectrumDotSlider*> (highBoostControl.get())->getXCoordinate = // NOLINT
-        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+        [this, &trebleBoostFreqParam = *pultecParams.trebleBoostFreqParam]
     {
-        return getXCoordinateForFrequency (8000.0f);
+        return getXCoordinateForFrequency (trebleBoostFreqParam.get());
     };
-    addAndMakeVisible (highBoostControl.get());
+    addAndMakeVisible (*highBoostControl);
+
+    highBoostFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleBoostFreqParam,
+                                                                     pluginState,
+                                                                     *this,
+                                                                     gui::SpectrumDotSlider::FrequencyOriented);
+    highBoostFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+
+    static_cast<gui::SpectrumDotSlider*> (highBoostFreqControl.get())->getYCoordinate = // NOLINT
+        [this, &trebleBoostParam = *pultecParams.trebleBoostParam]
+    {
+        return getYCoordinateForDecibels (trebleBoostParam.get());
+    };
+    addAndMakeVisible (*highBoostFreqControl);
+
+    highBoostFullControl = std::make_unique<DotSliderGroup>();
+    static_cast<DotSliderGroup*> (highBoostFullControl.get())->setSliders ({ static_cast<gui::SpectrumDotSlider*> (highBoostControl.get()), static_cast<gui::SpectrumDotSlider*> (highBoostFreqControl.get()) }); // NOLINT
+    addAndMakeVisible (highBoostFullControl.get());
 
     highCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutParam,
                                                                pluginState,
@@ -97,13 +116,32 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                                                                gui::SpectrumDotSlider::MagnitudeOriented);
     highCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
     static_cast<gui::SpectrumDotSlider*> (highCutControl.get())->getXCoordinate = // NOLINT
-        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+        [this, &trebleCutFreqParam = *pultecParams.trebleCutFreqParam]
     {
-        return getXCoordinateForFrequency (12000.0f);
+        return getXCoordinateForFrequency (trebleCutFreqParam.get());
     };
     addAndMakeVisible (highCutControl.get());
 
+    highCutFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutFreqParam,
+                                                                   pluginState,
+                                                                   *this,
+                                                                   gui::SpectrumDotSlider::FrequencyOriented);
+    highCutFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    static_cast<gui::SpectrumDotSlider*> (highCutFreqControl.get())->getYCoordinate = // NOLINT
+        [this, &trebleCutParam = *pultecParams.trebleCutParam]
+    {
+        return getYCoordinateForDecibels (trebleCutParam.get());
+    };
+    addAndMakeVisible (*highCutFreqControl);
+
+    highCutFullControl = std::make_unique<DotSliderGroup>();
+    static_cast<DotSliderGroup*> (highCutFullControl.get())->setSliders ({ static_cast<gui::SpectrumDotSlider*> (highCutControl.get()), static_cast<gui::SpectrumDotSlider*> (highCutFreqControl.get()) }); // NOLINT
+    addAndMakeVisible (highCutFullControl.get());
+
     updatePlot();
+
+    addAndMakeVisible (chyron);
+    chyron.toFront (false);
 }
 
 AnalogEQPlot::~AnalogEQPlot() = default;
@@ -116,8 +154,8 @@ void AnalogEQPlot::updatePlot()
 
 void AnalogEQPlot::paint (juce::Graphics& g)
 {
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g);
-    gui::drawMagnitudeLines (*this, g, { -30.0f, -20.0f, -10.0f, 10.0f, 20.0f, 30.0f });
+    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
+    gui::drawMagnitudeLines (*this, g, { -20.0f, -15.0f, -10.0f, -5.0f, 5.0f, 10.0f, 15.0f, 20.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
 
     g.setColour (juce::Colours::red);
     g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
@@ -130,7 +168,20 @@ void AnalogEQPlot::resized()
     lowFreqControl->setBounds (getLocalBounds());
     lowBoostControl->setBounds (getLocalBounds());
     lowCutControl->setBounds (getLocalBounds());
-    highBoostControl->setBounds (getLocalBounds());
-    highCutControl->setBounds (getLocalBounds());
+    highBoostFullControl->setBounds (getLocalBounds());
+    highCutFullControl->setBounds (getLocalBounds());
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.225f);
+    const auto chyronHeight = proportionOfWidth (0.175f);
+    chyron.setBounds ((int) getXCoordinateForFrequency (1000.0f) - chyronWidth / 2,
+                      getHeight() - pad - chyronHeight,
+                      chyronWidth,
+                      chyronHeight);
+}
+
+void AnalogEQPlot::mouseDown (const juce::MouseEvent&)
+{
+    chyron.setSelectedBand (EQBand::None);
 }
 } // namespace gui::analog_eq

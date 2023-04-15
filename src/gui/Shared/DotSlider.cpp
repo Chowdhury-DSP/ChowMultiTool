@@ -131,9 +131,11 @@ void DotSliderGroup::mouseDown (const juce::MouseEvent& e)
 {
     for (auto& slider : sliders)
     {
+        slider->toFront (false);
         if (slider->checkModifierKeys (e.mods))
             slider->mouseDown (e);
     }
+    toFront (false);
 }
 
 void DotSliderGroup::mouseDrag (const juce::MouseEvent& e)
