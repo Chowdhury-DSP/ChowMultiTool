@@ -52,7 +52,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else # Windows
     echo "Building for WINDOWS"
 
-    AAX_PATH=C:/SDKs/AAX_SDK/
+    AAX_PATH=C:/SDKs/AAX_SDK_clang/
     ilok_pass=$(cat /d/ilok_pass)
     aax_target_dir="/c/Program Files/Common Files/Avid/Audio/Plug-Ins"
     TARGET_DIR="Win64"
