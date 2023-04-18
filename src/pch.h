@@ -21,9 +21,11 @@
 #include <chowdsp_visualizers/chowdsp_visualizers.h>
 #include <chowdsp_waveshapers/chowdsp_waveshapers.h>
 
+#if JUCE_MODULE_AVAILABLE_melatonin_inspector
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wreturn-type")
 #include <melatonin_inspector/melatonin_inspector.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#endif
 
 // Other third-party libraries
 #include <chowdsp_wdf/chowdsp_wdf.h>

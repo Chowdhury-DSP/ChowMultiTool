@@ -112,12 +112,14 @@ void PluginEditor::resized()
         editorComponent->setBounds (bounds);
 }
 
-void PluginEditor::mouseDoubleClick (const juce::MouseEvent& e)
+void PluginEditor::mouseDoubleClick ([[maybe_unused]] const juce::MouseEvent& e)
 {
+#if JUCE_MODULE_AVAILABLE_melatonin_inspector
     if (e.mods.isShiftDown())
     {
         inspector.setVisible (true);
         inspector.toggle (true);
     }
+#endif
 }
 } // namespace gui

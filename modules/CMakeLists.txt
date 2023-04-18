@@ -9,11 +9,6 @@ message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
 subproject_version(chowdsp_wdf chowdsp_wdf_version)
 message(STATUS "VERSION for chowdsp_wdf: ${chowdsp_wdf_version}")
 
-juce_add_modules(
-    ALIAS_NAMESPACE melatonin
-    melatonin_inspector
-)
-
 include(cmake/WarningFlags.cmake)
 add_library(juce_plugin_modules STATIC)
 target_link_libraries(juce_plugin_modules
@@ -30,7 +25,6 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_wdf
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_visualizers
-        melatonin::melatonin_inspector
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -45,6 +39,13 @@ if(CHOWMULTITOOL_BUILD_CLAP)
             clap_juce_extensions
     )
 endif()
+
+option(CHOWMULTITOOL_BUILD_UI_INSPECTOR "Build the plugin with Melatonin Inspector" OFF)
+if (CHOWMULTITOOL_BUILD_UI_INSPECTOR)
+    juce_add_modules(ALIAS_NAMESPACE melatonin melatonin_inspector)
+    target_link_libraries(juce_plugin_modules PRIVATE melatonin::melatonin_inspector)
+endif()
+
 
 add_diagnostic_info(juce_plugin_modules)
 

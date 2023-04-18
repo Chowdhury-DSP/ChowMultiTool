@@ -34,7 +34,9 @@ private:
     juce::ComponentBoundsConstrainer constrainer;
     chowdsp::SharedLNFAllocator lnfAllocator;
 
+#if JUCE_MODULE_AVAILABLE_melatonin_inspector
     melatonin::Inspector inspector { *this, false };
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
