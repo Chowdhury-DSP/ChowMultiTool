@@ -21,7 +21,9 @@ target_sources(ChowMultiTool PRIVATE
     dsp/SVF/SVFProcessor.cpp
 
     gui/PluginEditor.cpp
+
     gui/Toolbar/Toolbar.cpp
+    gui/Toolbar/SettingsButton.cpp
 
     gui/EQ/EQEditor.cpp
     gui/EQ/EQPlot.cpp
@@ -62,6 +64,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/Shared/SimpleBox.cpp
     gui/Shared/ErrorMessageView.cpp
     gui/Shared/TextSlider.cpp
+    gui/Shared/LookAndFeels.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

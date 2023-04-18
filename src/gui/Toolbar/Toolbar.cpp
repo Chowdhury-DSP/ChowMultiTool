@@ -4,19 +4,21 @@
 
 namespace gui
 {
-Toolbar::Toolbar (ChowMultiTool& plugin)
+Toolbar::Toolbar (ChowMultiTool& plugin, chowdsp::OpenGLHelper& oglHelper)
     : state (plugin.getState()),
       toolChoiceAttachment (state.params.toolParam,
                             state,
                             toolChoiceBox),
       presetsFileInterface (plugin.getPresetManager(),
                             static_cast<state::presets::PresetManager&> (plugin.getPresetManager()).getPresetSettings()), //NOLINT
-      presetsComp (plugin.getPresetManager(), &presetsFileInterface)
+      presetsComp (plugin.getPresetManager(), &presetsFileInterface),
+      settingsButton (plugin, oglHelper)
 {
     setupUndoRedoButtons();
 
     addAndMakeVisible (toolChoiceBox);
     addAndMakeVisible (presetsComp);
+    addAndMakeVisible (settingsButton);
 }
 
 Toolbar::~Toolbar()
@@ -78,5 +80,7 @@ void Toolbar::resized()
 
     bounds.removeFromLeft (25);
     presetsComp.setBounds (bounds.removeFromLeft (180));
+
+    settingsButton.setBounds (bounds.removeFromRight (30).reduced (5));
 }
 } // namespace gui

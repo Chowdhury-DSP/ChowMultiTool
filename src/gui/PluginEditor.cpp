@@ -20,8 +20,20 @@ namespace
 PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
       plugin (p),
-      toolbar (plugin)
+      toolbar (plugin, oglHelper)
 {
+    oglHelper.setComponent (this);
+
+    juce::Logger::writeToLog ("Checking OpenGL availability...");
+    const auto shouldUseOpenGLByDefault = oglHelper.isOpenGLAvailable();
+#if CHOWDSP_OPENGL_IS_AVAILABLE
+    juce::Logger::writeToLog ("OpenGL is available on this system: " + juce::String (shouldUseOpenGLByDefault ? "TRUE" : "FALSE"));
+#else
+    juce::Logger::writeToLog ("Plugin was built without linking to OpenGL!");
+#endif
+    pluginSettings->addProperties<&PluginEditor::openGLChangeCallback> ({ { openGLSettingID, shouldUseOpenGLByDefault } }, *this);
+    openGLChangeCallback (openGLSettingID);
+
     addAndMakeVisible (toolbar);
     addChildComponent (errorMessageView);
 
@@ -39,6 +51,19 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
 PluginEditor::~PluginEditor()
 {
     juce::LookAndFeel::setDefaultLookAndFeel (nullptr);
+}
+
+void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingID settingID)
+{
+    if (settingID != openGLSettingID)
+        return;
+
+    const auto shouldUseOpenGL = pluginSettings->getProperty<bool> (openGLSettingID);
+    if (shouldUseOpenGL == oglHelper.isAttached())
+        return; // no change
+
+    juce::Logger::writeToLog ("Using OpenGL: " + juce::String (shouldUseOpenGL ? "TRUE" : "FALSE"));
+    shouldUseOpenGL ? oglHelper.attach() : oglHelper.detach();
 }
 
 void PluginEditor::setResizeBehaviour()

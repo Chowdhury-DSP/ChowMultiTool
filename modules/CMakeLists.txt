@@ -78,3 +78,15 @@ set_target_properties(juce_plugin_modules PROPERTIES
     C_VISBILITY_PRESET hidden
     CXX_VISIBILITY_PRESET hidden
 )
+
+# Enable OpenGL on Windows by default.
+if (WIN32)
+    option(CHOWDSP_ENABLE_OPENGL "Enable OpenGL for this plugin" ON)
+else()
+    option(CHOWDSP_ENABLE_OPENGL "Enable OpenGL for this plugin" OFF)
+endif()
+
+if(CHOWDSP_ENABLE_OPENGL)
+    message(STATUS "Linking with OpenGL")
+    target_link_libraries(juce_plugin_modules PRIVATE juce::juce_opengl)
+endif()

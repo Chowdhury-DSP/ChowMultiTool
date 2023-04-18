@@ -7,7 +7,8 @@ class ChowMultiTool;
 
 namespace gui
 {
-class PluginEditor : public juce::AudioProcessorEditor
+class PluginEditor : public juce::AudioProcessorEditor,
+                     public chowdsp::TrackedByBroadcasters
 {
 public:
     explicit PluginEditor (ChowMultiTool& plugin);
@@ -17,6 +18,8 @@ public:
     void resized() override;
 
     auto& getErrorMessageView() { return errorMessageView; }
+
+    static constexpr chowdsp::GlobalPluginSettings::SettingID openGLSettingID { "use_opengl" };
 
 private:
     void mouseDoubleClick (const juce::MouseEvent&) override;
@@ -33,6 +36,10 @@ private:
     chowdsp::ScopedCallback toolChangeCallback;
     juce::ComponentBoundsConstrainer constrainer;
     chowdsp::SharedLNFAllocator lnfAllocator;
+
+    chowdsp::SharedPluginSettings pluginSettings;
+    chowdsp::OpenGLHelper oglHelper;
+    void openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingID settingID);
 
 #if JUCE_MODULE_AVAILABLE_melatonin_inspector
     melatonin::Inspector inspector { *this, false };

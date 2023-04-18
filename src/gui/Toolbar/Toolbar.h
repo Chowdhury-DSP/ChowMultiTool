@@ -1,6 +1,7 @@
 #pragma once
 
 #include "state/PluginState.h"
+#include "SettingsButton.h"
 
 class ChowMultiTool;
 
@@ -10,7 +11,7 @@ class Toolbar : public juce::Component,
                 private juce::ChangeListener
 {
 public:
-    explicit Toolbar (ChowMultiTool& plugin);
+    Toolbar (ChowMultiTool& plugin, chowdsp::OpenGLHelper& oglHelper);
     ~Toolbar() override;
 
     void paint (juce::Graphics& g) override;
@@ -31,6 +32,8 @@ private:
 
     chowdsp::presets::frontend::FileInterface presetsFileInterface;
     chowdsp::presets::PresetsComponent presetsComp;
+
+    SettingsButton settingsButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Toolbar)
 };

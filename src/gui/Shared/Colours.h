@@ -12,6 +12,13 @@ const auto majorLinesColour = linesColour.withAlpha (0.5f);
 const auto minorLinesColour = linesColour.withAlpha (0.2f);
 } // namespace gui::colours
 
+namespace gui::logo::colours
+{
+using namespace gui::colours;
+const auto accentRed = juce::Colour { 0xFFC03221 };
+const auto backgroundBlue = juce::Colour { 0xFF4B8F8C };
+} // namespace gui::brickwall::colours
+
 namespace gui::band_splitter::colours
 {
 using namespace gui::colours;
