@@ -122,7 +122,11 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
 
                                              // clear output busses that we're not using
                                              for (int i = 1; i <= 3; ++i)
-                                                 plugin.getBusBuffer (buffer, false, i).clear();
+                                             {
+                                                 auto otherBusBuffer = plugin.getBusBuffer (buffer, false, i);
+                                                 if (otherBusBuffer.getNumChannels() > 0)
+                                                    busBuffer.clear();
+                                             }
                                          }
                                      });
 }

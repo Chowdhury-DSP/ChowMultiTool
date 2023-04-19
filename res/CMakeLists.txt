@@ -9,6 +9,7 @@ cmrc_add_resource_library(gui-resources
     WHENCE gui_assets
     ${SVG_FILES}
     ${TTF_FILES}
+    gui_assets/logo.svg
 )
 
 set_target_properties(gui-resources

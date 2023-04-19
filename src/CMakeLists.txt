@@ -21,6 +21,7 @@ target_sources(ChowMultiTool PRIVATE
     dsp/SVF/SVFProcessor.cpp
 
     gui/PluginEditor.cpp
+    gui/InitPage/InitPage.cpp
 
     gui/Toolbar/Toolbar.cpp
     gui/Toolbar/SettingsButton.cpp

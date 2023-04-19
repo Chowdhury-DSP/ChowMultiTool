@@ -4,6 +4,7 @@
 #include "Brickwall/BrickwallEditor.h"
 #include "ChowMultiTool.h"
 #include "EQ/EQEditor.h"
+#include "InitPage/InitPage.h"
 #include "SVF/SVFEditor.h"
 #include "Shared/Colours.h"
 #include "SignalGenerator/SignalGeneratorEditor.h"
@@ -83,34 +84,35 @@ void PluginEditor::refreshEditor()
 
     if (toolChoice < 0)
     {
-        editorComponent.reset();
-        return;
+        editorComponent = std::make_unique<init::InitPage> (plugin);
     }
+    else
+    {
+        types_list::forEach<dsp::ToolTypes> (
+            [this, toolChoice] (auto toolTypeIndex)
+            {
+                if ((int) toolTypeIndex != toolChoice)
+                    return;
 
-    types_list::forEach<dsp::ToolTypes> (
-        [this, toolChoice] (auto toolTypeIndex)
-        {
-            if ((int) toolTypeIndex != toolChoice)
-                return;
+                using ToolType = typename dsp::ToolTypes::template AtIndex<toolTypeIndex>;
+                auto& pluginState = plugin.getState();
 
-            using ToolType = typename dsp::ToolTypes::template AtIndex<toolTypeIndex>;
-            auto& pluginState = plugin.getState();
-
-            if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams);
-            else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
-                editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams);
-            else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
-                editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState);
-            else if constexpr (std::is_same_v<ToolType, dsp::analog_eq::AnalogEQProcessor>)
-                editorComponent = std::make_unique<analog_eq::AnalogEQEditor> (pluginState, *pluginState.params.analogEQParams);
-            else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
-                editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams);
-            else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
-                editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams);
-            else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
-                editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, plugin.supportsParameterModulation());
-        });
+                if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams);
+                else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
+                    editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams);
+                else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
+                    editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState);
+                else if constexpr (std::is_same_v<ToolType, dsp::analog_eq::AnalogEQProcessor>)
+                    editorComponent = std::make_unique<analog_eq::AnalogEQEditor> (pluginState, *pluginState.params.analogEQParams);
+                else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
+                    editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams);
+                else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
+                    editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams);
+                else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
+                    editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, plugin.supportsParameterModulation());
+            });
+    }
 
     addAndMakeVisible (editorComponent.get());
     resized();

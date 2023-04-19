@@ -55,7 +55,7 @@ juce_add_plugin(ChowMultiTool
     PLUGIN_CODE Mlt4
     FORMATS ${JUCE_FORMATS}
     PRODUCT_NAME "${PRODUCT_NAME}"
-    ICON_BIG res/logo.png
+    ICON_BIG res/gui_assets/logo.png
     
     LV2URI https://github.com/Chowdhury-DSP/ChowMultiTool
     
