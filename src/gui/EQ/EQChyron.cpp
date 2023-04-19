@@ -14,7 +14,11 @@ EQChyron::EQChyron (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQPa
 void EQChyron::setSelectedBand (int newSelectedBand)
 {
     setVisible (newSelectedBand >= 0);
-    if (selectedBand == newSelectedBand)
+
+    auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
+    const auto newFilterType = helpers::getFilterType (activeParams.typeParam->getIndex());
+
+    if (selectedBand == newSelectedBand && filterType == newFilterType)
         return;
 
     selectedBand = newSelectedBand;
@@ -47,7 +51,7 @@ void EQChyron::updateValues()
     freqSlider->setName ("Cutoff");
     addAndMakeVisible (*freqSlider);
 
-    const auto filterType = helpers::getFilterType (activeParams.typeParam->getIndex());
+    filterType = helpers::getFilterType (activeParams.typeParam->getIndex());
     if (helpers::hasQParam (filterType))
     {
         qSlider.emplace (state, activeParams.qParam.get());

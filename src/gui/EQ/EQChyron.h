@@ -21,6 +21,7 @@ private:
     void updateValues();
 
     int selectedBand = -1;
+    chowdsp::EQ::EQPlotFilterType filterType = chowdsp::EQ::EQPlotFilterType::LPF1;
 
     chowdsp::PluginState& state;
     chowdsp::EQ::StandardEQParameters<numBands>& eqParams;

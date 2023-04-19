@@ -1,8 +1,8 @@
 #include "SettingsButton.h"
 #include "ChowMultiTool.h"
 #include "gui/PluginEditor.h"
-#include "gui/Shared/LookAndFeels.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui
 {
@@ -56,7 +56,7 @@ void SettingsButton::addPluginSettingMenuOption (const juce::String& name,
     item.text = name;
     item.action = [this, id, isCurrentlyOn]
     { pluginSettings->setProperty (id, ! isCurrentlyOn); };
-    item.colour = isCurrentlyOn ? colours::linesColour : logo::colours::accentRed;
+    item.colour = isCurrentlyOn ? logo::colours::accentRed : colours::linesColour;
 
     menu.addItem (item);
 }
