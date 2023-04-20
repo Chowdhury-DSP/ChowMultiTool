@@ -16,6 +16,7 @@ public:
 
     juce::AudioProcessorEditor* createEditor() override;
 
+#if ! JUCE_IOS
     // CLAP extensions
     bool supportsRemoteControls() const noexcept override { return true; }
     uint32_t remoteControlsPageCount() noexcept override { return (uint32_t) remoteControls.getNumPages(); }
@@ -24,6 +25,7 @@ public:
                                  uint32_t& pageID,
                                  juce::String& pageName,
                                  std::array<juce::AudioProcessorParameter*, CLAP_REMOTE_CONTROLS_COUNT>& params) noexcept override;
+#endif
 
 private:
     static BusesProperties createBusLayout();
@@ -32,7 +34,9 @@ private:
     chowdsp::SharedPluginSettings pluginSettings;
 
     dsp::MultiToolProcessor processor { *this, state };
+#if ! JUCE_IOS
     state::RemoteControlsHelper remoteControls { state, state.params, this };
+#endif
 
     juce::UndoManager undoManager { 500000 };
 

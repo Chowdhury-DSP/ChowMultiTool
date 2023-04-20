@@ -1,7 +1,9 @@
 #pragma once
 
-#include "clap-juce-extensions/clap-juce-extensions.h"
 #include <pch.h>
+
+#if ! JUCE_IOS
+#include "clap-juce-extensions/clap-juce-extensions.h"
 
 namespace state
 {
@@ -23,3 +25,4 @@ private:
     chowdsp::ScopedCallback toolChangeCallback;
 };
 } // namespace state
+#endif // ! JUCE_IOS

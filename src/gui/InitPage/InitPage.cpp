@@ -56,9 +56,6 @@ void InitPage::paint (juce::Graphics& g)
 
     smallTextBounds = smallTextBounds.withY (proportionOfHeight (0.75f));
     g.drawFittedText (Info::getPlatformString() + ", " + Info::getWrapperTypeString (plugin), smallTextBounds, juce::Justification::centred, 1);
-
-//    smallTextBounds = smallTextBounds.withY (proportionOfHeight (0.85f));
-//    g.drawFittedText ("DSP by ChowDSP", smallTextBounds, juce::Justification::centred, 1);
 }
 
 void InitPage::resized()

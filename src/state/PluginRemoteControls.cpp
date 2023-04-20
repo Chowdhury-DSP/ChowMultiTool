@@ -1,6 +1,7 @@
 #include "PluginRemoteControls.h"
 #include "dsp/MultiToolProcessor.h"
 
+#if ! JUCE_IOS
 namespace state
 {
 using ToolTypes = dsp::ToolTypes;
@@ -101,3 +102,4 @@ void RemoteControlsHelper::pageFill (uint32_t pageIndex,
     }
 }
 } // namespace state
+#endif // ! JUCE_IOS
