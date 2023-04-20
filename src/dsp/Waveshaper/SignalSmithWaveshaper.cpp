@@ -4,16 +4,24 @@ namespace dsp::waveshaper
 {
 static constexpr auto TOL = chowdsp::ScientificRatio<1, -2>::value<double>;
 
+[[nodiscard]] inline auto sin_arg (const xsimd::batch<double>& x)
+{
+    const auto arg = xsimd::max (xsimd::abs (x), xsimd::broadcast (5.0 * std::numeric_limits<double>::epsilon()));
+    const auto y = xsimd::log (arg);
+//    jassert (! xsimd::any (xsimd::isnan (y)));
+    return y;
+}
+
 [[nodiscard]] inline auto nlFunc (const xsimd::batch<double>& x, double k, double M, double k_sq) noexcept
 {
     using chowdsp::Power::ipow;
-    return x * ((1.0 - k_sq) + k * xsimd::sin (M * xsimd::log (xsimd::abs (x))));
+    return x * ((1.0 - k_sq) + k * xsimd::sin (M * sin_arg (x)));
 }
 
 [[nodiscard]] inline auto nlFunc_AD1 (const xsimd::batch<double>& x, double k, double M, double k_sq, double M_sq) noexcept
 {
     using chowdsp::Power::ipow;
-    const auto [sinterm, costerm] = xsimd::sincos (M * xsimd::log (xsimd::abs (x)));
+    const auto [sinterm, costerm] = xsimd::sincos (M * sin_arg (x));
 
     auto y = 2.0 * sinterm - M * costerm;
     y *= k / (M_sq + 4.0);
@@ -24,7 +32,7 @@ static constexpr auto TOL = chowdsp::ScientificRatio<1, -2>::value<double>;
 [[nodiscard]] inline auto nlFunc_AD2 (const xsimd::batch<double>& x, double M, double k_sq, double M_sq, double k_o_M_term) noexcept
 {
     using chowdsp::Power::ipow;
-    const auto [sinterm, costerm] = xsimd::sincos (M * xsimd::log (xsimd::abs (x)));
+    const auto [sinterm, costerm] = xsimd::sincos (M * sin_arg (x));
 
     auto y = k_o_M_term * ((6.0 - M_sq) * sinterm - 5.0 * M * costerm);
     y += (1.0 - k_sq) / 6.0;
