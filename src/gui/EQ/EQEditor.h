@@ -25,6 +25,8 @@ private:
     IconButton linearPhaseButton;
     chowdsp::ButtonAttachment linearPhaseAttach;
 
+    IconButton drawButton;
+
     juce::TooltipWindow tooltips { this, 300 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQEditor)

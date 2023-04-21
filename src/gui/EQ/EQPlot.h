@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EQChyron.h"
+#include "EQDrawView.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
 
@@ -16,6 +17,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& e) override;
+
+    void toggleDrawView (bool isDrawView);
 
 private:
     void setSelectedBand (int bandIndex);
@@ -40,6 +43,9 @@ private:
     std::array<EQBandSliderGroup, numBands> sliderGroups;
 
     EQChyron chyron;
+
+    EQDrawView drawView;
+    bool drawMode = false;
 
     chowdsp::ScopedCallbackList callbacks;
 

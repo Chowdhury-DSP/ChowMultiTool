@@ -32,6 +32,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/EQ/BottomBar.cpp
     gui/EQ/EQBandBox.cpp
     gui/EQ/EQChyron.cpp
+    gui/EQ/EQDrawView.cpp
 
     gui/Waveshaper/WaveshaperEditor.cpp
     gui/Waveshaper/WaveshaperPlot.cpp

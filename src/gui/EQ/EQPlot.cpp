@@ -49,7 +49,8 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                                               .maxFrequencyHz = maxFrequency,
                                                               .minMagnitudeDB = -23.0f,
                                                               .maxMagnitudeDB = 20.0f }),
-      chyron (pluginState, eqParameters, hcp)
+      chyron (pluginState, eqParameters, hcp),
+      drawView (*this)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
@@ -163,7 +164,23 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
     addAndMakeVisible (chyron);
     chyron.toFront (false);
 
+    addChildComponent (drawView);
+
     setSelectedBand (-1);
+}
+
+void EQPlot::toggleDrawView (bool isDrawView)
+{
+    drawMode = isDrawView;
+    drawView.setVisible (isDrawView);
+
+    if (drawMode)
+    {
+        setSelectedBand (-1);
+    }
+
+    resized();
+    repaint();
 }
 
 void EQPlot::setSelectedBand (int bandIndex)
@@ -190,15 +207,18 @@ void EQPlot::paint (juce::Graphics& g)
                              colours::majorLinesColour,
                              colours::minorLinesColour);
 
-    g.setColour (colours::linesColour);
-    g.strokePath (getMasterFilterPath(), juce::PathStrokeType { 2.5f });
+    if (! drawMode)
+    {
+        g.setColour (colours::linesColour);
+        g.strokePath (getMasterFilterPath(), juce::PathStrokeType { 2.5f });
+    }
 }
 
 void EQPlot::resized()
 {
     EqualizerPlotWithParameters::resized();
     for (auto& group : sliderGroups)
-        group.setBounds (getLocalBounds());
+        group.setBounds (drawMode ? juce::Rectangle<int> {} : getLocalBounds());
 
     const auto pad = proportionOfWidth (0.005f);
     const auto chyronWidth = proportionOfWidth (0.14f);
@@ -207,6 +227,8 @@ void EQPlot::resized()
                       getHeight() - pad - chyronHeight - proportionOfHeight (0.075f),
                       chyronWidth,
                       chyronHeight);
+
+    drawView.setBounds (getLocalBounds());
 }
 
 void EQPlot::mouseDown (const juce::MouseEvent&)

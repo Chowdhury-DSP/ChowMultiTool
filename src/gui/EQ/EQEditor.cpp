@@ -8,7 +8,8 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     : plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
-      linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton)
+      linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
+      drawButton ("Vector/pencil-solid.svg", colours::thumbColours[0], colours::linesColour)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);
 
@@ -17,6 +18,11 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     addAndMakeVisible (linearPhaseButton);
 
     linearPhaseButton.setTooltip ("Linear Phase");
+
+    addAndMakeVisible (drawButton);
+    drawButton.onStateChange = [this]
+    { plot.toggleDrawView (drawButton.getToggleState()); };
+
 }
 
 void EQEditor::paint (juce::Graphics& g)
@@ -39,5 +45,7 @@ void EQEditor::resized()
     const auto pad = proportionOfWidth (0.005f);
     const auto buttonDim = proportionOfWidth (0.035f);
     linearPhaseButton.setBounds (bounds.getWidth() - pad - buttonDim, pad, buttonDim, buttonDim);
+
+    drawButton.setBounds (linearPhaseButton.getBoundsInParent().translated (-pad - buttonDim, 0));
 }
 } // namespace gui::eq
