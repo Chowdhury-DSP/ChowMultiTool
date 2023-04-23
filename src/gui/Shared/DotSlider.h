@@ -7,17 +7,22 @@ namespace gui
 class DotSlider : public juce::Slider
 {
 public:
-    DotSlider (chowdsp::FloatParameter& p, chowdsp::PluginState& state);
+    DotSlider (chowdsp::FloatParameter& p, chowdsp::PluginState& state, const chowdsp::HostContextProvider* hcp = nullptr);
 
     virtual juce::Rectangle<float> getThumbBounds() const noexcept = 0;
     void paint (juce::Graphics& g) override;
     bool hitTest (int x, int y) override;
+    void mouseDown (const juce::MouseEvent& e) override;
 
     std::function<bool (const juce::ModifierKeys&)> checkModifierKeys = [] (const juce::ModifierKeys& mods)
     { return ! mods.isAnyModifierKeyDown(); };
 
+
 protected:
     chowdsp::FloatParameter& param;
+    const chowdsp::HostContextProvider* hostContextProvider = nullptr;
+
+    friend struct DotSliderGroup;
 
 private:
     chowdsp::SliderAttachment attachment;
@@ -37,7 +42,8 @@ public:
     SpectrumDotSlider (chowdsp::FloatParameter& p,
                        chowdsp::PluginState& state,
                        const chowdsp::SpectrumPlotBase& base,
-                       Orientation orientation);
+                       Orientation orientation,
+                       const chowdsp::HostContextProvider* hcp = nullptr);
 
     juce::Rectangle<float> getThumbBounds() const noexcept override;
 
@@ -69,5 +75,6 @@ struct DotSliderGroup : public juce::Component
     void mouseDoubleClick (const juce::MouseEvent&) override;
 
     std::vector<DotSlider*> sliders;
+    const chowdsp::HostContextProvider* hostContextProvider = nullptr;
 };
 } // namespace gui

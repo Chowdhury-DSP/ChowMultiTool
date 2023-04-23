@@ -1,9 +1,11 @@
 #include "DotSlider.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui
 {
-DotSlider::DotSlider (chowdsp::FloatParameter& p, chowdsp::PluginState& state)
+DotSlider::DotSlider (chowdsp::FloatParameter& p, chowdsp::PluginState& state, const chowdsp::HostContextProvider* hcp)
     : param (p),
+      hostContextProvider (hcp),
       attachment (param, state, *this)
 {
     setTextBoxStyle (juce::Slider::TextEntryBoxPosition::NoTextBox, false, 0, 0);
@@ -22,12 +24,28 @@ bool DotSlider::hitTest (int x, int y)
     return getThumbBounds().contains ((float) x, (float) y);
 }
 
+void DotSlider::mouseDown (const juce::MouseEvent& e)
+{
+    if (e.mods.isPopupMenu())
+    {
+        if (hostContextProvider != nullptr)
+        {
+            chowdsp::SharedLNFAllocator lnfAllocator;
+            hostContextProvider->showParameterContextPopupMenu (param, {}, lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        }
+        return;
+    }
+
+    juce::Slider::mouseDown (e);
+}
+
 //==================================================
 SpectrumDotSlider::SpectrumDotSlider (chowdsp::FloatParameter& p,
                                       chowdsp::PluginState& state,
                                       const chowdsp::SpectrumPlotBase& base,
-                                      Orientation orientation)
-    : DotSlider (p, state),
+                                      Orientation orientation,
+                                      const chowdsp::HostContextProvider* hcp)
+    : DotSlider (p, state, hcp),
       plotBase (base)
 {
     if (orientation == FrequencyOriented)
@@ -129,6 +147,28 @@ void DotSliderGroup::setSliders (std::vector<DotSlider*>&& newSliders)
 
 void DotSliderGroup::mouseDown (const juce::MouseEvent& e)
 {
+    if (e.mods.isPopupMenu())
+    {
+        if (hostContextProvider != nullptr)
+        {
+            juce::PopupMenu menu;
+            for (auto& slider : sliders)
+            {
+                if (auto paramMenu = hostContextProvider->getContextMenuForParameter (slider->param))
+                    menu.addSubMenu (slider->param.name.remove, paramMenu->getEquivalentPopupMenu());
+            }
+
+            if (menu.containsAnyActiveItems())
+            {
+                chowdsp::SharedLNFAllocator lnfAllocator;
+                menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+                menu.showMenuAsync (juce::PopupMenu::Options {}
+                                        .withParentComponent (getParentComponent()));
+            }
+        }
+        return;
+    }
+
     for (auto& slider : sliders)
     {
         slider->toFront (false);

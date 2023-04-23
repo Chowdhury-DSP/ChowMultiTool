@@ -7,7 +7,7 @@ namespace gui::analog_eq
 class AnalogEQEditor : public juce::Component
 {
 public:
-    AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params);
+    AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void resized() override;
     void paint (juce::Graphics& g) override;

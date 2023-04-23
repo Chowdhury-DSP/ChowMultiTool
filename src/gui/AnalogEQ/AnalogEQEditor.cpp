@@ -3,8 +3,8 @@
 
 namespace gui::analog_eq
 {
-AnalogEQEditor::AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params)
-    : plot (pluginState, params)
+AnalogEQEditor::AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp)
+    : plot (pluginState, params, hcp)
 {
     addAndMakeVisible (plot);
 }

@@ -11,7 +11,7 @@ class DotSlider;
 class AnalogEQPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& params);
+    AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp);
     ~AnalogEQPlot() override;
 
     void paint (juce::Graphics& g) override;

@@ -12,9 +12,16 @@ namespace
     constexpr int blockSize = 1 << fftOrder;
     constexpr int minFrequency = 16;
     constexpr int maxFrequency = 22'000;
+
+    template <typename T, typename B, typename... Args>
+    T& make_unique_component (std::unique_ptr<B>& ptr, Args&&... args)
+    {
+        ptr = std::make_unique<T> (std::forward<Args> (args)...);
+        return static_cast<T&> (*ptr); // NOLINT
+    }
 } // namespace
 
-AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecParams)
+AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecParams, const chowdsp::HostContextProvider& hcp)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -50,93 +57,98 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                 };
         });
 
-    lowFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassFreqParam,
-                                                               pluginState,
-                                                               *this,
-                                                               gui::SpectrumDotSlider::FrequencyOriented);
-    lowFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
-    addAndMakeVisible (lowFreqControl.get());
+    auto& lfControl = make_unique_component<gui::SpectrumDotSlider> (lowFreqControl,
+                                                                     *pultecParams.bassFreqParam,
+                                                                     pluginState,
+                                                                     *this,
+                                                                     gui::SpectrumDotSlider::FrequencyOriented,
+                                                                     &hcp);
+    lfControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    addAndMakeVisible (lfControl);
 
-    lowBoostControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassBoostParam,
-                                                                pluginState,
-                                                                *this,
-                                                                gui::SpectrumDotSlider::MagnitudeOriented);
-    lowBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
-    static_cast<gui::SpectrumDotSlider*> (lowBoostControl.get())->getXCoordinate = // NOLINT
-        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    auto& lbControl = make_unique_component<gui::SpectrumDotSlider> (lowBoostControl,
+                                                                     *pultecParams.bassBoostParam,
+                                                                     pluginState,
+                                                                     *this,
+                                                                     gui::SpectrumDotSlider::MagnitudeOriented,
+                                                                     &hcp);
+    lbControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    lbControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 0.9f);
     };
-    addAndMakeVisible (lowBoostControl.get());
+    addAndMakeVisible (lbControl);
 
-    lowCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.bassCutParam,
-                                                              pluginState,
-                                                              *this,
-                                                              gui::SpectrumDotSlider::MagnitudeOriented);
-    lowCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
-    static_cast<gui::SpectrumDotSlider*> (lowCutControl.get())->getXCoordinate = // NOLINT
-        [this, &bassFreqParam = *pultecParams.bassFreqParam]
+    auto& lcControl = make_unique_component<gui::SpectrumDotSlider> (lowCutControl,
+                                                                     *pultecParams.bassCutParam,
+                                                                     pluginState,
+                                                                     *this,
+                                                                     gui::SpectrumDotSlider::MagnitudeOriented,
+                                                                     &hcp);
+    lcControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    lcControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.9f);
     };
-    addAndMakeVisible (lowCutControl.get());
+    addAndMakeVisible (lcControl);
 
-    highBoostControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleBoostParam,
-                                                                 pluginState,
-                                                                 *this,
-                                                                 gui::SpectrumDotSlider::MagnitudeOriented);
-    highBoostControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
-    static_cast<gui::SpectrumDotSlider*> (highBoostControl.get())->getXCoordinate = // NOLINT
-        [this, &trebleBoostFreqParam = *pultecParams.trebleBoostFreqParam]
+    auto& highBoostGain = make_unique_component<gui::SpectrumDotSlider> (highBoostControl,
+                                                                         *pultecParams.trebleBoostParam,
+                                                                         pluginState,
+                                                                         *this,
+                                                                         gui::SpectrumDotSlider::MagnitudeOriented);
+    highBoostGain.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+    highBoostGain.getXCoordinate = [this, &trebleBoostFreqParam = *pultecParams.trebleBoostFreqParam]
     {
         return getXCoordinateForFrequency (trebleBoostFreqParam.get());
     };
-    addAndMakeVisible (*highBoostControl);
+    addAndMakeVisible (highBoostGain);
 
-    highBoostFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleBoostFreqParam,
-                                                                     pluginState,
-                                                                     *this,
-                                                                     gui::SpectrumDotSlider::FrequencyOriented);
-    highBoostFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::teal);
-
-    static_cast<gui::SpectrumDotSlider*> (highBoostFreqControl.get())->getYCoordinate = // NOLINT
-        [this, &trebleBoostParam = *pultecParams.trebleBoostParam]
+    auto& highBoostFreq = make_unique_component<gui::SpectrumDotSlider> (highBoostFreqControl,
+                                                                         *pultecParams.trebleBoostFreqParam,
+                                                                         pluginState,
+                                                                         *this,
+                                                                         gui::SpectrumDotSlider::FrequencyOriented);
+    highBoostFreq.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+    highBoostFreq.getYCoordinate = [this, &trebleBoostParam = *pultecParams.trebleBoostParam]
     {
         return getYCoordinateForDecibels (trebleBoostParam.get());
     };
-    addAndMakeVisible (*highBoostFreqControl);
+    addAndMakeVisible (highBoostFreq);
 
-    highBoostFullControl = std::make_unique<DotSliderGroup>();
-    static_cast<DotSliderGroup*> (highBoostFullControl.get())->setSliders ({ static_cast<gui::SpectrumDotSlider*> (highBoostControl.get()), static_cast<gui::SpectrumDotSlider*> (highBoostFreqControl.get()) }); // NOLINT
-    addAndMakeVisible (highBoostFullControl.get());
+    auto& highBoostFull = make_unique_component<DotSliderGroup> (highBoostFullControl);
+    highBoostFull.setSliders ({ &highBoostGain, &highBoostFreq });
+    highBoostFull.hostContextProvider = &hcp;
+    addAndMakeVisible (highBoostFull);
 
-    highCutControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutParam,
-                                                               pluginState,
-                                                               *this,
-                                                               gui::SpectrumDotSlider::MagnitudeOriented);
-    highCutControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
-    static_cast<gui::SpectrumDotSlider*> (highCutControl.get())->getXCoordinate = // NOLINT
-        [this, &trebleCutFreqParam = *pultecParams.trebleCutFreqParam]
+    auto& highCutGain = make_unique_component<gui::SpectrumDotSlider> (highCutControl,
+                                                                       *pultecParams.trebleCutParam,
+                                                                       pluginState,
+                                                                       *this,
+                                                                       gui::SpectrumDotSlider::MagnitudeOriented);
+    highCutGain.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    highCutGain.getXCoordinate = [this, &trebleCutFreqParam = *pultecParams.trebleCutFreqParam]
     {
         return getXCoordinateForFrequency (trebleCutFreqParam.get());
     };
-    addAndMakeVisible (highCutControl.get());
+    addAndMakeVisible (highCutGain);
 
-    highCutFreqControl = std::make_unique<gui::SpectrumDotSlider> (*pultecParams.trebleCutFreqParam,
-                                                                   pluginState,
-                                                                   *this,
-                                                                   gui::SpectrumDotSlider::FrequencyOriented);
-    highCutFreqControl->setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
-    static_cast<gui::SpectrumDotSlider*> (highCutFreqControl.get())->getYCoordinate = // NOLINT
-        [this, &trebleCutParam = *pultecParams.trebleCutParam]
+    auto& highCutFreq = make_unique_component<gui::SpectrumDotSlider> (highCutFreqControl,
+                                                                       *pultecParams.trebleCutFreqParam,
+                                                                       pluginState,
+                                                                       *this,
+                                                                       gui::SpectrumDotSlider::FrequencyOriented);
+    highCutFreq.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    highCutFreq.getYCoordinate = [this, &trebleCutParam = *pultecParams.trebleCutParam]
     {
         return getYCoordinateForDecibels (trebleCutParam.get());
     };
-    addAndMakeVisible (*highCutFreqControl);
+    addAndMakeVisible (highCutFreq);
 
-    highCutFullControl = std::make_unique<DotSliderGroup>();
-    static_cast<DotSliderGroup*> (highCutFullControl.get())->setSliders ({ static_cast<gui::SpectrumDotSlider*> (highCutControl.get()), static_cast<gui::SpectrumDotSlider*> (highCutFreqControl.get()) }); // NOLINT
-    addAndMakeVisible (highCutFullControl.get());
+    auto& highCutFull = make_unique_component<DotSliderGroup> (highCutFullControl);
+    highCutFull.setSliders ({ &highCutGain, &highCutFreq });
+    highCutFull.hostContextProvider = &hcp;
+    addAndMakeVisible (highCutFull);
 
     updatePlot();
 

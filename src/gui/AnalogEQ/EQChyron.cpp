@@ -3,7 +3,7 @@
 
 namespace gui::analog_eq
 {
-constexpr float labelHeightFactor = 0.2f;
+constexpr float labelHeightFactor = 0.275f;
 
 EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params)
     : lowFreqBoostSlider (state, params.bassBoostParam.get()),

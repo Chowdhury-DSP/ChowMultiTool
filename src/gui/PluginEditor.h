@@ -28,6 +28,7 @@ private:
     void refreshEditor();
 
     ChowMultiTool& plugin;
+    chowdsp::HostContextProvider hostContextProvider;
 
     Toolbar toolbar;
     std::unique_ptr<juce::Component> editorComponent;
