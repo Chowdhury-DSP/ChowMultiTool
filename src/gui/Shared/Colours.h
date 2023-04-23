@@ -6,6 +6,7 @@ namespace gui::colours
 {
 const auto backgroundLight = juce::Colour { 0xFF211F1F };
 const auto backgroundDark = juce::Colour { 0xFF131111 };
+const auto toolbarGrey = juce::Colour { 0xFF666666 };
 
 const auto linesColour = juce::Colour { 0xFFD3D3D3 };
 const auto majorLinesColour = linesColour.withAlpha (0.5f);

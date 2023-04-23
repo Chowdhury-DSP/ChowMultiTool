@@ -1,7 +1,8 @@
 #pragma once
 
-#include "state/PluginState.h"
+#include "PresetsComponent.h"
 #include "SettingsButton.h"
+#include "state/PluginState.h"
 
 class ChowMultiTool;
 
@@ -23,6 +24,7 @@ private:
     void refreshUndoRedoButtons();
 
     State& state;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     juce::DrawableButton undoButton { "UNDO", juce::DrawableButton::ImageStretched };
     juce::DrawableButton redoButton { "REDO", juce::DrawableButton::ImageStretched };
@@ -31,7 +33,7 @@ private:
     chowdsp::ComboBoxAttachment toolChoiceAttachment;
 
     chowdsp::presets::frontend::FileInterface presetsFileInterface;
-    chowdsp::presets::PresetsComponent presetsComp;
+    presets::PresetsComponent presetsComp;
 
     SettingsButton settingsButton;
 

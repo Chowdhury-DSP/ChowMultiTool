@@ -13,7 +13,9 @@ SettingsButton::SettingsButton (ChowMultiTool& plug, chowdsp::OpenGLHelper& open
 {
     const auto fs = cmrc::gui::get_filesystem();
     const auto cogSVGFile = fs.open ("Vector/cog-solid.svg");
-    setImages (juce::Drawable::createFromImageData (cogSVGFile.begin(), cogSVGFile.size()).get());
+    auto cogDrawable = juce::Drawable::createFromImageData (cogSVGFile.begin(), cogSVGFile.size());
+    cogDrawable->replaceColour (juce::Colours::white, colours::backgroundLight);
+    setImages (cogDrawable.get());
     onClick = [this]
     { showSettingsMenu(); };
 }

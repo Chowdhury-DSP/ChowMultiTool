@@ -1,5 +1,7 @@
 #include "Toolbar.h"
 #include "ChowMultiTool.h"
+#include "gui/Shared/Colours.h"
+#include "gui/Shared/LookAndFeels.h"
 #include "state/PresetManager.h"
 
 namespace gui
@@ -11,13 +13,21 @@ Toolbar::Toolbar (ChowMultiTool& plugin, chowdsp::OpenGLHelper& oglHelper)
                             toolChoiceBox),
       presetsFileInterface (plugin.getPresetManager(),
                             static_cast<state::presets::PresetManager&> (plugin.getPresetManager()).getPresetSettings()), //NOLINT
-      presetsComp (plugin.getPresetManager(), &presetsFileInterface),
+      presetsComp (plugin.getPresetManager(), presetsFileInterface),
       settingsButton (plugin, oglHelper)
 {
     setupUndoRedoButtons();
 
+    toolChoiceBox.setColour (juce::ComboBox::outlineColourId, juce::Colours::transparentBlack);
+    toolChoiceBox.setColour (juce::ComboBox::backgroundColourId, colours::linesColour);
+    toolChoiceBox.setColour (juce::ComboBox::textColourId, colours::backgroundLight);
+    toolChoiceBox.setColour (juce::ComboBox::arrowColourId, colours::backgroundLight);
+    toolChoiceBox.setLookAndFeel (lnfAllocator->getLookAndFeel<gui::lnf::MenuLNF>());
     addAndMakeVisible (toolChoiceBox);
+
+    presetsComp.setLookAndFeel (lnfAllocator->getLookAndFeel<gui::lnf::MenuLNF>());
     addAndMakeVisible (presetsComp);
+
     addAndMakeVisible (settingsButton);
 }
 
@@ -30,8 +40,14 @@ void Toolbar::setupUndoRedoButtons()
 {
     const auto fs = cmrc::gui::get_filesystem();
     const auto undoSVG = fs.open ("Vector/undo-solid.svg");
-    undoButton.setImages (juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size()).get());
-
+    auto undoDrawableEnabled = juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size());
+    undoDrawableEnabled->replaceColour (juce::Colours::black, colours::linesColour);
+    auto undoDrawableDisabled = juce::Drawable::createFromImageData (undoSVG.begin(), undoSVG.size());
+    undoDrawableDisabled->replaceColour (juce::Colours::black, colours::backgroundLight);
+    undoButton.setImages (undoDrawableEnabled.get(),
+                          nullptr,
+                          nullptr,
+                          undoDrawableDisabled.get());
     addAndMakeVisible (undoButton);
     undoButton.onClick = [this]
     {
@@ -39,7 +55,14 @@ void Toolbar::setupUndoRedoButtons()
     };
 
     const auto redoSVG = fs.open ("Vector/redo-solid.svg");
-    redoButton.setImages (juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size()).get());
+    auto redoDrawableEnabled = juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size());
+    redoDrawableEnabled->replaceColour (juce::Colours::black, colours::linesColour);
+    auto redoDrawableDisabled = juce::Drawable::createFromImageData (redoSVG.begin(), redoSVG.size());
+    redoDrawableDisabled->replaceColour (juce::Colours::black, colours::backgroundLight);
+    redoButton.setImages (redoDrawableEnabled.get(),
+                          nullptr,
+                          nullptr,
+                          redoDrawableDisabled.get());
     addAndMakeVisible (redoButton);
     redoButton.onClick = [this]
     {
@@ -66,21 +89,32 @@ void Toolbar::changeListenerCallback (juce::ChangeBroadcaster* source)
 
 void Toolbar::paint (juce::Graphics& g)
 {
-    g.fillAll (juce::Colours::darkgrey);
+    g.fillAll (colours::toolbarGrey);
 }
 
 void Toolbar::resized()
 {
     auto bounds = getLocalBounds();
-    undoButton.setBounds (bounds.removeFromLeft (40).reduced (5));
-    redoButton.setBounds (bounds.removeFromLeft (40).reduced (5));
 
-    bounds.removeFromLeft (25);
-    toolChoiceBox.setBounds (bounds.removeFromLeft (100));
+    const auto buttonDim = proportionOfHeight (0.7f);
+    const auto buttonY = (getHeight() - buttonDim) / 2;
 
-    bounds.removeFromLeft (25);
-    presetsComp.setBounds (bounds.removeFromLeft (180));
+    bounds.reduce (proportionOfWidth (0.01875f), 0);
+    undoButton.setBounds (juce::Rectangle { buttonDim, buttonDim }.withY (buttonY).withX (bounds.getX()));
 
-    settingsButton.setBounds (bounds.removeFromRight (30).reduced (5));
+    bounds.removeFromLeft (buttonDim + proportionOfWidth (0.0125f));
+    redoButton.setBounds (juce::Rectangle { buttonDim, buttonDim }.withY (buttonY).withX (bounds.getX()));
+
+    toolChoiceBox.setBounds (proportionOfWidth (0.1875f),
+                             proportionOfHeight (10.0f / 75.0f),
+                             proportionOfWidth (0.28125f),
+                             proportionOfHeight (55.0f / 75.0f));
+
+    presetsComp.setBounds (proportionOfWidth (0.53125f),
+                           proportionOfHeight (10.0f / 75.0f),
+                           proportionOfWidth (0.3125f),
+                           proportionOfHeight (55.0f / 75.0f));
+
+    settingsButton.setBounds (juce::Rectangle { buttonDim, buttonDim }.withY (buttonY).withRightX (bounds.getRight()));
 }
 } // namespace gui
