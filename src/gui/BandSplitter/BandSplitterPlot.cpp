@@ -1,5 +1,6 @@
 #include "BandSplitterPlot.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/LookAndFeels.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace gui::band_splitter
@@ -13,10 +14,12 @@ namespace
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
                                                   chowdsp::EQ::EqualizerPlot& plot,
-                                                  State& pluginState)
+                                                  State& pluginState,
+                                                  const chowdsp::HostContextProvider& hcp)
     : cutoffParam (cutoff),
       plotBase (plot),
-      cutoffAttachment (cutoff, pluginState, *this)
+      cutoffAttachment (cutoff, pluginState, *this),
+      hostContextProvider (hcp)
 {
     setTextBoxStyle (NoTextBox, false, 0, 0);
     setSliderStyle (LinearHorizontal);
@@ -42,6 +45,19 @@ bool BandSplitterPlot::InternalSlider::hitTest (int x, int y)
     return getThumbBounds().contains (x, y);
 }
 
+void BandSplitterPlot::InternalSlider::mouseDown (const juce::MouseEvent& e)
+{
+    if (e.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        hostContextProvider.showParameterContextPopupMenu (cutoffParam,
+                                                           {},
+                                                           lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        return;
+    }
+    juce::Slider::mouseDown (e);
+}
+
 double BandSplitterPlot::InternalSlider::proportionOfLengthToValue (double proportion)
 {
     return (double) plotBase.getFrequencyForXCoordinate ((float) proportion * (float) getWidth());
@@ -64,7 +80,7 @@ juce::Rectangle<int> BandSplitterPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
-BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& bandSplitParams)
+BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& bandSplitParams, const chowdsp::HostContextProvider& hcp)
     : chowdsp::EQ::EqualizerPlot (numBands,
                                   chowdsp::SpectrumPlotParams {
                                       .minFrequencyHz = (float) minFrequency,
@@ -72,8 +88,8 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                       .minMagnitudeDB = -60.0f,
                                       .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
-      cutoffSlider (*bandSplitParams.cutoff, *this, pluginState),
-      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState)
+      cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
+      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp)
 {
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);

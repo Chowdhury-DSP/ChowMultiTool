@@ -4,9 +4,9 @@
 
 namespace gui::waveshaper
 {
-WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams)
+WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams, const chowdsp::HostContextProvider& hcp)
     : params (wsParams),
-      plot (pluginState, wsParams),
+      plot (pluginState, wsParams, hcp),
       foldFuzzControls (pluginState, wsParams),
       freeDrawButton ("Vector/pencil-solid.svg", colours::plotColour, colours::linesColour),
       mathButton ("Vector/calculator-solid.svg", colours::plotColour, colours::linesColour),

@@ -12,7 +12,7 @@ namespace gui::eq
 class EQEditor : public juce::Component
 {
 public:
-    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams);
+    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

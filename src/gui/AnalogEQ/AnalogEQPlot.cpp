@@ -33,7 +33,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                                 .fftOrder = fftOrder,
                             }),
       pultecEQ (pultecParams),
-      chyron (pluginState, *pluginState.params.analogEQParams)
+      chyron (pluginState, *pluginState.params.analogEQParams, hcp)
 {
     pultecEQ.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)

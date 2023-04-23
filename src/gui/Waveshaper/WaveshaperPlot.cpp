@@ -1,9 +1,10 @@
 #include "WaveshaperPlot.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui::waveshaper
 {
-WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsParams)
+WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsParams, const chowdsp::HostContextProvider& hcp)
     : plotter ({
         .xMin = -1.5f,
         .xMax = 1.5f,
@@ -12,7 +13,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
       mathArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       pointsArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       shapeParam (*wsParams.shapeParam),
-      gainAttach (*wsParams.gainParam, pluginState, *this)
+      gainAttach (*wsParams.gainParam, pluginState, *this),
+      hostContextProvider (hcp)
 {
     wsParams.doForAllParameters (
         [this, &pluginState] (const auto& param, size_t)
@@ -289,5 +291,19 @@ void WaveshaperPlot::resized()
     drawArea.setBounds (getLocalBounds());
     mathArea.setBounds (getLocalBounds());
     pointsArea.setBounds (getLocalBounds());
+}
+
+void WaveshaperPlot::mouseDown (const juce::MouseEvent& e)
+{
+    if (e.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        hostContextProvider.showParameterContextPopupMenu (gainAttach.getParameter(),
+                                                           {},
+                                                           lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        return;
+    }
+
+    juce::Slider::mouseDown (e);
 }
 } // namespace gui::waveshaper

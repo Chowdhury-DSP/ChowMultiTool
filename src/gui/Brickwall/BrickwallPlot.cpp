@@ -1,5 +1,6 @@
 #include "BrickwallPlot.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/LookAndFeels.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
 
 namespace
@@ -21,10 +22,12 @@ namespace gui::brickwall
 {
 BrickwallPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
                                                chowdsp::SpectrumPlotBase& plot,
-                                               State& pluginState)
+                                               State& pluginState,
+                                               const chowdsp::HostContextProvider& hcp)
     : cutoffParam (cutoff),
       plotBase (plot),
-      cutoffAttachment (cutoff, pluginState, *this)
+      cutoffAttachment (cutoff, pluginState, *this),
+      hostContextProvider (hcp)
 {
     setTextBoxStyle (NoTextBox, false, 0, 0);
     setSliderStyle (LinearHorizontal);
@@ -50,6 +53,19 @@ bool BrickwallPlot::InternalSlider::hitTest (int x, int y)
     return getThumbBounds().contains (x, y);
 }
 
+void BrickwallPlot::InternalSlider::mouseDown (const juce::MouseEvent& e)
+{
+    if (e.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        hostContextProvider.showParameterContextPopupMenu (cutoffParam,
+                                                           {},
+                                                           lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        return;
+    }
+    juce::Slider::mouseDown (e);
+}
+
 double BrickwallPlot::InternalSlider::proportionOfLengthToValue (double proportion)
 {
     return (double) plotBase.getFrequencyForXCoordinate ((float) proportion * (float) getWidth());
@@ -72,7 +88,7 @@ juce::Rectangle<int> BrickwallPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
-BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickwallParams)
+BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickwallParams, const chowdsp::HostContextProvider& hcp)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -83,7 +99,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickw
                                 .fftOrder = fftOrder,
                             }),
       brickwall (brickwallParams),
-      cutoffSlider (*brickwallParams.cutoff, *this, pluginState)
+      cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {
     addAndMakeVisible (cutoffSlider);
 

@@ -4,9 +4,12 @@
 
 namespace gui::eq
 {
-EQChyron::EQChyron (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters)
+EQChyron::EQChyron (chowdsp::PluginState& pluginState,
+                    chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+                    const chowdsp::HostContextProvider& hcp)
     : state (pluginState),
-      eqParams (eqParameters)
+      eqParams (eqParameters),
+      hostContextProvider (hcp)
 {
     updateValues();
 }
@@ -47,14 +50,14 @@ void EQChyron::updateValues()
         return;
     }
 
-    freqSlider.emplace (state, activeParams.freqParam.get());
+    freqSlider.emplace (state, activeParams.freqParam.get(), &hostContextProvider);
     freqSlider->setName ("Cutoff");
     addAndMakeVisible (*freqSlider);
 
     filterType = helpers::getFilterType (activeParams.typeParam->getIndex());
     if (helpers::hasQParam (filterType))
     {
-        qSlider.emplace (state, activeParams.qParam.get());
+        qSlider.emplace (state, activeParams.qParam.get(), &hostContextProvider);
         qSlider->setName ("Q");
         addAndMakeVisible (*qSlider);
     }
@@ -65,7 +68,7 @@ void EQChyron::updateValues()
 
     if (helpers::hasGainParam (filterType))
     {
-        gainSlider.emplace (state, activeParams.gainParam.get());
+        gainSlider.emplace (state, activeParams.gainParam.get(), &hostContextProvider);
         gainSlider->setName ("Gain");
         addAndMakeVisible (*gainSlider);
     }

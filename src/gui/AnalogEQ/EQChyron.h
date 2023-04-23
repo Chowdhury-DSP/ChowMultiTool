@@ -18,7 +18,7 @@ enum class EQBand
 class EQChyron : public juce::Component
 {
 public:
-    EQChyron (chowdsp::PluginState& pluginState, dsp::analog_eq::Params& params);
+    EQChyron (chowdsp::PluginState& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void resized() override;
     void paint (juce::Graphics& g) override;

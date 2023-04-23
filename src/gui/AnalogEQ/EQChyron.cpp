@@ -5,15 +5,15 @@ namespace gui::analog_eq
 {
 constexpr float labelHeightFactor = 0.275f;
 
-EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params)
-    : lowFreqBoostSlider (state, params.bassBoostParam.get()),
-      lowFreqCutSlider (state, params.bassCutParam.get()),
-      lowFreqCutoffSlider (state, params.bassFreqParam.get()),
-      highFreqBoostSlider (state, params.trebleBoostParam.get()),
-      highFreqBoostFreqSlider (state, params.trebleBoostFreqParam.get()),
-      highFreqBoostQSlider (state, params.trebleBoostQParam.get()),
-      highFreqCutSlider (state, params.trebleCutParam.get()),
-      highFreqCutFreqSlider (state, params.trebleCutFreqParam.get())
+EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp)
+    : lowFreqBoostSlider (state, params.bassBoostParam.get(), &hcp),
+      lowFreqCutSlider (state, params.bassCutParam.get(), &hcp),
+      lowFreqCutoffSlider (state, params.bassFreqParam.get(), &hcp),
+      highFreqBoostSlider (state, params.trebleBoostParam.get(), &hcp),
+      highFreqBoostFreqSlider (state, params.trebleBoostFreqParam.get(), &hcp),
+      highFreqBoostQSlider (state, params.trebleBoostQParam.get(), &hcp),
+      highFreqCutSlider (state, params.trebleCutParam.get(), &hcp),
+      highFreqCutFreqSlider (state, params.trebleCutFreqParam.get(), &hcp)
 {
     for (auto* param : { (chowdsp::FloatParameter*) params.bassBoostParam.get(),
                          (chowdsp::FloatParameter*) params.bassCutParam.get(),

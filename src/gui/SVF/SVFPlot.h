@@ -10,7 +10,7 @@ class SVFPlot : public chowdsp::SpectrumPlotBase,
                 private juce::Timer
 {
 public:
-    SVFPlot (State& pluginState, dsp::svf::Params& params, bool allowParamModulation);
+    SVFPlot (State& pluginState, dsp::svf::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

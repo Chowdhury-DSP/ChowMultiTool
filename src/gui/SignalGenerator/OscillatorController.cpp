@@ -3,7 +3,7 @@
 
 namespace gui::signal_gen
 {
-OscillatorController::OscillatorController (State& state)
+OscillatorController::OscillatorController (State& state, const chowdsp::HostContextProvider& hcp)
     : plotSignalGen (*state.params.signalGenParams),
       gainSlider (*state.params.signalGenParams->gain,
                   state,
@@ -29,6 +29,7 @@ OscillatorController::OscillatorController (State& state)
     addAndMakeVisible (freqSlider);
 
     sliders.setSliders ({ &gainSlider, &freqSlider });
+    sliders.hostContextProvider = &hcp;
     addAndMakeVisible (sliders);
 
     plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });

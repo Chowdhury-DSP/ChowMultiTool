@@ -155,7 +155,7 @@ void DotSliderGroup::mouseDown (const juce::MouseEvent& e)
             for (auto& slider : sliders)
             {
                 if (auto paramMenu = hostContextProvider->getContextMenuForParameter (slider->param))
-                    menu.addSubMenu (slider->param.name.remove, paramMenu->getEquivalentPopupMenu());
+                    menu.addSubMenu (slider->param.name, paramMenu->getEquivalentPopupMenu());
             }
 
             if (menu.containsAnyActiveItems())

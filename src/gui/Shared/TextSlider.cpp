@@ -1,5 +1,6 @@
 #include "TextSlider.h"
 #include "Colours.h"
+#include "LookAndFeels.h"
 
 namespace gui
 {
@@ -40,9 +41,10 @@ struct TextSliderLNF : chowdsp::ChowLNF
     SharedFonts fonts;
 };
 
-TextSlider::TextSlider (chowdsp::PluginState& state, chowdsp::FloatParameter* param)
+TextSlider::TextSlider (chowdsp::PluginState& state, chowdsp::FloatParameter* param, const chowdsp::HostContextProvider* hcp)
     : parameter (param),
-      attachment (*param, state, *this)
+      attachment (*param, state, *this),
+      hostContextProvider (hcp)
 {
     juce::Slider::setName (param->getName (1024));
     setLookAndFeel (lnfAllocator->getLookAndFeel<TextSliderLNF>());
@@ -66,7 +68,12 @@ void TextSlider::mouseDown (const juce::MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        // @TODO: host context menu?
+        if (hostContextProvider != nullptr)
+        {
+            hostContextProvider->showParameterContextPopupMenu (*parameter,
+                                                                {},
+                                                                lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        }
         return;
     }
 

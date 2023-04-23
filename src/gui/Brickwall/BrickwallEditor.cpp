@@ -4,8 +4,8 @@
 
 namespace gui::brickwall
 {
-BrickwallEditor::BrickwallEditor (State& pluginState, dsp::brickwall::Params& params)
-    : plot (pluginState, params)
+BrickwallEditor::BrickwallEditor (State& pluginState, dsp::brickwall::Params& params, const chowdsp::HostContextProvider& hcp)
+    : plot (pluginState, params, hcp)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, params);
 

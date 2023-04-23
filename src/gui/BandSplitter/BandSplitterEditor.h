@@ -9,7 +9,7 @@ namespace gui::band_splitter
 class BandSplitterEditor : public juce::Component
 {
 public:
-    BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params);
+    BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

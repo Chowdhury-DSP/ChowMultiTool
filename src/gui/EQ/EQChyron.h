@@ -11,7 +11,9 @@ constexpr auto numBands = dsp::eq::EQToolParams::numBands;
 class EQChyron : public juce::Component
 {
 public:
-    EQChyron (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters);
+    EQChyron (chowdsp::PluginState& pluginState,
+              chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+              const chowdsp::HostContextProvider& hcp);
 
     void resized() override;
     void paint (juce::Graphics& g) override;
@@ -31,6 +33,7 @@ private:
     std::optional<TextSlider> gainSlider;
 
     chowdsp::ScopedCallbackList callbacks;
+    const chowdsp::HostContextProvider& hostContextProvider;
 
     SharedFonts fonts;
 

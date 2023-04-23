@@ -23,8 +23,8 @@ void BandSplitterEditor::BandsButton::paintButton (juce::Graphics& g, bool, bool
     g.drawFittedText (text, getLocalBounds().reduced (pad), juce::Justification::centred, 1);
 }
 
-BandSplitterEditor::BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params)
-    : bandSplitterPlot (pluginState, params),
+BandSplitterEditor::BandSplitterEditor (State& pluginState, dsp::band_splitter::Params& params, const chowdsp::HostContextProvider& hcp)
+    : bandSplitterPlot (pluginState, params, hcp),
       slopePicker (pluginState, *params.slope),
       bandsButton (*params.threeBandOnOff, pluginState)
 {

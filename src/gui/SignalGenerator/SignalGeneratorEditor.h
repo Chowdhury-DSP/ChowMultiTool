@@ -9,7 +9,7 @@ namespace gui::signal_gen
 class SignalGeneratorEditor : public juce::Component
 {
 public:
-    explicit SignalGeneratorEditor (State& state);
+    SignalGeneratorEditor (State& state, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

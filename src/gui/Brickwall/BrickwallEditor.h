@@ -7,7 +7,7 @@ namespace gui::brickwall
 class BrickwallEditor : public juce::Component
 {
 public:
-    BrickwallEditor (State& pluginState, dsp::brickwall::Params& params);
+    BrickwallEditor (State& pluginState, dsp::brickwall::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

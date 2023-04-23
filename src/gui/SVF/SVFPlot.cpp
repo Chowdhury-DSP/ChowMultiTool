@@ -13,7 +13,7 @@ namespace
     constexpr int maxFrequency = 20'200;
 } // namespace
 
-SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)
+SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -21,7 +21,7 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowPar
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
       processor (svfParams),
-      freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented)
+      freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp)
 {
     addAndMakeVisible (freqSlider);
 
@@ -48,7 +48,7 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, bool allowPar
 
     updatePlot();
 
-    if (allowParamModulation)
+    if (hcp.supportsParameterModulation())
         startTimerHz (29);
 }
 

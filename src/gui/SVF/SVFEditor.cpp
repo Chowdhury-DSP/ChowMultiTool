@@ -4,8 +4,8 @@
 
 namespace gui::svf
 {
-SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, bool allowParamModulation)
-    : plot (pluginState, svfParams, allowParamModulation),
+SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp)
+    : plot (pluginState, svfParams, hcp),
       paramControls (pluginState, svfParams),
       arpLimitButton ("Vector/arrows-up-to-line-solid.svg", colours::plotColour, colours::linesColour),
       arpLimitAttach (svfParams.arpLimitMode, pluginState, arpLimitButton)

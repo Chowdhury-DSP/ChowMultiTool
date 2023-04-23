@@ -99,19 +99,19 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams);
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
-                    editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams);
+                    editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
-                    editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState);
+                    editorComponent = std::make_unique<signal_gen::SignalGeneratorEditor> (pluginState, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::analog_eq::AnalogEQProcessor>)
                     editorComponent = std::make_unique<analog_eq::AnalogEQEditor> (pluginState, *pluginState.params.analogEQParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::band_splitter::BandSplitterProcessor>)
-                    editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams);
+                    editorComponent = std::make_unique<band_splitter::BandSplitterEditor> (pluginState, *pluginState.params.bandSplitParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
-                    editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams);
+                    editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState, *pluginState.params.brickwallParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
-                    editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, plugin.supportsParameterModulation());
+                    editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, hostContextProvider);
             });
     }
 

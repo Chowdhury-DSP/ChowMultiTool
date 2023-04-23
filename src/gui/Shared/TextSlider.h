@@ -7,7 +7,7 @@ namespace gui
 class TextSlider : public juce::Slider
 {
 public:
-    TextSlider (chowdsp::PluginState& state, chowdsp::FloatParameter* param);
+    TextSlider (chowdsp::PluginState& state, chowdsp::FloatParameter* param, const chowdsp::HostContextProvider* hcp = nullptr);
     ~TextSlider() override;
 
     void paint (juce::Graphics& g) override;
@@ -19,6 +19,7 @@ private:
 
     const chowdsp::FloatParameter* parameter;
     chowdsp::SliderAttachment attachment;
+    const chowdsp::HostContextProvider* hostContextProvider = nullptr;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
     SharedFonts fonts;

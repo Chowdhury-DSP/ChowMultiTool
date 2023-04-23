@@ -10,7 +10,7 @@ namespace gui::signal_gen
 class OscillatorController : public juce::Component
 {
 public:
-    explicit OscillatorController (State& state);
+    OscillatorController (State& state, const chowdsp::HostContextProvider& hcp);
 
     void resized() override;
 

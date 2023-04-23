@@ -9,7 +9,7 @@ namespace gui::waveshaper
 class WaveshaperEditor : public juce::Component
 {
 public:
-    WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams);
+    WaveshaperEditor (State& pluginState, dsp::waveshaper::Params& wsParams, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

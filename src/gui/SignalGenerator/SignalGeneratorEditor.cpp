@@ -3,8 +3,8 @@
 
 namespace gui::signal_gen
 {
-SignalGeneratorEditor::SignalGeneratorEditor (State& state)
-    : oscController (state),
+SignalGeneratorEditor::SignalGeneratorEditor (State& state, const chowdsp::HostContextProvider& hcp)
+    : oscController (state, hcp),
       oscillatorChoice (state, state.params.signalGenParams->oscillatorChoice)
 {
     addAndMakeVisible (oscController);

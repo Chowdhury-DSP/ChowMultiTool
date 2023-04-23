@@ -9,7 +9,9 @@ namespace gui::eq
 class EQPlot : public chowdsp::EQ::EqualizerPlotWithParameters<numBands>
 {
 public:
-    EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters);
+    EQPlot (chowdsp::PluginState& pluginState,
+            chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+            const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

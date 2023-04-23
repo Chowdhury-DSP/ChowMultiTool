@@ -4,8 +4,8 @@
 
 namespace gui::eq
 {
-EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams)
-    : plot (pluginState, eqParams.eqParams),
+EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp)
+    : plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton)

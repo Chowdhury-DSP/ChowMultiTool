@@ -38,7 +38,9 @@ void EQPlot::EQBandSliderGroup::paint (juce::Graphics& g)
 constexpr int minFrequency = 18;
 constexpr int maxFrequency = 22'000;
 
-EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParameters<numBands>& eqParameters)
+EQPlot::EQPlot (chowdsp::PluginState& pluginState,
+                chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+                const chowdsp::HostContextProvider& hcp)
     : chowdsp::EQ::EqualizerPlotWithParameters<numBands> (pluginState.getParameterListeners(),
                                                           eqParameters,
                                                           &helpers::getFilterType,
@@ -47,7 +49,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
                                                               .maxFrequencyHz = maxFrequency,
                                                               .minMagnitudeDB = -23.0f,
                                                               .maxMagnitudeDB = 20.0f }),
-      chyron (pluginState, eqParameters)
+      chyron (pluginState, eqParameters, hcp)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
@@ -151,6 +153,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState, chowdsp::EQ::StandardEQParame
         };
 
         sliderGroups[i].setSliders ({ &(*freqSliders[i]), &(*gainSliders[i]), &(*qSliders[i]) });
+        sliderGroups[i].hostContextProvider = &hcp;
         addAndMakeVisible (sliderGroups[i]);
     }
 

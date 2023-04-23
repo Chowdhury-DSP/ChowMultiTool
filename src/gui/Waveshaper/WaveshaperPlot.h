@@ -11,10 +11,11 @@ namespace gui::waveshaper
 class WaveshaperPlot : public juce::Slider
 {
 public:
-    WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsParams);
+    WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsParams, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void mouseDown (const juce::MouseEvent& e) override;
 
     void toggleDrawMode (bool isDrawMode);
     void toggleMathMode (bool isMathMode);
@@ -29,6 +30,7 @@ private:
     chowdsp::ScopedCallbackList callbacks;
     const chowdsp::EnumChoiceParameter<dsp::waveshaper::Shapes>& shapeParam;
     chowdsp::SliderAttachment gainAttach;
+    const chowdsp::HostContextProvider& hostContextProvider;
 
     bool drawMode = false;
     bool mathMode = false;

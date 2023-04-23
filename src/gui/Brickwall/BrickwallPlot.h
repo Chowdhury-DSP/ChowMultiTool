@@ -8,7 +8,7 @@ namespace gui::brickwall
 class BrickwallPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    BrickwallPlot (State& pluginState, dsp::brickwall::Params& params);
+    BrickwallPlot (State& pluginState, dsp::brickwall::Params& params, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
@@ -26,9 +26,11 @@ private:
     {
         InternalSlider (chowdsp::FloatParameter& cutoffParam,
                         chowdsp::SpectrumPlotBase& plotBase,
-                        State& pluginState);
+                        State& pluginState,
+                        const chowdsp::HostContextProvider& hcp);
         void paint (juce::Graphics& g) override;
         bool hitTest (int x, int y) override;
+        void mouseDown (const juce::MouseEvent& e) override;
         double proportionOfLengthToValue (double proportion) override;
         double valueToProportionOfLength (double value) override;
         juce::Rectangle<int> getThumbBounds() const;
@@ -36,6 +38,7 @@ private:
         chowdsp::FloatParameter& cutoffParam;
         chowdsp::SpectrumPlotBase& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
+        const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallPlot)
