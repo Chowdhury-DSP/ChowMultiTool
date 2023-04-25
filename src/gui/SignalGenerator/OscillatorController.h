@@ -4,6 +4,7 @@
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
+#include "SignalGenChyron.h"
 
 namespace gui::signal_gen
 {
@@ -17,10 +18,9 @@ public:
 private:
     OscillatorPlot plot;
 
-    dsp::signal_gen::SignalGeneratorProcessor plotSignalGen;
-
     SpectrumDotSlider gainSlider, freqSlider;
     DotSliderGroup sliders;
+    SignalGenChyron chyron;
 
     chowdsp::ScopedCallbackList parameterChangeListeners;
 

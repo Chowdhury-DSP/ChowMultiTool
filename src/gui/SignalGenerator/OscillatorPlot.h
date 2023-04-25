@@ -1,9 +1,10 @@
 #pragma once
 
-#include <pch.h>
+#include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 
 namespace gui::signal_gen
 {
+using dsp::signal_gen::Oscillator;
 class OscillatorPlot : public chowdsp::SpectrumPlotBase
 {
 public:
@@ -11,22 +12,12 @@ public:
 
     void paint (juce::Graphics& g) override;
 
-    void updatePlot (float gainParamDB);
-
-    static constexpr auto analysisFs = 48000.0f;
-#if JUCE_DEBUG
-    static constexpr int fftSize = 1 << 14;
-#else
-    static constexpr int fftSize = 1 << 15;
-#endif
-
-    std::function<void (const chowdsp::BufferView<float>&)> plotUpdateCallback = nullptr;
+    void updatePlot (float freqParamHz, float gainParamDB, Oscillator oscillator);
 
 private:
-    chowdsp::StaticBuffer<float, 1, fftSize * 2> plotBuffer;
-    juce::dsp::FFT fft { chowdsp::Math::log2 (fftSize) };
-
-    std::array<float, (size_t) fftSize / 2 + 1> fftBinsSmoothDB {};
+    float freqHz = 100.0f;
+    float gainLinear = 1.0f;
+    Oscillator oscChoice = Oscillator::Sine;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OscillatorPlot)
 };

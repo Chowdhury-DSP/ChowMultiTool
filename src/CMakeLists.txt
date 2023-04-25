@@ -55,6 +55,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/SignalGenerator/SignalGeneratorEditor.cpp
     gui/SignalGenerator/OscillatorController.cpp
     gui/SignalGenerator/OscillatorPlot.cpp
+    gui/SignalGenerator/SignalGenChyron.cpp
 
     gui/SVF/SVFEditor.cpp
     gui/SVF/SVFPlot.cpp

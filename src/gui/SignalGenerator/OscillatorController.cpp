@@ -4,15 +4,15 @@
 namespace gui::signal_gen
 {
 OscillatorController::OscillatorController (State& state, const chowdsp::HostContextProvider& hcp)
-    : plotSignalGen (*state.params.signalGenParams),
-      gainSlider (*state.params.signalGenParams->gain,
+    : gainSlider (*state.params.signalGenParams->gain,
                   state,
                   plot,
                   SpectrumDotSlider::Orientation::MagnitudeOriented),
       freqSlider (*state.params.signalGenParams->frequency,
                   state,
                   plot,
-                  SpectrumDotSlider::Orientation::FrequencyOriented)
+                  SpectrumDotSlider::Orientation::FrequencyOriented),
+      chyron (state, *state.params.signalGenParams, hcp)
 {
     gainSlider.getXCoordinate = [this, &state]
     {
@@ -32,27 +32,22 @@ OscillatorController::OscillatorController (State& state, const chowdsp::HostCon
     sliders.hostContextProvider = &hcp;
     addAndMakeVisible (sliders);
 
-    plotSignalGen.prepare ({ OscillatorPlot::analysisFs, (uint32_t) OscillatorPlot::fftSize, 1 });
-
     addAndMakeVisible (plot);
     plot.toBack();
-    plot.plotUpdateCallback = [this] (const chowdsp::BufferView<float>& buffer)
-    {
-        plotSignalGen.reset();
-        plotSignalGen.processBlock (buffer);
-    };
+
+    addAndMakeVisible (chyron);
 
     auto& params = state.params.signalGenParams;
-    plot.updatePlot (params->gain->get());
+    plot.updatePlot (params->frequency->get(), params->gain->get(), params->oscillatorChoice->get());
 
     static constexpr auto listenerThread = chowdsp::ParameterListenerThread::MessageThread;
     parameterChangeListeners += {
         state.addParameterListener (*params->frequency, listenerThread, [this, &params]
-                                    { plot.updatePlot (params->gain->get()); }),
+                                    { plot.updatePlot (params->frequency->get(), params->gain->get(), params->oscillatorChoice->get()); }),
         state.addParameterListener (*params->gain, listenerThread, [this, &params]
-                                    { plot.updatePlot (params->gain->get()); }),
+                                    { plot.updatePlot (params->frequency->get(), params->gain->get(), params->oscillatorChoice->get()); }),
         state.addParameterListener (*params->oscillatorChoice, listenerThread, [this, &params]
-                                    { plot.updatePlot (params->gain->get()); }),
+                                    { plot.updatePlot (params->frequency->get(), params->gain->get(), params->oscillatorChoice->get()); }),
     };
 }
 
@@ -60,5 +55,13 @@ void OscillatorController::resized()
 {
     plot.setBounds (getLocalBounds());
     sliders.setBounds (getLocalBounds());
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.2f);
+    const auto chyronHeight = proportionOfWidth (0.1f);
+    chyron.setBounds (pad,
+                      getHeight() - 8 * pad - chyronHeight,
+                      chyronWidth,
+                      chyronHeight);
 }
 } // namespace gui::signal_gen

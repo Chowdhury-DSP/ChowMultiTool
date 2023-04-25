@@ -90,19 +90,19 @@ void EQChyron::resized()
         if (qSlider.has_value() && gainSlider.has_value())
         {
             const auto fourthHeight = proportionOfHeight (1.0f / 4.0f);
-            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), fourthHeight }));
-            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * fourthHeight }));
-            gainSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 3 * fourthHeight }));
+            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
+            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
+            gainSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 3 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
         }
         else if (qSlider.has_value())
         {
             const auto thirdHeight = proportionOfHeight (1.0f / 3.0f);
-            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), thirdHeight }));
-            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * thirdHeight }));
+            freqSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
+            qSlider->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
         }
         else
         {
-            freqSlider->setBounds (sliderBounds.withCentre (bounds.getCentre()));
+            freqSlider->setBounds (sliderBounds.withCentre (bounds.getCentre()).reduced (proportionOfWidth (0.025f), 0));
         }
     }
 }
