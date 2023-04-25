@@ -28,7 +28,37 @@ enum class FilterType
     ChebyshevII = 2,
     Elliptic = 4,
 };
+}
 
+template <>
+constexpr magic_enum::customize::customize_t
+    magic_enum::customize::enum_name<dsp::brickwall::Order> (dsp::brickwall::Order value) noexcept
+{
+    using dsp::brickwall::Order;
+    switch (value)
+    {
+        case Order::m2nd_Order:
+            return "2nd Order";
+        case Order::m4th_Order:
+            return "4th Order";
+        case Order::m6th_Order:
+            return "6th Order";
+        case Order::m8th_Order:
+            return "8th Order";
+        case Order::m10th_Order:
+            return "10th Order";
+        case Order::m12th_Order:
+            return "12th Order";
+        case Order::m14th_Order:
+            return "14th Order";
+        case Order::m16th_Order:
+            return "16th Order";
+    }
+    return default_tag;
+}
+
+namespace dsp::brickwall
+{
 struct Params : chowdsp::ParamHolder
 {
     Params()
@@ -48,8 +78,7 @@ struct Params : chowdsp::ParamHolder
     chowdsp::EnumChoiceParameter<Order>::Ptr order {
         juce::ParameterID { "brickwall_order", ParameterVersionHints::version1_0_0 },
         "Brickwall Order",
-        Order::m12th_Order,
-        std::initializer_list<std::pair<char, char>> { { 'm', 24 }, { '_', ' ' } }
+        Order::m12th_Order
     };
 
     chowdsp::EnumChoiceParameter<FilterType>::Ptr filterType {

@@ -35,6 +35,6 @@ void SimpleBox::paint (juce::Graphics& g)
 {
     g.setFont (juce::Font (fonts->robotoBold).withHeight (0.6f * (float) getHeight()));
     g.setColour (findColour (juce::ComboBox::textColourId));
-    g.drawFittedText (extraText + getText(), getLocalBounds(), juce::Justification::centred, 1);
+    g.drawFittedText (extraText + getText(), getLocalBounds().reduced (proportionOfWidth (0.05f), 0), juce::Justification::centred, 1);
 }
 } // namespace gui
