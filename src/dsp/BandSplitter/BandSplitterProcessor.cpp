@@ -23,6 +23,11 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         || bufferIn.getNumChannels() != bufferHigh.getNumChannels())
         return;
 
+    if (bufferLow.getReadPointer (0) == nullptr
+        || bufferMid.getReadPointer (0) == nullptr
+        || bufferHigh.getReadPointer (0) == nullptr)
+        return;
+
     const auto processTwoBandFilter = [&] (auto& filter)
     {
         filter.setCrossoverFrequency (params.cutoff->getCurrentValue());
@@ -52,8 +57,13 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     };
 
     if (params.threeBandOnOff->get())
+    {
         processCrossover (threeBandFilters, processThreeBandFilter);
+    }
     else
+    {
+        bufferMid.clear();
         processCrossover (twoBandFilters, processTwoBandFilter);
+    }
 }
 } // namespace dsp::band_splitter

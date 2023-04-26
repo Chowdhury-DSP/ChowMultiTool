@@ -95,8 +95,14 @@ void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
 {
     const auto toolChoice = params.toolParam->getIndex() - 1;
-    if (toolChoice < 0)
-        return; // no tool!
+    if (toolChoice < 0) // no tool!
+    {
+        auto busBuffer = plugin.getBusBuffer (buffer, true, 0);
+        for (int ch = busBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
+            buffer.clear (ch, 0, buffer.getNumSamples());
+
+        return;
+    }
 
     chowdsp::TupleHelpers::visit_at (tools,
                                      (size_t) toolChoice,
@@ -120,13 +126,8 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
                                              auto busBuffer = plugin.getBusBuffer (buffer, true, 0);
                                              tool.processBlock (busBuffer);
 
-                                             // clear output busses that we're not using
-                                             for (int i = 1; i <= 3; ++i)
-                                             {
-                                                 auto otherBusBuffer = plugin.getBusBuffer (buffer, false, i);
-                                                 if (otherBusBuffer.getNumChannels() > 0)
-                                                     otherBusBuffer.clear();
-                                             }
+                                             for (int ch = busBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
+                                                 buffer.clear (ch, 0, buffer.getNumSamples());
                                          }
                                      });
 }

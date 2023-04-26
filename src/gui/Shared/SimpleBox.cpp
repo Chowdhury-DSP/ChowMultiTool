@@ -19,6 +19,9 @@ juce::Font SimpleBox::LNF::getPopupMenuFont()
 juce::PopupMenu::Options SimpleBox::LNF::getOptionsForComboBoxPopupMenu (juce::ComboBox& box, juce::Label& label)
 {
     return chowdsp::ChowLNF::getOptionsForComboBoxPopupMenu (box, label)
+#if JUCE_IOS
+        .withItemThatMustBeVisible (box.getNumItems() / 2)
+#endif
         .withStandardItemHeight (box.getHeight());
 }
 
