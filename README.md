@@ -6,14 +6,15 @@
 ChowMultiTool is a swiss-army-knife sort of plugin, containing
 a handful of little effects and other things that I've found useful.
 
-**This is currently pre-alpha software, and may be unstable!
-Please don't use it for anything important just yet.**
+**This software is currently in beta. We expect it to be mostly stable,
+but there may be breaking changes introduced in between now and version
+1.0.0.**
 
-If you would like to stay updated about future releases, please
-use the repository "Watch" button.
+## Quick Links:
 
-If you would lik to contribute to the development of the plugin,
-Please get in touch via GitHub Issues, or some other method.
+- Latest Release (coming soon)
+- ChowMultiTool for iOS (coming soon)
+- [Nightly Builds](https://chowdsp.com/nightly.html#multitool)
 
 ## Tools:
 
@@ -21,9 +22,9 @@ Please get in touch via GitHub Issues, or some other method.
 - Signal Generator
 - Waveshaper
 - Band-Splitter
-- Pultec-style EQ
-- Brickwall filters
-- SVF
+- Analog-style EQ
+- Brickwall Filters
+- State Variable Filters
 
 ## Building
 
@@ -48,6 +49,7 @@ $ cmake --build build --config Release
 
 - Extra Icons - [FontAwesome](https://fontawesome.com/)
 - Math expression parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
+- UI Inspection - [melatonin_inspector](https://github.com/sudara/melatonin_inspector)
 
 ## License
 
