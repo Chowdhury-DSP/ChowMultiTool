@@ -15,6 +15,7 @@ but there may be breaking changes introduced in between now and version
 - Latest Release (coming soon)
 - ChowMultiTool for iOS (coming soon)
 - [Nightly Builds](https://chowdsp.com/nightly.html#multitool)
+- [TestFlight Builds](https://testflight.apple.com/join/KuFujgKZ)
 
 ## Tools:
 
@@ -25,6 +26,9 @@ but there may be breaking changes introduced in between now and version
 - Analog-style EQ
 - Brickwall Filters
 - State Variable Filters
+
+### Video walkthrough:
+[![Walkthrough video link](https://img.youtube.com/vi/9J8roV1Eoj0/0.jpg)](https://youtu.be/9J8roV1Eoj0)
 
 ## Building
 
