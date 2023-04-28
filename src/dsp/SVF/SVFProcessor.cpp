@@ -66,53 +66,62 @@ int SVFProcessor::getHighestNotePriority() const noexcept
     return currentPlayingNote;
 }
 
+void SVFProcessor::processKeytracking (const juce::MidiBuffer& midi) noexcept
+{
+    bool keytrackFrequencyNeedsUpdate = false;
+    for (const juce::MidiMessageMetadata midiMessageMetadata : midi)
+    {
+        const auto midiMessage = midiMessageMetadata.getMessage();
+        if (midiMessage.isNoteOn())
+        {
+            for (auto& note : playingNotes)
+            {
+                if (note == -1)
+                {
+                    note = midiMessage.getNoteNumber();
+                    break;
+                }
+            }
+            keytrackFrequencyNeedsUpdate = true;
+        }
+        else if (midiMessage.isNoteOff())
+        {
+            for (auto& note : playingNotes)
+            {
+                if (note == midiMessage.getNoteNumber())
+                {
+                    note = -1;
+                    break;
+                }
+            }
+            keytrackFrequencyNeedsUpdate = true;
+        }
+    }
+
+    if (keytrackFrequencyNeedsUpdate)
+    {
+        if (params.keytrackMonoMode->get() == KeytrackMonoMode::Highest_Note_Priority)
+            currentPlayingNote = getHighestNotePriority();
+        else if (params.keytrackMonoMode->get() == KeytrackMonoMode::Lowest_Note_Priority)
+            currentPlayingNote = getLowestNotePriority();
+
+        const auto midiNoteToHz = [] (float midiNoteNumber)
+        {
+            return 440.0f * std::pow (2.0f, (midiNoteNumber - 69.0f) / 12.0f);
+        };
+        cutoffSmooth.setTargetValue (midiNoteToHz ((float) currentPlayingNote + params.keytrackOffset->getCurrentValue()));
+    }
+}
+
 template <typename FilterType, typename... TestFilterTypes>
 constexpr bool IsOneOfFilters = std::disjunction<std::is_same<FilterType, TestFilterTypes>...>::value;
 
 void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept
 {
     if (params.keytrack->get())
-    {
-        bool keytrackFrequencyNeedsUpdate = false;
-        for (const juce::MidiMessageMetadata midiMessageMetadata : midi)
-        {
-            const auto midiMessage = midiMessageMetadata.getMessage();
-            if (midiMessage.isNoteOn())
-            {
-                for (auto& note : playingNotes)
-                {
-                    if (note == -1)
-                    {
-                        note = midiMessage.getNoteNumber();
-                        break;
-                    }
-                }
-                keytrackFrequencyNeedsUpdate = true;
-            }
-            else if (midiMessage.isNoteOff())
-            {
-                for (auto& note : playingNotes)
-                {
-                    if (note == midiMessage.getNoteNumber())
-                    {
-                        note = -1;
-                        break;
-                    }
-                }
-                keytrackFrequencyNeedsUpdate = true;
-            }
-        }
-
-        if (keytrackFrequencyNeedsUpdate)
-        {
-            currentPlayingNote = getHighestNotePriority();
-            cutoffSmooth.setTargetValue ((float) juce::MidiMessage::getMidiNoteInHertz (currentPlayingNote));
-        }
-    }
+        processKeytracking (midi);
     else
-    {
         cutoffSmooth.setTargetValue (*params.cutoff);
-    }
 
     qSmooth.setTargetValue (*params.qParam);
     modeSmooth.setTargetValue (*params.mode);

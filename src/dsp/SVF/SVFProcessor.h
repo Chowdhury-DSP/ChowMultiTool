@@ -18,6 +18,12 @@ enum class PlainType
     Bandpass = 4,
     MultiMode = 8,
 };
+
+enum class KeytrackMonoMode
+{
+    Highest_Note_Priority = 1,
+    Lowest_Note_Priority = 2,
+};
 } // namespace dsp::svf
 
 template <>
@@ -59,6 +65,8 @@ struct Params : public chowdsp::ParamHolder
     {
         add (cutoff,
              keytrack,
+             keytrackOffset,
+             keytrackMonoMode,
              qParam,
              mode,
              type,
@@ -69,17 +77,38 @@ struct Params : public chowdsp::ParamHolder
              wernerDamping);
     }
 
+    chowdsp::FreqHzParameter::Ptr cutoff {
+        juce::ParameterID { "svf_cutoff", ParameterVersionHints::version1_0_0 },
+        "SVF Cutoff",
+        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20'000.0f, 2000.0f),
+        1000.0f
+    };
+
     chowdsp::BoolParameter::Ptr keytrack {
         juce::ParameterID { "svf_keytrack", ParameterVersionHints::version1_0_0 },
         "SVF Keytrack",
         false
     };
 
-    chowdsp::FreqHzParameter::Ptr cutoff {
-        juce::ParameterID { "svf_cutoff", ParameterVersionHints::version1_0_0 },
-        "SVF Cutoff",
-        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20'000.0f, 2000.0f),
-        1000.0f
+    chowdsp::FloatParameter::Ptr keytrackOffset {
+        juce::ParameterID { "svf_keytrack_offset", ParameterVersionHints::version1_0_0 },
+        "SVF Keytrack Offset",
+        juce::NormalisableRange { -24.0f, 24.0f },
+        0.0f,
+        [] (float val) -> juce::String
+        {
+            auto baseString = chowdsp::ParamUtils::floatValToString (val);
+            if (val > 0.0f)
+                baseString = "+" + baseString;
+            return baseString + " st";
+        },
+        &chowdsp::ParamUtils::stringToFloatVal
+    };
+
+    chowdsp::EnumChoiceParameter<KeytrackMonoMode>::Ptr keytrackMonoMode {
+        juce::ParameterID { "svf_keytrack_mono_mode", ParameterVersionHints::version1_0_0 },
+        "SVF Keytrack Mono Mode",
+        KeytrackMonoMode::Highest_Note_Priority
     };
 
     chowdsp::FloatParameter::Ptr qParam {
@@ -146,6 +175,9 @@ public:
 
 private:
     void processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept;
+    void processKeytracking (const juce::MidiBuffer& midi) noexcept;
+    int getLowestNotePriority() const noexcept;
+    int getHighestNotePriority() const noexcept;
 
     const Params& params;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> cutoffSmooth;
@@ -166,8 +198,6 @@ private:
     static constexpr size_t maxPolyphony = 32;
     std::array<int, maxPolyphony> playingNotes {};
     int currentPlayingNote = 69;
-    int getLowestNotePriority() const noexcept;
-    int getHighestNotePriority() const noexcept;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFProcessor)
 };
