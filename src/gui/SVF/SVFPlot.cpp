@@ -30,7 +30,8 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp
     {
         processor.reset();
         juce::FloatVectorOperations::copy (output, input, numSamples);
-        processor.processBlock (chowdsp::BufferView<float> { output, numSamples });
+        juce::MidiBuffer midi {};
+        processor.processBlock (chowdsp::BufferView<float> { output, numSamples }, midi);
     };
 
     svfParams.doForAllParameters (

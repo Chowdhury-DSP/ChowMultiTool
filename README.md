@@ -47,7 +47,7 @@ $ cmake --build build --config Release
 
 ## Credits
 
-- Extra Icons - [FontAwesome](https://fontawesome.com/)
+- Extra Icons - [FontAwesome](https://fontawesome.com/) and [FontAudio](https://github.com/fefanto/fontaudio)
 - Math expression parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
 - UI Inspection - [melatonin_inspector](https://github.com/sudara/melatonin_inspector)
 

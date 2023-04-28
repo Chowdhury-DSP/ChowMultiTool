@@ -19,6 +19,8 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     modeSmooth.setCurrentAndTargetValue (*params.mode);
     dampingSmooth.reset (spec.sampleRate, 0.025);
     dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
+
+    std::fill (playingNotes.begin(), playingNotes.end(), -1);
 }
 
 void SVFProcessor::reset()
@@ -35,12 +37,83 @@ void SVFProcessor::reset()
     dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
 }
 
+int SVFProcessor::getLowestNotePriority() const noexcept
+{
+    int noteToPlay = 128;
+    for (auto note : playingNotes)
+    {
+        if (note > -1)
+            noteToPlay = std::min (noteToPlay, note);
+    }
+
+    if (noteToPlay < 128)
+        return noteToPlay;
+
+    return currentPlayingNote;
+}
+
+int SVFProcessor::getHighestNotePriority() const noexcept
+{
+    int noteToPlay = -1;
+    for (auto note : playingNotes)
+    {
+        noteToPlay = std::max (noteToPlay, note);
+    }
+
+    if (noteToPlay > -1)
+        return noteToPlay;
+
+    return currentPlayingNote;
+}
+
 template <typename FilterType, typename... TestFilterTypes>
 constexpr bool IsOneOfFilters = std::disjunction<std::is_same<FilterType, TestFilterTypes>...>::value;
 
-void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer) noexcept
+void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept
 {
-    cutoffSmooth.setTargetValue (*params.cutoff);
+    if (params.keytrack->get())
+    {
+        bool keytrackFrequencyNeedsUpdate = false;
+        for (const juce::MidiMessageMetadata midiMessageMetadata : midi)
+        {
+            const auto midiMessage = midiMessageMetadata.getMessage();
+            if (midiMessage.isNoteOn())
+            {
+                for (auto& note : playingNotes)
+                {
+                    if (note == -1)
+                    {
+                        note = midiMessage.getNoteNumber();
+                        break;
+                    }
+                }
+                keytrackFrequencyNeedsUpdate = true;
+            }
+            else if (midiMessage.isNoteOff())
+            {
+                for (auto& note : playingNotes)
+                {
+                    if (note == midiMessage.getNoteNumber())
+                    {
+                        note = -1;
+                        break;
+                    }
+                }
+                keytrackFrequencyNeedsUpdate = true;
+            }
+        }
+
+        if (keytrackFrequencyNeedsUpdate)
+        {
+            currentPlayingNote = getHighestNotePriority();
+            cutoffSmooth.setTargetValue ((float) juce::MidiMessage::getMidiNoteInHertz (currentPlayingNote));
+        }
+    }
+    else
+    {
+        cutoffSmooth.setTargetValue (*params.cutoff);
+    }
+
     qSmooth.setTargetValue (*params.qParam);
     modeSmooth.setTargetValue (*params.mode);
     dampingSmooth.setTargetValue (*params.wernerDamping);

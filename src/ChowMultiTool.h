@@ -11,8 +11,10 @@ public:
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
-    void processAudioBlock (juce::AudioBuffer<float>& buffer) override;
+    void processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer) override;
+    void processAudioBlock (juce::AudioBuffer<float>&) override {}
     bool isBusesLayoutSupported (const BusesLayout& layout) const override;
+    bool acceptsMidi() const override { return true; }
 
     juce::AudioProcessorEditor* createEditor() override;
 

@@ -58,6 +58,7 @@ struct Params : public chowdsp::ParamHolder
     Params()
     {
         add (cutoff,
+             keytrack,
              qParam,
              mode,
              type,
@@ -67,6 +68,12 @@ struct Params : public chowdsp::ParamHolder
              wernerType,
              wernerDamping);
     }
+
+    chowdsp::BoolParameter::Ptr keytrack {
+        juce::ParameterID { "svf_keytrack", ParameterVersionHints::version1_0_0 },
+        "SVF Keytrack",
+        false
+    };
 
     chowdsp::FreqHzParameter::Ptr cutoff {
         juce::ParameterID { "svf_cutoff", ParameterVersionHints::version1_0_0 },
@@ -135,7 +142,7 @@ public:
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
-    void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
+    void processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept;
 
 private:
     void processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept;
@@ -155,6 +162,12 @@ private:
 
     chowdsp::ARPFilter<float> arpFilter;
     chowdsp::WernerFilter wernerFilter;
+
+    static constexpr size_t maxPolyphony = 32;
+    std::array<int, maxPolyphony> playingNotes {};
+    int currentPlayingNote = 69;
+    int getLowestNotePriority() const noexcept;
+    int getHighestNotePriority() const noexcept;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFProcessor)
 };

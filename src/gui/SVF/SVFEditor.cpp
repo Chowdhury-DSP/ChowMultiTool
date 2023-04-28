@@ -7,6 +7,8 @@ namespace gui::svf
 SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp)
     : plot (pluginState, svfParams, hcp),
       paramControls (pluginState, svfParams),
+      keytrackButton ("Vector/fad-keyboard.svg", colours::plotColour, colours::linesColour),
+      keytrackAttach (svfParams.keytrack, pluginState, keytrackButton),
       arpLimitButton ("Vector/arrows-up-to-line-solid.svg", colours::plotColour, colours::linesColour),
       arpLimitAttach (svfParams.arpLimitMode, pluginState, arpLimitButton)
 {
@@ -16,6 +18,7 @@ SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const cho
     bottomBar = std::make_unique<BottomBar> (pluginState, svfParams);
     addAndMakeVisible (bottomBar.get());
 
+    addAndMakeVisible (keytrackButton);
     addChildComponent (arpLimitButton);
     arpLimitButton.setVisible (svfParams.type->get() == dsp::svf::SVFType::ARP);
     modeChangeCallback = pluginState.addParameterListener (svfParams.type,
@@ -45,6 +48,7 @@ void SVFEditor::resized()
 
     const auto pad = proportionOfWidth (0.005f);
     const auto buttonDim = proportionOfWidth (0.035f);
-    arpLimitButton.setBounds (bounds.getWidth() - pad - buttonDim, pad, buttonDim, buttonDim);
+    keytrackButton.setBounds (bounds.getWidth() - pad - buttonDim, pad, buttonDim, buttonDim);
+    arpLimitButton.setBounds (bounds.getWidth() - 2 * (pad + buttonDim), pad, buttonDim, buttonDim);
 }
 } // namespace gui::svf

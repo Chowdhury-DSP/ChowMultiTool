@@ -20,6 +20,8 @@ private:
     SVFParamControls paramControls;
     std::unique_ptr<BottomBar> bottomBar;
 
+    IconButton keytrackButton;
+    chowdsp::ButtonAttachment keytrackAttach;
     IconButton arpLimitButton;
     chowdsp::ButtonAttachment arpLimitAttach;
     chowdsp::ScopedCallback modeChangeCallback;
