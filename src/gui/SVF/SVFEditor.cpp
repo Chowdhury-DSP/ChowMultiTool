@@ -13,7 +13,7 @@ struct KeytrackButton : IconButton
     chowdsp::SharedLNFAllocator lnfAllocator;
     chowdsp::EnumChoiceParameter<Mode>* monoModeParam;
     std::optional<chowdsp::ParameterAttachment<chowdsp::EnumChoiceParameter<Mode>>> monoModeAttach;
-    juce::UndoManager* um;
+    juce::UndoManager* um = nullptr;
 
     void mouseDown (const juce::MouseEvent& e) override
     {
@@ -71,6 +71,7 @@ SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const cho
     auto* keytrackButtonCast = static_cast<KeytrackButton*> (keytrackButton.get()); // NOLINT
     keytrackButtonCast->monoModeParam = svfParams.keytrackMonoMode.get();
     keytrackButtonCast->monoModeAttach.emplace (*svfParams.keytrackMonoMode, pluginState, [](int){});
+    keytrackButtonCast->um = pluginState.undoManager;
 
     addChildComponent (arpLimitButton);
     arpLimitButton.setVisible (svfParams.type->get() == dsp::svf::SVFType::ARP);
@@ -81,8 +82,8 @@ SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const cho
                                                                arpLimitButton.setVisible (svfParams.type->get() == dsp::svf::SVFType::ARP);
                                                            });
 
-    keytrackButton->setTooltip ("Enable keytracking. Right-click to select different note priorities.");
-    arpLimitButton.setTooltip ("Turns on the ARP filter's \"Limit\" mode.");
+    keytrackButton->setTooltip ("Toggles keytrack mode. Right-click to select different note priorities.");
+    arpLimitButton.setTooltip ("Toggles the ARP filter's \"Limit\" mode.");
 }
 
 void SVFEditor::paint (juce::Graphics& g)

@@ -11,7 +11,7 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     arpFilter.prepare (spec);
     wernerFilter.prepare (spec);
 
-    cutoffSmooth.reset (spec.sampleRate, 0.025);
+    cutoffSmooth.reset (spec.sampleRate, 0.0025);
     cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
     qSmooth.reset (spec.sampleRate, 0.025);
     qSmooth.setCurrentAndTargetValue (*params.qParam);
@@ -68,7 +68,7 @@ int SVFProcessor::getHighestNotePriority() const noexcept
 
 void SVFProcessor::processKeytracking (const juce::MidiBuffer& midi) noexcept
 {
-    bool keytrackFrequencyNeedsUpdate = false;
+    bool currentNoteNeedsUpdate = false;
     for (const juce::MidiMessageMetadata midiMessageMetadata : midi)
     {
         const auto midiMessage = midiMessageMetadata.getMessage();
@@ -82,7 +82,7 @@ void SVFProcessor::processKeytracking (const juce::MidiBuffer& midi) noexcept
                     break;
                 }
             }
-            keytrackFrequencyNeedsUpdate = true;
+            currentNoteNeedsUpdate = true;
         }
         else if (midiMessage.isNoteOff())
         {
@@ -94,23 +94,23 @@ void SVFProcessor::processKeytracking (const juce::MidiBuffer& midi) noexcept
                     break;
                 }
             }
-            keytrackFrequencyNeedsUpdate = true;
+            currentNoteNeedsUpdate = true;
         }
     }
 
-    if (keytrackFrequencyNeedsUpdate)
+    if (currentNoteNeedsUpdate)
     {
         if (params.keytrackMonoMode->get() == KeytrackMonoMode::Highest_Note_Priority)
             currentPlayingNote = getHighestNotePriority();
         else if (params.keytrackMonoMode->get() == KeytrackMonoMode::Lowest_Note_Priority)
             currentPlayingNote = getLowestNotePriority();
-
-        const auto midiNoteToHz = [] (float midiNoteNumber)
-        {
-            return 440.0f * std::pow (2.0f, (midiNoteNumber - 69.0f) / 12.0f);
-        };
-        cutoffSmooth.setTargetValue (midiNoteToHz ((float) currentPlayingNote + params.keytrackOffset->getCurrentValue()));
     }
+    cutoffSmooth.setTargetValue (midiNoteToHz ((float) currentPlayingNote + params.keytrackOffset->getCurrentValue()));
+}
+
+float SVFProcessor::midiNoteToHz (float midiNoteNumber)
+{
+    return 440.0f * std::pow (2.0f, (midiNoteNumber - 69.0f) / 12.0f);
 }
 
 template <typename FilterType, typename... TestFilterTypes>

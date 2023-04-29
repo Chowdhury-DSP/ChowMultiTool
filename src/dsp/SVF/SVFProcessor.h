@@ -93,7 +93,7 @@ struct Params : public chowdsp::ParamHolder
     chowdsp::FloatParameter::Ptr keytrackOffset {
         juce::ParameterID { "svf_keytrack_offset", ParameterVersionHints::version1_0_0 },
         "SVF Keytrack Offset",
-        juce::NormalisableRange { -24.0f, 24.0f },
+        juce::NormalisableRange { -36.0f, 36.0f },
         0.0f,
         [] (float val) -> juce::String
         {
@@ -172,6 +172,8 @@ public:
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept;
+
+    static float midiNoteToHz (float midiNote);
 
 private:
     void processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept;

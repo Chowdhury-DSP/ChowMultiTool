@@ -3,6 +3,7 @@
 #include "dsp/SVF/SVFProcessor.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
+#include "SVFChyron.h"
 
 namespace gui::svf
 {
@@ -18,11 +19,22 @@ public:
 private:
     void timerCallback() override;
     void updatePlot();
+    void keytrackParamChanged (bool keytrackModeOn);
 
     chowdsp::GenericFilterPlotter filterPlotter;
     dsp::svf::SVFProcessor processor;
 
+    struct KeytrackDotSlider : SpectrumDotSlider
+    {
+        using SpectrumDotSlider::SpectrumDotSlider;
+        double proportionOfLengthToValue (double proportion) override;
+        double valueToProportionOfLength (double value) override;
+    };
+
     SpectrumDotSlider freqSlider;
+    KeytrackDotSlider keytrackSlider;
+
+    SVFChyron chyron;
 
     chowdsp::ScopedCallbackList callbacks;
 
