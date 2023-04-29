@@ -31,6 +31,5 @@ void SignalGenChyron::paint (juce::Graphics& g)
 
     g.setColour (colours::linesColour);
     g.drawRoundedRectangle (bounds.toFloat(), 2.5f, 1.0f);
-
 }
 } // namespace gui::signal_gen

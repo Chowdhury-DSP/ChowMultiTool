@@ -92,7 +92,7 @@ void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     recalculateLatency();
 }
 
-void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
+void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& midiBuffer)
 {
     const auto toolChoice = params.toolParam->getIndex() - 1;
     if (toolChoice < 0) // no tool!
@@ -106,7 +106,7 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
 
     chowdsp::TupleHelpers::visit_at (tools,
                                      (size_t) toolChoice,
-                                     [this, &buffer] (auto& tool)
+                                     [this, &buffer, &midiBuffer] (auto& tool)
                                      {
                                          using ToolType [[maybe_unused]] = std::decay_t<decltype (tool)>;
                                          if constexpr (std::is_same_v<ToolType, band_splitter::BandSplitterProcessor>)
@@ -120,6 +120,14 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer)
                                              auto midBuffer = plugin.getBusBuffer (buffer, false, 2);
                                              auto highBuffer = plugin.getBusBuffer (buffer, false, 3);
                                              tool.processBlock (inBuffer, lowBuffer, midBuffer, highBuffer);
+                                         }
+                                         else if constexpr (std::is_same_v<ToolType, svf::SVFProcessor>)
+                                         {
+                                             auto busBuffer = plugin.getBusBuffer (buffer, true, 0);
+                                             tool.processBlock (busBuffer, midiBuffer);
+
+                                             for (int ch = busBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
+                                                 buffer.clear (ch, 0, buffer.getNumSamples());
                                          }
                                          else
                                          {

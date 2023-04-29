@@ -20,9 +20,13 @@ private:
     SVFParamControls paramControls;
     std::unique_ptr<BottomBar> bottomBar;
 
+    std::unique_ptr<IconButton> keytrackButton;
+    chowdsp::ButtonAttachment keytrackAttach;
     IconButton arpLimitButton;
     chowdsp::ButtonAttachment arpLimitAttach;
     chowdsp::ScopedCallback modeChangeCallback;
+
+    juce::TooltipWindow tooltips { this, 300 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SVFEditor)
 };

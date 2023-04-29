@@ -96,16 +96,13 @@ juce::Rectangle<float> SpectrumDotSlider::getThumbBounds() const noexcept
     {
         if (getSliderStyle() == LinearHorizontal)
         {
-            if (getYCoordinate == nullptr)
-            {
-                return juce::Point { plotBase.getXCoordinateForFrequency (param.get()),
-                                     plotBase.getYCoordinateForDecibels (0.0f) };
-            }
-            else
-            {
-                return juce::Point { plotBase.getXCoordinateForFrequency (param.get()),
-                                     getYCoordinate() };
-            }
+            const auto xCoord = getXCoordinate != nullptr
+                                    ? getXCoordinate()
+                                    : plotBase.getXCoordinateForFrequency (param.get());
+            const auto yCoord = getYCoordinate != nullptr
+                                    ? getYCoordinate()
+                                    : plotBase.getYCoordinateForDecibels (0.0f);
+            return juce::Point { xCoord, yCoord };
         }
         else if (getSliderStyle() == LinearVertical)
         {
