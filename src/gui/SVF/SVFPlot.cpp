@@ -16,7 +16,7 @@ namespace
 
 double SVFPlot::KeytrackDotSlider::proportionOfLengthToValue (double proportion)
 {
-    const auto freqToMidiNote = [](float freqHz)
+    const auto freqToMidiNote = [] (float freqHz)
     {
         return 12.0f * std::log2 (freqHz / 440.0f) + 69.0f;
     };

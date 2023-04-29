@@ -18,7 +18,7 @@ namespace gui::logo::colours
 using namespace gui::colours;
 const auto accentRed = juce::Colour { 0xFFC03221 };
 const auto backgroundBlue = juce::Colour { 0xFF4B8F8C };
-} // namespace gui::brickwall::colours
+} // namespace gui::logo::colours
 
 namespace gui::band_splitter::colours
 {

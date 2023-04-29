@@ -1,6 +1,6 @@
 #include "InitPage.h"
-#include "gui/Shared/Colours.h"
 #include "ChowMultiTool.h"
+#include "gui/Shared/Colours.h"
 
 namespace gui::init
 {

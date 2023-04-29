@@ -1,9 +1,9 @@
 #pragma once
 
+#include "SVFChyron.h"
 #include "dsp/SVF/SVFProcessor.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
-#include "SVFChyron.h"
 
 namespace gui::svf
 {

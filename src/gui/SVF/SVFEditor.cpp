@@ -70,7 +70,7 @@ SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const cho
     addAndMakeVisible (keytrackButton.get());
     auto* keytrackButtonCast = static_cast<KeytrackButton*> (keytrackButton.get()); // NOLINT
     keytrackButtonCast->monoModeParam = svfParams.keytrackMonoMode.get();
-    keytrackButtonCast->monoModeAttach.emplace (*svfParams.keytrackMonoMode, pluginState, [](int){});
+    keytrackButtonCast->monoModeAttach.emplace (*svfParams.keytrackMonoMode, pluginState, [] (int) {});
     keytrackButtonCast->um = pluginState.undoManager;
 
     addChildComponent (arpLimitButton);

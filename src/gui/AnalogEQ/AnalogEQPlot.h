@@ -1,8 +1,8 @@
 #pragma once
 
+#include "EQChyron.h"
 #include "dsp/AnalogEQ/AnalogEQProcessor.h"
 #include "state/PluginState.h"
-#include "EQChyron.h"
 
 namespace gui::analog_eq
 {

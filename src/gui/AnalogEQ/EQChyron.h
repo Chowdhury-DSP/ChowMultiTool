@@ -44,4 +44,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQChyron)
 };
-} // namespace gui::eq
+} // namespace gui::analog_eq
