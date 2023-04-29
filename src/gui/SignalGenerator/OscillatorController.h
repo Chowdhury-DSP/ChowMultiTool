@@ -1,10 +1,10 @@
 #pragma once
 
 #include "OscillatorPlot.h"
+#include "SignalGenChyron.h"
 #include "dsp/SignalGenerator/SignalGeneratorProcessor.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
-#include "SignalGenChyron.h"
 
 namespace gui::signal_gen
 {

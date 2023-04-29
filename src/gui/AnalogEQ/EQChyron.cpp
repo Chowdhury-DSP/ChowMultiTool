@@ -138,7 +138,7 @@ void EQChyron::paint (juce::Graphics& g)
     if (band != EQBand::None)
     {
         const auto labelBounds = bounds.withHeight (proportionOfHeight (labelHeightFactor));
-        const auto labelText = [this] () -> juce::String
+        const auto labelText = [this]() -> juce::String
         {
             if (band == EQBand::Bass)
                 return "Bass";

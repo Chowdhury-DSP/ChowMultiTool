@@ -17,7 +17,6 @@ public:
     std::function<bool (const juce::ModifierKeys&)> checkModifierKeys = [] (const juce::ModifierKeys& mods)
     { return ! mods.isAnyModifierKeyDown(); };
 
-
 protected:
     chowdsp::FloatParameter& param;
     const chowdsp::HostContextProvider* hostContextProvider = nullptr;

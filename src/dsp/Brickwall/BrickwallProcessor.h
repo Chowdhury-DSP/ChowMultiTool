@@ -28,7 +28,7 @@ enum class FilterType
     ChebyshevII = 2,
     Elliptic = 4,
 };
-}
+} // namespace dsp::brickwall
 
 template <>
 constexpr magic_enum::customize::customize_t

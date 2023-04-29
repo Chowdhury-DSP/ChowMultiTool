@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "gui/Shared/Fonts.h"
+#include <pch.h>
 
 namespace gui::presets
 {
@@ -15,4 +15,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComponent)
 };
-}
+} // namespace gui::presets

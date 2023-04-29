@@ -27,7 +27,7 @@ public:
     MultiToolProcessor (juce::AudioProcessor& plugin, State& pluginState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
-    void processBlock (juce::AudioBuffer<float>& buffer);
+    void processBlock (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& midiBuffer);
 
 private:
     void recalculateLatency();

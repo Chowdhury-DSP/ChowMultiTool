@@ -1,7 +1,7 @@
 #include "BrickwallPlot.h"
 #include "gui/Shared/Colours.h"
-#include "gui/Shared/LookAndFeels.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace
 {

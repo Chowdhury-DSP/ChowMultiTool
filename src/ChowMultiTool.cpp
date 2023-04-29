@@ -48,9 +48,14 @@ void ChowMultiTool::prepareToPlay (double sampleRate, int samplesPerBlock)
     processor.prepare ({ sampleRate, (uint32_t) samplesPerBlock, (uint32_t) getMainBusNumInputChannels() });
 }
 
-void ChowMultiTool::processAudioBlock (juce::AudioBuffer<float>& buffer)
+void ChowMultiTool::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiBuffer)
 {
-    processor.processBlock (buffer);
+    juce::ScopedNoDenormals noDenormals;
+
+    state.getParameterListeners().callAudioThreadBroadcasters();
+
+    processor.processBlock (buffer, midiBuffer);
+
     chowdsp::BufferMath::sanitizeBuffer (buffer);
 }
 

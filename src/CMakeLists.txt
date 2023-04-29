@@ -60,6 +60,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/SVF/SVFEditor.cpp
     gui/SVF/SVFPlot.cpp
     gui/SVF/SVFParamControls.cpp
+    gui/SVF/SVFChyron.cpp
     gui/SVF/BottomBar.cpp
 
     gui/Shared/DotSlider.cpp

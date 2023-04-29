@@ -11,4 +11,4 @@ PresetsComponent::PresetsComponent (chowdsp::presets::PresetManager& presetMgr, 
     presetNameDisplay.setFont (juce::Font { fonts->robotoBold }.withHeight (18.0f));
     presetNameEditor.setFont (juce::Font { fonts->robotoBold }.withHeight (18.0f));
 }
-}
+} // namespace gui::presets

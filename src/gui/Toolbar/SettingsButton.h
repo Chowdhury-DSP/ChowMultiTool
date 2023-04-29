@@ -19,7 +19,7 @@ private:
 
     chowdsp::SharedPluginSettings pluginSettings;
     chowdsp::SharedLNFAllocator lnfAllocator;
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButton)
 };
-}
+} // namespace gui

@@ -8,7 +8,7 @@ static constexpr auto TOL = chowdsp::ScientificRatio<1, -2>::value<double>;
 {
     const auto arg = xsimd::max (xsimd::abs (x), xsimd::broadcast (5.0 * std::numeric_limits<double>::epsilon()));
     const auto y = xsimd::log (arg);
-//    jassert (! xsimd::any (xsimd::isnan (y)));
+    //    jassert (! xsimd::any (xsimd::isnan (y)));
     return y;
 }
 
