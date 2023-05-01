@@ -11,6 +11,11 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     arpFilter.prepare (spec);
     wernerFilter.prepare (spec);
 
+    driveInGain.prepare (spec);
+    driveInGain.setRampDurationSeconds (0.025);
+    driveOutGain.prepare (spec);
+    driveOutGain.setRampDurationSeconds (0.025);
+
     cutoffSmooth.reset (spec.sampleRate, 0.0025);
     cutoffSmooth.setCurrentAndTargetValue (*params.cutoff);
     qSmooth.reset (spec.sampleRate, 0.025);
@@ -197,6 +202,9 @@ void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) 
         const auto resonance = params.qParam->convertTo0to1 (qSmooth.getCurrentValue());
         wernerFilter.calcCoeffs (cutoffSmooth.getCurrentValue(), dampingSmooth.getCurrentValue(), resonance);
 
+        driveInGain.setGainDecibels (-24.0f + 48.0f * params.wernerDrive->getCurrentValue());
+        driveInGain.process (buffer);
+
         magic_enum::enum_switch (
             [this, &buffer] (auto subType)
             {
@@ -212,6 +220,9 @@ void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) 
                 }
             },
             params.wernerType->get());
+
+        driveOutGain.setGainDecibels (juce::jmax (0.0f, -driveInGain.getGainDecibels()) + 6.0f);
+        driveOutGain.process (buffer);
     }
 }
 } // namespace dsp::svf

@@ -74,7 +74,8 @@ struct Params : public chowdsp::ParamHolder
              arpType,
              arpLimitMode,
              wernerType,
-             wernerDamping);
+             wernerDamping,
+             wernerDrive);
     }
 
     chowdsp::FreqHzParameter::Ptr cutoff {
@@ -114,8 +115,8 @@ struct Params : public chowdsp::ParamHolder
     chowdsp::FloatParameter::Ptr qParam {
         juce::ParameterID { "svf_q_value", ParameterVersionHints::version1_0_0 },
         "SVF Q",
-        chowdsp::ParamUtils::createNormalisableRange (0.5f, 20.0f, 2.5f),
-        chowdsp::CoefficientCalculators::butterworthQ<float>,
+        chowdsp::ParamUtils::createNormalisableRange (0.5f, 30.0f, 5.0f),
+        5.0f,
         &chowdsp::ParamUtils::floatValToString,
         &chowdsp::ParamUtils::stringToFloatVal
     };
@@ -162,6 +163,12 @@ struct Params : public chowdsp::ParamHolder
         "SVF Werner Damping",
         0.5f,
     };
+
+    chowdsp::PercentParameter::Ptr wernerDrive {
+        juce::ParameterID { "svf_werner_drive", ParameterVersionHints::version1_0_0 },
+        "SVF Werner Drive",
+        0.0f,
+    };
 };
 
 class SVFProcessor
@@ -196,6 +203,8 @@ private:
 
     chowdsp::ARPFilter<float> arpFilter;
     chowdsp::WernerFilter wernerFilter;
+
+    chowdsp::Gain<float> driveInGain, driveOutGain;
 
     static constexpr size_t maxPolyphony = 32;
     std::array<int, maxPolyphony> playingNotes {};

@@ -18,8 +18,8 @@ private:
 
     const dsp::svf::Params& svfParams;
 
-    juce::Slider modeSlider, qSlider, dampingSlider;
-    chowdsp::SliderAttachment modeAttach, qAttach, dampingAttach;
+    juce::Slider modeSlider, qSlider, dampingSlider, driveSlider;
+    chowdsp::SliderAttachment modeAttach, qAttach, dampingAttach, driveAttach;
 
     chowdsp::ScopedCallbackList callbacks;
 
