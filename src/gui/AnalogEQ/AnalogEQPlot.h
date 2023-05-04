@@ -17,10 +17,19 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
+    enum class BandID
+    {
+        None,
+        Low,
+        High_Cut,
+        High_Boost,
+    };
+
 private:
     void mouseDown (const juce::MouseEvent& e) override;
 
     void updatePlot();
+    void setSelectedBand (BandID bandID);
 
     chowdsp::GenericFilterPlotter filterPlotter;
     dsp::analog_eq::AnalogEQProcessor pultecEQ;

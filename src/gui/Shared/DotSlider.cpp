@@ -114,7 +114,7 @@ juce::Rectangle<float> SpectrumDotSlider::getThumbBounds() const noexcept
         return {};
     }();
 
-    const auto dim = plotBase.getLocalBounds().proportionOfWidth (0.025f);
+    const auto dim = plotBase.getLocalBounds().proportionOfWidth (widthProportion);
     return juce::Rectangle { dim, dim }
         .toFloat()
         .withCentre (centre);

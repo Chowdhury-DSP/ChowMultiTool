@@ -69,6 +69,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/Shared/ErrorMessageView.cpp
     gui/Shared/TextSlider.cpp
     gui/Shared/LookAndFeels.cpp
+    gui/Shared/VerticalSlider.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

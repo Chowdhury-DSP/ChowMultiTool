@@ -53,6 +53,7 @@ public:
     std::function<float()> getYCoordinate = nullptr;
 
     const chowdsp::SpectrumPlotBase& plotBase;
+    float widthProportion = 0.025f;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumDotSlider)

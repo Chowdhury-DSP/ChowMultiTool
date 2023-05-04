@@ -12,6 +12,24 @@ namespace
     constexpr int blockSize = 1 << fftOrder;
     constexpr int minFrequency = 16;
     constexpr int maxFrequency = 22'000;
+    constexpr auto thumbSizeFactor = 0.03f;
+
+    struct SelectableDotSlider : SpectrumDotSlider
+    {
+        using SpectrumDotSlider::SpectrumDotSlider;
+        bool isSelected = false;
+        AnalogEQPlot::BandID bandID = AnalogEQPlot::BandID::None;
+        void paint (juce::Graphics& g) override
+        {
+            SpectrumDotSlider::paint (g);
+
+            if (isSelected)
+            {
+                g.setColour (findColour (juce::Slider::thumbColourId));
+                g.drawEllipse (getThumbBounds().expanded (2.0f), 1.0f);
+            }
+        }
+    };
 
     template <typename T, typename B, typename... Args>
     T& make_unique_component (std::unique_ptr<B>& ptr, Args&&... args)
@@ -57,59 +75,86 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                 };
         });
 
-    auto& lfControl = make_unique_component<gui::SpectrumDotSlider> (lowFreqControl,
-                                                                     *pultecParams.bassFreqParam,
-                                                                     pluginState,
-                                                                     *this,
-                                                                     gui::SpectrumDotSlider::FrequencyOriented,
-                                                                     &hcp);
+    callbacks += {
+        pluginState.addParameterListener (*pultecParams.bassFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::Low); }),
+        pluginState.addParameterListener (*pultecParams.bassBoostParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::Low); }),
+        pluginState.addParameterListener (*pultecParams.bassCutParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::Low); }),
+        pluginState.addParameterListener (*pultecParams.trebleCutFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::High_Cut); }),
+        pluginState.addParameterListener (*pultecParams.trebleCutParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::High_Cut); }),
+        pluginState.addParameterListener (*pultecParams.trebleBoostFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::High_Boost); }),
+        pluginState.addParameterListener (*pultecParams.trebleBoostParam, chowdsp::ParameterListenerThread::MessageThread, [this]
+                                          { setSelectedBand (BandID::High_Boost); }),
+    };
+
+    auto& lfControl = make_unique_component<SelectableDotSlider> (lowFreqControl,
+                                                                  *pultecParams.bassFreqParam,
+                                                                  pluginState,
+                                                                  *this,
+                                                                  gui::SpectrumDotSlider::FrequencyOriented,
+                                                                  &hcp);
     lfControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    lfControl.widthProportion = thumbSizeFactor;
+    lfControl.bandID = BandID::Low;
     addAndMakeVisible (lfControl);
 
-    auto& lbControl = make_unique_component<gui::SpectrumDotSlider> (lowBoostControl,
-                                                                     *pultecParams.bassBoostParam,
-                                                                     pluginState,
-                                                                     *this,
-                                                                     gui::SpectrumDotSlider::MagnitudeOriented,
-                                                                     &hcp);
+    auto& lbControl = make_unique_component<SelectableDotSlider> (lowBoostControl,
+                                                                  *pultecParams.bassBoostParam,
+                                                                  pluginState,
+                                                                  *this,
+                                                                  gui::SpectrumDotSlider::MagnitudeOriented,
+                                                                  &hcp);
     lbControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    lbControl.widthProportion = thumbSizeFactor;
+    lbControl.bandID = BandID::Low;
     lbControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 0.9f);
     };
     addAndMakeVisible (lbControl);
 
-    auto& lcControl = make_unique_component<gui::SpectrumDotSlider> (lowCutControl,
-                                                                     *pultecParams.bassCutParam,
-                                                                     pluginState,
-                                                                     *this,
-                                                                     gui::SpectrumDotSlider::MagnitudeOriented,
-                                                                     &hcp);
+    auto& lcControl = make_unique_component<SelectableDotSlider> (lowCutControl,
+                                                                  *pultecParams.bassCutParam,
+                                                                  pluginState,
+                                                                  *this,
+                                                                  gui::SpectrumDotSlider::MagnitudeOriented,
+                                                                  &hcp);
     lcControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
+    lcControl.widthProportion = thumbSizeFactor;
+    lcControl.bandID = BandID::Low;
     lcControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.9f);
     };
     addAndMakeVisible (lcControl);
 
-    auto& highBoostGain = make_unique_component<gui::SpectrumDotSlider> (highBoostControl,
-                                                                         *pultecParams.trebleBoostParam,
-                                                                         pluginState,
-                                                                         *this,
-                                                                         gui::SpectrumDotSlider::MagnitudeOriented);
+    auto& highBoostGain = make_unique_component<SelectableDotSlider> (highBoostControl,
+                                                                      *pultecParams.trebleBoostParam,
+                                                                      pluginState,
+                                                                      *this,
+                                                                      gui::SpectrumDotSlider::MagnitudeOriented);
     highBoostGain.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+    highBoostGain.widthProportion = thumbSizeFactor;
+    highBoostGain.bandID = BandID::High_Boost;
     highBoostGain.getXCoordinate = [this, &trebleBoostFreqParam = *pultecParams.trebleBoostFreqParam]
     {
         return getXCoordinateForFrequency (trebleBoostFreqParam.get());
     };
     addAndMakeVisible (highBoostGain);
 
-    auto& highBoostFreq = make_unique_component<gui::SpectrumDotSlider> (highBoostFreqControl,
-                                                                         *pultecParams.trebleBoostFreqParam,
-                                                                         pluginState,
-                                                                         *this,
-                                                                         gui::SpectrumDotSlider::FrequencyOriented);
+    auto& highBoostFreq = make_unique_component<SelectableDotSlider> (highBoostFreqControl,
+                                                                      *pultecParams.trebleBoostFreqParam,
+                                                                      pluginState,
+                                                                      *this,
+                                                                      gui::SpectrumDotSlider::FrequencyOriented);
     highBoostFreq.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
+    highBoostFreq.widthProportion = thumbSizeFactor;
+    highBoostFreq.bandID = BandID::High_Boost;
     highBoostFreq.getYCoordinate = [this, &trebleBoostParam = *pultecParams.trebleBoostParam]
     {
         return getYCoordinateForDecibels (trebleBoostParam.get());
@@ -121,24 +166,28 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
     highBoostFull.hostContextProvider = &hcp;
     addAndMakeVisible (highBoostFull);
 
-    auto& highCutGain = make_unique_component<gui::SpectrumDotSlider> (highCutControl,
-                                                                       *pultecParams.trebleCutParam,
-                                                                       pluginState,
-                                                                       *this,
-                                                                       gui::SpectrumDotSlider::MagnitudeOriented);
+    auto& highCutGain = make_unique_component<SelectableDotSlider> (highCutControl,
+                                                                    *pultecParams.trebleCutParam,
+                                                                    pluginState,
+                                                                    *this,
+                                                                    gui::SpectrumDotSlider::MagnitudeOriented);
     highCutGain.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    highCutGain.widthProportion = thumbSizeFactor;
+    highCutGain.bandID = BandID::High_Cut;
     highCutGain.getXCoordinate = [this, &trebleCutFreqParam = *pultecParams.trebleCutFreqParam]
     {
         return getXCoordinateForFrequency (trebleCutFreqParam.get());
     };
     addAndMakeVisible (highCutGain);
 
-    auto& highCutFreq = make_unique_component<gui::SpectrumDotSlider> (highCutFreqControl,
-                                                                       *pultecParams.trebleCutFreqParam,
-                                                                       pluginState,
-                                                                       *this,
-                                                                       gui::SpectrumDotSlider::FrequencyOriented);
+    auto& highCutFreq = make_unique_component<SelectableDotSlider> (highCutFreqControl,
+                                                                    *pultecParams.trebleCutFreqParam,
+                                                                    pluginState,
+                                                                    *this,
+                                                                    gui::SpectrumDotSlider::FrequencyOriented);
     highCutFreq.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
+    highCutFreq.widthProportion = thumbSizeFactor;
+    highCutFreq.bandID = BandID::High_Cut;
     highCutFreq.getYCoordinate = [this, &trebleCutParam = *pultecParams.trebleCutParam]
     {
         return getYCoordinateForDecibels (trebleCutParam.get());
@@ -162,6 +211,22 @@ void AnalogEQPlot::updatePlot()
 {
     filterPlotter.updateFilterPlot();
     repaint();
+}
+
+void AnalogEQPlot::setSelectedBand (BandID band)
+{
+    for (juce::Slider* slider : { lowFreqControl.get(),
+                                  lowBoostControl.get(),
+                                  lowCutControl.get(),
+                                  highBoostControl.get(),
+                                  highCutControl.get(),
+                                  highBoostFreqControl.get(),
+                                  highCutFreqControl.get() })
+    {
+        auto* sliderCast = static_cast<SelectableDotSlider*> (slider); // NOLINT
+        sliderCast->isSelected = sliderCast->bandID == band;
+        sliderCast->repaint();
+    }
 }
 
 void AnalogEQPlot::paint (juce::Graphics& g)

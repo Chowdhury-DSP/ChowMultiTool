@@ -19,6 +19,7 @@ OscillatorController::OscillatorController (State& state, const chowdsp::HostCon
         return plot.getXCoordinateForFrequency (state.params.signalGenParams->frequency->get());
     };
     gainSlider.setColour (juce::Slider::thumbColourId, colours::thumbColour);
+    gainSlider.widthProportion = 0.0375f;
     addAndMakeVisible (gainSlider);
 
     freqSlider.getYCoordinate = [this, &state]
@@ -26,6 +27,7 @@ OscillatorController::OscillatorController (State& state, const chowdsp::HostCon
         return plot.getYCoordinateForDecibels (state.params.signalGenParams->gain->get());
     };
     freqSlider.setColour (juce::Slider::thumbColourId, colours::thumbColour);
+    freqSlider.widthProportion = 0.0375f;
     addAndMakeVisible (freqSlider);
 
     sliders.setSliders ({ &gainSlider, &freqSlider });
