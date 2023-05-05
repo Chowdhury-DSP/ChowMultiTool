@@ -1,10 +1,15 @@
 #include "SVFParamControls.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/Fonts.h"
 
 namespace gui::svf
 {
-SVFParamControls::SVFParamControls (State& pluginState, dsp::svf::Params& params)
+SVFParamControls::SVFParamControls (State& pluginState, dsp::svf::Params& params, const chowdsp::HostContextProvider& hcp)
     : svfParams (params),
+      modeSlider (*params.mode, hcp),
+      qSlider (*params.qParam, hcp),
+      dampingSlider (*params.wernerDamping, hcp),
+      driveSlider (*params.wernerDrive, hcp),
       modeAttach (*params.mode, pluginState, modeSlider),
       qAttach (*params.qParam, pluginState, qSlider),
       dampingAttach (*params.wernerDamping, pluginState, dampingSlider),
@@ -12,8 +17,8 @@ SVFParamControls::SVFParamControls (State& pluginState, dsp::svf::Params& params
 {
     for (auto* slider : { &modeSlider, &qSlider, &dampingSlider, &driveSlider })
     {
-        slider->setSliderStyle (juce::Slider::LinearVertical);
-        slider->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 15);
+        slider->setColour (juce::Slider::thumbColourId, colours::boxColour);
+        slider->setColour (juce::Slider::textBoxHighlightColourId, colours::boxColour.withAlpha (0.5f));
         addChildComponent (*slider);
     }
 
@@ -49,33 +54,37 @@ void SVFParamControls::paint (juce::Graphics& g)
     g.fillAll (colours::backgroundDark);
 
     g.setColour (colours::linesColour);
-    auto bounds = getLocalBounds();
+    auto labelBounds = getLocalBounds().removeFromTop (proportionOfHeight (0.05f));
+
+    g.setFont (juce::Font { SharedFonts{}->robotoBold }.withHeight (0.85f * (float) labelBounds.getHeight()));
+    g.setColour (colours::linesColour);
 
     if (modeSlider.isVisible() && dampingSlider.isVisible())
     {
         const auto quarterWidth = proportionOfWidth (0.25f);
-        g.drawFittedText ("Damp", bounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
-        g.drawFittedText ("Drive", bounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
-        g.drawFittedText ("Mode", bounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Damp", labelBounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Drive", labelBounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Mode", labelBounds.removeFromLeft (quarterWidth), juce::Justification::centredTop, 1);
     }
     else if (dampingSlider.isVisible())
     {
         const auto thirdWidth = proportionOfWidth (1.0f / 3.0f);
-        g.drawFittedText ("Damp", bounds.removeFromLeft (thirdWidth), juce::Justification::centredTop, 1);
-        g.drawFittedText ("Drive", bounds.removeFromLeft (thirdWidth), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Damp", labelBounds.removeFromLeft (thirdWidth), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Drive", labelBounds.removeFromLeft (thirdWidth), juce::Justification::centredTop, 1);
     }
     else if (modeSlider.isVisible())
     {
-        g.drawFittedText ("Mode", bounds.removeFromLeft (proportionOfWidth (0.5f)), juce::Justification::centredTop, 1);
+        g.drawFittedText ("Mode", labelBounds.removeFromLeft (proportionOfWidth (0.5f)), juce::Justification::centredTop, 1);
     }
 
-    g.drawFittedText ("Q", bounds, juce::Justification::centredTop, 1);
+    g.drawFittedText ("Q", labelBounds, juce::Justification::centredTop, 1);
 }
 
 void SVFParamControls::resized()
 {
     auto bounds = getLocalBounds();
     bounds.removeFromTop (proportionOfHeight (0.05f));
+    const auto textBoxHeight = proportionOfHeight (0.04f);
 
     if (modeSlider.isVisible() && dampingSlider.isVisible())
     {
@@ -83,18 +92,28 @@ void SVFParamControls::resized()
         dampingSlider.setBounds (bounds.removeFromLeft (quarterWidth));
         driveSlider.setBounds (bounds.removeFromLeft (quarterWidth));
         modeSlider.setBounds (bounds.removeFromLeft (quarterWidth));
+
+        dampingSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, quarterWidth, textBoxHeight);
+        driveSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, quarterWidth, textBoxHeight);
+        modeSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, quarterWidth, textBoxHeight);
     }
     else if (dampingSlider.isVisible())
     {
         const auto thirdWidth = proportionOfWidth (1.0f / 3.0f);
         dampingSlider.setBounds (bounds.removeFromLeft (thirdWidth));
         driveSlider.setBounds (bounds.removeFromLeft (thirdWidth));
+
+        dampingSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, thirdWidth, textBoxHeight);
+        driveSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, thirdWidth, textBoxHeight);
     }
     else if (modeSlider.isVisible())
     {
-        modeSlider.setBounds (bounds.removeFromLeft (proportionOfWidth (0.5f)));
+        const auto halfWidth = proportionOfWidth (0.5f);
+        modeSlider.setBounds (bounds.removeFromLeft (halfWidth));
+        modeSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, halfWidth, textBoxHeight);
     }
 
     qSlider.setBounds (bounds);
+    qSlider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, qSlider.getWidth(), textBoxHeight);
 }
 } // namespace gui::svf

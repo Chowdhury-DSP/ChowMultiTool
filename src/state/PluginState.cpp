@@ -49,7 +49,8 @@ PluginExtraState::PluginExtraState()
 
     addStateValues ({ &waveshaperExtraState->freeDrawState,
                       &waveshaperExtraState->mathState,
-                      &waveshaperExtraState->pointsState });
+                      &waveshaperExtraState->pointsState,
+                      &editorBounds });
 }
 
 PluginExtraState::~PluginExtraState() = default;

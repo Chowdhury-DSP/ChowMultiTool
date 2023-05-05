@@ -2,13 +2,14 @@
 
 #include "dsp/SVF/SVFProcessor.h"
 #include "state/PluginState.h"
+#include "gui/Shared/VerticalSlider.h"
 
 namespace gui::svf
 {
 class SVFParamControls : public juce::Component
 {
 public:
-    SVFParamControls (State& pluginState, dsp::svf::Params& svfParams);
+    SVFParamControls (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp);
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -18,7 +19,7 @@ private:
 
     const dsp::svf::Params& svfParams;
 
-    juce::Slider modeSlider, qSlider, dampingSlider, driveSlider;
+    VerticalSlider modeSlider, qSlider, dampingSlider, driveSlider;
     chowdsp::SliderAttachment modeAttach, qAttach, dampingAttach, driveAttach;
 
     chowdsp::ScopedCallbackList callbacks;

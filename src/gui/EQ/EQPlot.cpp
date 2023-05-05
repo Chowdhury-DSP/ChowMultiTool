@@ -63,6 +63,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                 *this,
                                 SpectrumDotSlider::Orientation::FrequencyOriented);
         addChildComponent (*freqSliders[i]);
+        freqSliders[i]->widthProportion = 0.03f;
         freqSliders[i]->getYCoordinate = [this, i, &eqParameters]
         {
             return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
@@ -77,6 +78,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                 *this,
                                 SpectrumDotSlider::Orientation::MagnitudeOriented);
         addChildComponent (*gainSliders[i]);
+        gainSliders[i]->widthProportion = 0.03f;
         gainSliders[i]->getXCoordinate = [this, i, &eqParameters]
         {
             return getXCoordinateForFrequency (eqParameters.eqParams[i].freqParam->get());
@@ -92,6 +94,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
         { return mods.isCommandDown(); };
         qSliders[i]->setVelocityModeParameters (1.0, 1, 0.0, true, juce::ModifierKeys::altModifier);
         addChildComponent (*qSliders[i]);
+        qSliders[i]->widthProportion = 0.03f;
         qSliders[i]->getYCoordinate = [this, i, &eqParameters]
         {
             return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
@@ -198,8 +201,8 @@ void EQPlot::resized()
         group.setBounds (getLocalBounds());
 
     const auto pad = proportionOfWidth (0.005f);
-    const auto chyronWidth = proportionOfWidth (0.135f);
-    const auto chyronHeight = proportionOfWidth (0.085f);
+    const auto chyronWidth = proportionOfWidth (0.14f);
+    const auto chyronHeight = proportionOfWidth (0.1f);
     chyron.setBounds (getWidth() - pad - chyronWidth,
                       getHeight() - pad - chyronHeight - proportionOfHeight (0.075f),
                       chyronWidth,

@@ -65,5 +65,5 @@ namespace gui::svf::colours
 {
 using namespace gui::colours;
 const auto plotColour = juce::Colour { 0xFFC70C0C };
-const auto boxColour = juce::Colour { 0xFF0b7189 };
+const auto boxColour = juce::Colour { 0xFF0b7189 }.brighter (0.15f);
 } // namespace gui::svf::colours

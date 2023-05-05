@@ -21,7 +21,8 @@ bool DotSlider::hitTest (int x, int y)
 {
     if (! isVisible())
         return false;
-    return getThumbBounds().contains ((float) x, (float) y);
+    const auto expandDim = 0.025f * (float) getWidth();
+    return getThumbBounds().expanded (expandDim).contains ((float) x, (float) y);
 }
 
 void DotSlider::mouseDown (const juce::MouseEvent& e)

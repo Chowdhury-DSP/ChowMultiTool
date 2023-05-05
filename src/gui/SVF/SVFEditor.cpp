@@ -55,7 +55,7 @@ struct KeytrackButton : IconButton
 
 SVFEditor::SVFEditor (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp)
     : plot (pluginState, svfParams, hcp),
-      paramControls (pluginState, svfParams),
+      paramControls (pluginState, svfParams, hcp),
       keytrackButton (std::make_unique<KeytrackButton> ("Vector/fad-keyboard.svg", colours::plotColour, colours::linesColour)),
       keytrackAttach (svfParams.keytrack, pluginState, *keytrackButton),
       arpLimitButton ("Vector/arrows-up-to-line-solid.svg", colours::plotColour, colours::linesColour),

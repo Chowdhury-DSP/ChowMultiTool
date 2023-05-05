@@ -45,7 +45,11 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp
       keytrackSlider (svfParams.keytrackOffset, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
       chyron (pluginState, svfParams, hcp)
 {
+    freqSlider.setColour (juce::Slider::thumbColourId, colours::boxColour);
+    freqSlider.widthProportion = 0.03f;
     addAndMakeVisible (freqSlider);
+    keytrackSlider.setColour (juce::Slider::thumbColourId, colours::boxColour);
+    keytrackSlider.widthProportion = 0.03f;
     addAndMakeVisible (keytrackSlider);
     addAndMakeVisible (chyron);
 

@@ -14,8 +14,8 @@ namespace gui
 {
 namespace
 {
-    constexpr int defaultWidth = 600;
-    constexpr int defaultHeight = 400;
+    constexpr int defaultWidth = 900;
+    constexpr int defaultHeight = 600;
 } // namespace
 
 PluginEditor::PluginEditor (ChowMultiTool& p)
@@ -76,7 +76,9 @@ void PluginEditor::setResizeBehaviour()
                                int ((float) defaultHeight * 3.0f));
     setConstrainer (&constrainer);
     setResizable (true, true);
-    setSize (defaultWidth, defaultHeight);
+
+    const auto& stateSize = plugin.getState().nonParams.editorBounds.get();
+    setSize (stateSize.x, stateSize.y);
 }
 
 void PluginEditor::refreshEditor()
@@ -132,6 +134,7 @@ void PluginEditor::paint (juce::Graphics& g)
 void PluginEditor::resized()
 {
     auto bounds = getLocalBounds();
+    plugin.getState().nonParams.editorBounds = bounds.getBottomRight();
 
     errorMessageView.setBounds (bounds);
     toolbar.setBounds (bounds.removeFromTop (proportionOfHeight (0.1f)));
