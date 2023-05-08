@@ -102,7 +102,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
 
             using chowdsp::Power::ipow;
             for (auto [x, y] : chowdsp::zip (xData, yData))
-                y = std::max (x, 0.0f);
+                y = std::abs (x);
         }
         else if (shapeParam.get() == Shapes::Wave_Multiply)
         {
