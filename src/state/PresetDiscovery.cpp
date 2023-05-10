@@ -29,12 +29,6 @@ struct FactoryPresetDiscoveryProvider
     {
     }
 
-    static constexpr clap_preset_discovery_filetype factoryPresetsFiletype {
-        .name = "preset file",
-        .description = nullptr,
-        .file_extension = nullptr,
-    };
-
     static constexpr clap_preset_discovery_location factoryPresetsLocation {
         .flags = CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT,
         .name = "Binary Data",
@@ -44,7 +38,6 @@ struct FactoryPresetDiscoveryProvider
 
     bool init() noexcept override
     {
-        indexer()->declare_filetype (indexer(), &factoryPresetsFiletype);
         indexer()->declare_location (indexer(), &factoryPresetsLocation);
         return true;
     }
