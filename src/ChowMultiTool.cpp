@@ -1,10 +1,12 @@
 #include "ChowMultiTool.h"
 #include "gui/PluginEditor.h"
 #include "state/PresetManager.h"
+#if HAS_CLAP_JUCE_EXTENSIONS
+#include "state/PresetDiscovery.h"
+#endif
 
 namespace
 {
-const juce::String settingsFilePath = "ChowdhuryDSP/ChowMultiTool/.plugin_settings.json";
 const juce::String logFileSubDir = "ChowdhuryDSP/ChowMultiTool/Logs";
 const juce::String logFileNameRoot = "ChowMultiTool_Log_";
 } // namespace
@@ -13,7 +15,7 @@ ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, creat
                                  logger (logFileSubDir, logFileNameRoot)
 {
     juce::Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
-    pluginSettings->initialise (settingsFilePath);
+    pluginSettings->initialise (chowdsp::toString (settingsFilePath));
 
     presetManager = std::make_unique<state::presets::PresetManager> (*this);
     programAdaptor = std::make_unique<chowdsp::presets::frontend::PresetsProgramAdapter> (presetManager);
@@ -65,7 +67,7 @@ juce::AudioProcessorEditor* ChowMultiTool::createEditor()
     return new gui::PluginEditor { *this };
 }
 
-#if ! JUCE_IOS
+#if HAS_CLAP_JUCE_EXTENSIONS
 bool ChowMultiTool::remoteControlsPageFill (uint32_t pageIndex,
                                             juce::String& sectionName,
                                             uint32_t& pageID,
@@ -74,6 +76,13 @@ bool ChowMultiTool::remoteControlsPageFill (uint32_t pageIndex,
 {
     remoteControls.pageFill (pageIndex, sectionName, pageID, pageName, params);
     return true;
+}
+
+bool ChowMultiTool::presetLoadFromLocation (uint32_t location_kind,
+                                            const char* location,
+                                            const char* load_key) noexcept
+{
+    return state::presets::discovery::presetLoadFromLocation (*presetManager, location_kind, location, load_key);
 }
 #endif
 
@@ -84,8 +93,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 #if HAS_CLAP_JUCE_EXTENSIONS
-#include "state/PresetDiscovery.h"
-
 static const struct clap_preset_discovery_factory presetDiscoveryFactory
 {
     .count = &state::presets::discovery::count,

@@ -48,3 +48,6 @@ CMRC_DECLARE (presets);
 
 // Any other widely used headers that don't change...
 #include "state/ParameterVersionHints.h"
+
+// some global constants
+constexpr std::string_view settingsFilePath = "ChowdhuryDSP/ChowMultiTool/.plugin_settings.json";

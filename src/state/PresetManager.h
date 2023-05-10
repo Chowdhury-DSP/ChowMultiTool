@@ -6,6 +6,8 @@ class ChowMultiTool;
 
 namespace state::presets
 {
+chowdsp::presets::Preset createPresetFromEmbeddedFile (const std::string& path, const cmrc::embedded_filesystem& fs);
+
 class PresetManager : public chowdsp::presets::PresetManager
 {
 public:
