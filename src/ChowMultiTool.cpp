@@ -82,3 +82,24 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ChowMultiTool();
 }
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+#include "state/PresetDiscovery.h"
+
+static const struct clap_preset_discovery_factory presetDiscoveryFactory
+{
+    .count = &state::presets::discovery::count,
+    .get_descriptor = &state::presets::discovery::get_descriptor,
+    .create = &state::presets::discovery::create,
+};
+
+const void* clapJuceExtensionCustomFactory (const char* factory_id)
+{
+    if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
+    {
+        return &presetDiscoveryFactory;
+    }
+
+    return nullptr;
+}
+#endif
