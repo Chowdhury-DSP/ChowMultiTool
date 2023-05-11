@@ -169,7 +169,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
     setSelectedBand (-1);
 }
 
-void EQPlot::toggleDrawView (bool isDrawView)
+void EQPlot::toggleDrawView (bool isDrawView, bool clicked)
 {
     drawMode = isDrawView;
     drawView.setVisible (isDrawView);
@@ -177,6 +177,10 @@ void EQPlot::toggleDrawView (bool isDrawView)
     if (drawMode)
     {
         setSelectedBand (-1);
+    }
+    if (!drawMode && clicked) // leaving draw mode
+    {
+       drawView.triggerOptimiser();
     }
 
     resized();

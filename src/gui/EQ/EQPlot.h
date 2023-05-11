@@ -17,8 +17,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& e) override;
-
-    void toggleDrawView (bool isDrawView);
+    void toggleDrawView (bool isDrawView, bool clicked);
 
 private:
     void setSelectedBand (int bandIndex);

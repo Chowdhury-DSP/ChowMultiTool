@@ -21,8 +21,12 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
 
     addAndMakeVisible (drawButton);
     drawButton.onStateChange = [this]
-    { plot.toggleDrawView (drawButton.getToggleState()); };
-
+    { plot.toggleDrawView (drawButton.getToggleState(), false); };
+    drawButton.onClick = [this]
+    {
+        std::cout << "Leaving Draw View: " << std::boolalpha << !drawButton.getToggleState() << "\n";
+        plot.toggleDrawView (drawButton.getToggleState(), true);
+    };
 }
 
 void EQEditor::paint (juce::Graphics& g)

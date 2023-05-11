@@ -47,6 +47,97 @@ void EQDrawView::paint (juce::Graphics& g)
     g.strokePath (eqPlotPath, juce::PathStrokeType { juce::PathStrokeType::curved });
 }
 
+std::array<float, EQOptimiser::numPoints> EQDrawView::getDrawnMagnitudeResponse()
+{
+
+    std::array<float, EQOptimiser::numPoints> freqs = optimiser.freqs;
+    std::cout << "Frequency Vector: ";
+    for (auto& f:freqs)
+        std::cout << f << " ";
+    std::cout << "\n";
+    std::array<float, EQOptimiser::numPoints> magnitudeResponse;
+
+    std::cout << "Magnitude Response - Get Drawn Magnitude Response: ";
+    for (size_t i = 0; i < EQOptimiser::numPoints; i++) {
+        magnitudeResponse[i] = gui::eq::getMagnitudeAtFrequency(eqPath, freqs[i], spectrumPlot.params);
+        std::cout << magnitudeResponse[i] << " ";
+    }
+    std::cout << "\n";
+    std::cout << "Magnitude Response - Get Drawn Magnitude Response (Return): ";
+    for (auto& mags:magnitudeResponse)
+        std::cout << mags << " ";
+    return magnitudeResponse;
+}
+
+void EQDrawView::triggerOptimiser()
+{
+    constexpr size_t numPoints = EQOptimiser::numPoints;
+    std::array<float, numPoints> desiredResponse {};
+    // get desired response from eqPath
+    desiredResponse = getDrawnMagnitudeResponse(); //mag dB here
+    std::cout << "\n";
+    std::cout << "Magnitude Response - Trigger Optimiser: ";
+    for (auto& mag: desiredResponse)
+        std::cout << mag << " ";
+    std::cout << "\n";
+    optimiser.runOptimiser (std::move (desiredResponse));
+}
+
+//VectorXf EQDrawView::EQDrawViewOptimise()
+//{
+//    getDrawnMagnitudeResponse();
+//
+//    //Set up parameters
+//    LBFGSBParam<float> param;
+//    param.ftol = 1e-5;
+//    param.epsilon_rel = 5e-7;
+//    param.max_linesearch = 1'000.f;
+//    param.max_iterations = 1'000.f;
+//
+//    // Initialize the solver
+//    LBFGSBSolver<float> solver(param);
+//
+//    //random number gen
+//    std::random_device rd;
+//    std::mt19937 gen(rd());
+//    std::uniform_real_distribution<float> gDis(-12, 12);
+//    std::uniform_real_distribution<float> qDis(0.5, 10);
+//    //create Eigen vectors for initial values and gradient
+//    int numBands = 8;
+//    VectorXf lb = VectorXf::Constant(numBands * 3, 0.0f);
+//    VectorXf ub = VectorXf::Constant(numBands * 3, 0.0f);
+//    // Set bounds for fcs
+//    for (int i = 0; i < numBands; i++) {
+//        lb[i] = 20.0f;
+//        ub[i] = 20000.0f;
+//    }
+//    // Set bounds for gs
+//    for (int i = numBands; i < 2*numBands; i++) {
+//        lb[i] = -12.0f;
+//        ub[i] = 12.0f;
+//    }
+//    // Set bounds for qs
+//    for (int i = 2*numBands; i < 3*numBands; i++) {
+//        lb[i] = 0.5f;
+//        ub[i] = 20.f;
+//    }
+//    //set initial guess
+//    VectorXf initial(24);
+//    for (int i = 0; i < 8; ++i) {
+//        initial(i) = std::pow(10, std::log10(20.f) + i * (std::log10(20000.f) - std::log10(20.f)) / 7.f);
+//        initial(numBands + i) = gDis(gen);
+//        initial(2 * numBands + i) = qDis(gen);
+//    }
+//
+//    float best_cost;
+//
+//    EQOptimiser optimiser(gui::eq::desiredMagnitudeResponse, gui::eq::frequencyVector);
+//
+//    auto min = solver.minimize(optimiser, initial, best_cost, lb, ub);
+//    eqMinimizerMaxIter = min;
+//    return initial.transpose();
+//}
+
 void EQDrawView::setEQPathPoint (juce::Point<float> point)
 {
     const auto pointIndex = (size_t) juce::roundToInt (juce::jmap (point.x, 0.0f, (float) getWidth(), 0.0f, (float) maxNumDrawPoints - 1.0f));

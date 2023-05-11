@@ -1,11 +1,15 @@
 #pragma once
-
 #include <pch.h>
+#include "dsp/EQ/EQOptimiser.h"
+
+using Eigen::VectorXf;
+using namespace LBFGSpp;
 
 namespace gui::eq
 {
 constexpr int maxNumDrawPoints = 600;
 using EQPath = std::array<juce::Point<float>, maxNumDrawPoints>;
+float getMagnitudeAtFrequency (const EQPath& eqPath, float frequencyHz, const chowdsp::SpectrumPlotParams& plotParams);
 
 class EQDrawView : public juce::Component
 {
@@ -13,6 +17,8 @@ public:
     explicit EQDrawView (const chowdsp::SpectrumPlotBase& spectrumPlot);
 
     void paint (juce::Graphics& g) override;
+    std::array<float, EQOptimiser::numPoints> getDrawnMagnitudeResponse();
+    void triggerOptimiser();
 
 private:
     void setEQPathPoint (juce::Point<float> point);
@@ -23,6 +29,7 @@ private:
 
     const chowdsp::SpectrumPlotBase& spectrumPlot;
     EQPath eqPath;
+    EQOptimiser optimiser;
 
     std::optional<juce::Point<float>> mousePos;
     juce::Point<float> lastMouseDragPoint {};
