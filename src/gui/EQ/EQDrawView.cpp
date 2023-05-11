@@ -28,7 +28,7 @@ void EQDrawView::paint (juce::Graphics& g)
         drawCircle (*mousePos);
     }
 
-    const auto getPoint = [this](float xCoord)
+    const auto getPoint = [this] (float xCoord)
     {
         const auto freqHz = spectrumPlot.getFrequencyForXCoordinate (xCoord);
         const auto magDB = getMagnitudeAtFrequency (eqPath, freqHz, spectrumPlot.params);
@@ -47,40 +47,39 @@ void EQDrawView::paint (juce::Graphics& g)
     g.strokePath (eqPlotPath, juce::PathStrokeType { juce::PathStrokeType::curved });
 }
 
-std::array<float, EQOptimiser::numPoints> EQDrawView::getDrawnMagnitudeResponse()
+std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitudeResponse()
 {
-
-    std::array<float, EQOptimiser::numPoints> freqs = optimiser.freqs;
+    std::array<float, dsp::eq::EQOptimiser::numPoints> freqs = optimiser.freqs;
     std::cout << "Frequency Vector: ";
-    for (auto& f:freqs)
+    for (auto& f : freqs)
         std::cout << f << " ";
     std::cout << "\n";
-    std::array<float, EQOptimiser::numPoints> magnitudeResponse;
+    std::array<float, dsp::eq::EQOptimiser::numPoints> magnitudeResponse;
 
     std::cout << "Magnitude Response - Get Drawn Magnitude Response: ";
-    for (size_t i = 0; i < EQOptimiser::numPoints; i++) {
-        magnitudeResponse[i] = gui::eq::getMagnitudeAtFrequency(eqPath, freqs[i], spectrumPlot.params);
+    for (size_t i = 0; i < dsp::eq::EQOptimiser::numPoints; i++)
+    {
+        magnitudeResponse[i] = gui::eq::getMagnitudeAtFrequency (eqPath, freqs[i], spectrumPlot.params);
         std::cout << magnitudeResponse[i] << " ";
     }
     std::cout << "\n";
     std::cout << "Magnitude Response - Get Drawn Magnitude Response (Return): ";
-    for (auto& mags:magnitudeResponse)
+    for (auto& mags : magnitudeResponse)
         std::cout << mags << " ";
     return magnitudeResponse;
 }
 
-void EQDrawView::triggerOptimiser()
+void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters)
 {
-    constexpr size_t numPoints = EQOptimiser::numPoints;
-    std::array<float, numPoints> desiredResponse {};
     // get desired response from eqPath
-    desiredResponse = getDrawnMagnitudeResponse(); //mag dB here
+    auto desiredResponse = getDrawnMagnitudeResponse(); //mag dB here
     std::cout << "\n";
     std::cout << "Magnitude Response - Trigger Optimiser: ";
-    for (auto& mag: desiredResponse)
+    for (auto& mag : desiredResponse)
         std::cout << mag << " ";
     std::cout << "\n";
     optimiser.runOptimiser (std::move (desiredResponse));
+    optimiser.updateEQParameters (eqParameters);
 }
 
 //VectorXf EQDrawView::EQDrawViewOptimise()

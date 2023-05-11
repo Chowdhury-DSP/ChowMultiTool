@@ -39,18 +39,19 @@ constexpr int minFrequency = 18;
 constexpr int maxFrequency = 22'000;
 
 EQPlot::EQPlot (chowdsp::PluginState& pluginState,
-                chowdsp::EQ::StandardEQParameters<numBands>& eqParameters,
+                chowdsp::EQ::StandardEQParameters<numBands>& eqParams,
                 const chowdsp::HostContextProvider& hcp)
     : chowdsp::EQ::EqualizerPlotWithParameters<numBands> (pluginState.getParameterListeners(),
-                                                          eqParameters,
+                                                          eqParams,
                                                           &helpers::getFilterType,
                                                           chowdsp::SpectrumPlotParams {
                                                               .minFrequencyHz = minFrequency,
                                                               .maxFrequencyHz = maxFrequency,
                                                               .minMagnitudeDB = -23.0f,
                                                               .maxMagnitudeDB = 20.0f }),
-      chyron (pluginState, eqParameters, hcp),
-      drawView (*this)
+      chyron (pluginState, eqParams, hcp),
+      drawView (*this),
+      eqParameters (eqParams)
 {
     for (size_t i = 0; i < numBands; ++i)
     {
@@ -65,7 +66,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                 SpectrumDotSlider::Orientation::FrequencyOriented);
         addChildComponent (*freqSliders[i]);
         freqSliders[i]->widthProportion = 0.03f;
-        freqSliders[i]->getYCoordinate = [this, i, &eqParameters]
+        freqSliders[i]->getYCoordinate = [this, i]
         {
             return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
                                                   ? eqParameters.eqParams[i].gainParam->get()
@@ -80,7 +81,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                 SpectrumDotSlider::Orientation::MagnitudeOriented);
         addChildComponent (*gainSliders[i]);
         gainSliders[i]->widthProportion = 0.03f;
-        gainSliders[i]->getXCoordinate = [this, i, &eqParameters]
+        gainSliders[i]->getXCoordinate = [this, i]
         {
             return getXCoordinateForFrequency (eqParameters.eqParams[i].freqParam->get());
         };
@@ -96,13 +97,13 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
         qSliders[i]->setVelocityModeParameters (1.0, 1, 0.0, true, juce::ModifierKeys::altModifier);
         addChildComponent (*qSliders[i]);
         qSliders[i]->widthProportion = 0.03f;
-        qSliders[i]->getYCoordinate = [this, i, &eqParameters]
+        qSliders[i]->getYCoordinate = [this, i]
         {
             return getYCoordinateForDecibels (helpers::hasGainParam (helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex()))
                                                   ? eqParameters.eqParams[i].gainParam->get()
                                                   : 0.0f);
         };
-        qSliders[i]->getXCoordinate = [this, i, &eqParameters]
+        qSliders[i]->getXCoordinate = [this, i]
         {
             return getXCoordinateForFrequency (eqParameters.eqParams[i].freqParam->get());
         };
@@ -112,7 +113,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
         callbacks += {
             pluginState.addParameterListener (*eqParameters.eqParams[i].onOffParam,
                                               chowdsp::ParameterListenerThread::MessageThread,
-                                              [this, i, &eqParameters, setSliderActive]
+                                              [this, i, setSliderActive]
                                               {
                                                   const auto isOn = eqParameters.eqParams[i].onOffParam->get();
                                                   const auto filterType = helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex());
@@ -124,7 +125,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                               }),
             pluginState.addParameterListener (*eqParameters.eqParams[i].typeParam,
                                               chowdsp::ParameterListenerThread::MessageThread,
-                                              [this, i, &eqParameters, setSliderActive]
+                                              [this, i, setSliderActive]
                                               {
                                                   const auto isOn = eqParameters.eqParams[i].onOffParam->get();
                                                   const auto filterType = helpers::getFilterType (eqParameters.eqParams[i].typeParam->getIndex());
@@ -180,7 +181,7 @@ void EQPlot::toggleDrawView (bool isDrawView, bool clicked)
     }
     if (!drawMode && clicked) // leaving draw mode
     {
-       drawView.triggerOptimiser();
+       drawView.triggerOptimiser (eqParameters);
     }
 
     resized();

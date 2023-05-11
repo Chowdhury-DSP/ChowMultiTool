@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-            namespace dsp::eq
+namespace dsp::eq
 {
 struct EQToolParams : chowdsp::ParamHolder
 {
@@ -104,30 +104,29 @@ struct EQToolParams : chowdsp::ParamHolder
                                                   "Linear Phase On/Off",
                                                   false };
 
-
-//    void setEQParams()
-//    {
-//        const size_t numBands = 8;
-//        Eigen::VectorXf optFcs(numBands);
-//        Eigen::VectorXf optG(numBands);
-//        Eigen::VectorXf optQ(numBands);
-//        for (int i = 0; i < numBands; i++) {
-//            optFcs[i] = optParams[i];
-//            optG[i] = optParams[numBands + i];
-//            optQ[i] = optParams[2*numBands + i];
-//        }
-//
-//        EQToolParams::EQParams::Params paramList {};
-//        for (size_t bandIdx = 0; bandIdx < numBands; bandIdx++)
-//        {
-//            paramList.bands[bandIdx].params.bandType = 4 ;
-//            paramList.bands[bandIdx].params.bandFreqHz = optFcs[bandIdx];
-//            paramList.bands[bandIdx].params.bandGainDB = optG[bandIdx];
-//            paramList.bands[bandIdx].params.bandQ = optQ[bandIdx];
-//            paramList.bands[bandIdx].params.bandOnOff = true;
-//        }
-//        eqParams.eqParams.setEQParameters (paramList);
-//    }
+    //    void setEQParams()
+    //    {
+    //        const size_t numBands = 8;
+    //        Eigen::VectorXf optFcs(numBands);
+    //        Eigen::VectorXf optG(numBands);
+    //        Eigen::VectorXf optQ(numBands);
+    //        for (int i = 0; i < numBands; i++) {
+    //            optFcs[i] = optParams[i];
+    //            optG[i] = optParams[numBands + i];
+    //            optQ[i] = optParams[2*numBands + i];
+    //        }
+    //
+    //        EQToolParams::EQParams::Params paramList {};
+    //        for (size_t bandIdx = 0; bandIdx < numBands; bandIdx++)
+    //        {
+    //            paramList.bands[bandIdx].params.bandType = 4 ;
+    //            paramList.bands[bandIdx].params.bandFreqHz = optFcs[bandIdx];
+    //            paramList.bands[bandIdx].params.bandGainDB = optG[bandIdx];
+    //            paramList.bands[bandIdx].params.bandQ = optQ[bandIdx];
+    //            paramList.bands[bandIdx].params.bandOnOff = true;
+    //        }
+    //        eqParams.eqParams.setEQParameters (paramList);
+    //    }
 };
 
 class EQProcessor
