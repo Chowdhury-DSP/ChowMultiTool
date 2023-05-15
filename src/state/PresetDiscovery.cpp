@@ -100,26 +100,6 @@ struct UserPresetDiscoveryProvider
                                  const clap_preset_discovery_indexer* indexer)
         : PresetDiscoveryProvider (desc, indexer)
     {
-        const auto settingsFile = chowdsp::GlobalPluginSettings::getSettingsFile (chowdsp::toString (settingsFilePath));
-        if (settingsFile.existsAsFile())
-        {
-            try
-            {
-                const auto settingsJson = chowdsp::JSONUtils::fromFile (settingsFile).at (chowdsp::GlobalPluginSettings::settingsTag);
-                userPresetsFolder = settingsJson.at (chowdsp::presets::frontend::SettingsInterface::userPresetsDirID);
-                userPresetsLocation = {
-                    .flags = CLAP_PRESET_DISCOVERY_IS_USER_CONTENT,
-                    .name = "User Presets Location",
-                    .kind = CLAP_PRESET_DISCOVERY_LOCATION_FILE,
-                    .location = userPresetsFolder.getFullPathName().toRawUTF8(),
-                };
-            }
-            catch (...)
-            {
-                juce::Logger::writeToLog ("Unable to open settings file!");
-                jassertfalse;
-            }
-        }
     }
 
     juce::File userPresetsFolder {};
@@ -134,8 +114,31 @@ struct UserPresetDiscoveryProvider
     bool init() noexcept override
     {
         indexer()->declare_filetype (indexer(), &userPresetFiletype);
-        if (userPresetsFolder.isDirectory())
-            indexer()->declare_location (indexer(), &userPresetsLocation);
+
+        const auto settingsFile = chowdsp::GlobalPluginSettings::getSettingsFile (chowdsp::toString (settingsFilePath));
+        if (settingsFile.existsAsFile())
+        {
+            try
+            {
+                const auto settingsJson = chowdsp::JSONUtils::fromFile (settingsFile).at (chowdsp::GlobalPluginSettings::settingsTag);
+                userPresetsFolder = settingsJson.at (chowdsp::presets::frontend::SettingsInterface::userPresetsDirID);
+            }
+            catch (...)
+            {
+                juce::Logger::writeToLog ("Unable to open settings file!");
+                jassertfalse;
+            }
+        }
+
+        if (! userPresetsFolder.isDirectory())
+            return false;
+
+        userPresetsLocation.flags = CLAP_PRESET_DISCOVERY_IS_USER_CONTENT;
+        userPresetsLocation.name = "User Presets Location";
+        userPresetsLocation.kind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
+        userPresetsLocation.location = userPresetsFolder.getFullPathName().toRawUTF8();
+        indexer()->declare_location (indexer(), &userPresetsLocation);
+
         return true;
     }
 
@@ -165,6 +168,9 @@ struct UserPresetDiscoveryProvider
 
             if (preset.getCategory().isNotEmpty())
                 metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
+            metadata_receiver->set_timestamps (metadata_receiver,
+                                               (clap_timestamp_t) userPresetFile.getCreationTime().toMilliseconds() / 1000,
+                                               (clap_timestamp_t) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
         }
 
         return true;
