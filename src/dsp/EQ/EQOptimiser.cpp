@@ -9,7 +9,7 @@ namespace dsp::eq
 {
 using namespace LBFGSpp;
 
-EQOptimiser::EQOptimiser() : solver(param)
+EQOptimiser::EQOptimiser() : solver (param)
 {
 }
 

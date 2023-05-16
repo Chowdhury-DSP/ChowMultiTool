@@ -169,11 +169,11 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
 
     setSelectedBand (-1);
 
-    optItersLabel.setFont(juce::Font("Georgia", 32, juce::Font::plain));
-    optItersLabel.setCentrePosition(getWidth() / 2, getHeight() / 2);
-    optItersLabel.setBounds(0, 0, 1000, 100);
-    addChildComponent(optItersLabel);
-    optItersLabel.toFront(true);
+    optItersLabel.setFont (juce::Font ("Georgia", 32, juce::Font::plain));
+    optItersLabel.setCentrePosition (getWidth() / 2, getHeight() / 2);
+    optItersLabel.setBounds (0, 0, 1000, 100);
+    addChildComponent (optItersLabel);
+    optItersLabel.toFront (true);
 }
 
 void EQPlot::toggleDrawView (bool isDrawView, bool clicked)
@@ -184,12 +184,12 @@ void EQPlot::toggleDrawView (bool isDrawView, bool clicked)
     if (drawMode) //entering draw mode
     {
         setSelectedBand (-1);
-        this->removeChildComponent(&optItersLabel);
+        this->removeChildComponent (&optItersLabel);
     }
-    if (!drawMode && clicked) // leaving draw mode
+    if (! drawMode && clicked) // leaving draw mode
     {
-       drawView.triggerOptimiser (eqParameters);
-       this->addAndMakeVisible(optItersLabel);
+        drawView.triggerOptimiser (eqParameters);
+        this->addAndMakeVisible (optItersLabel);
     }
     resized();
     repaint();
@@ -224,9 +224,9 @@ void EQPlot::paint (juce::Graphics& g)
         g.setColour (colours::linesColour);
         g.strokePath (getMasterFilterPath(), juce::PathStrokeType { 2.5f });
     }
-    optItersLabel.setText("We're Optimising... Iteration Number: " + std::to_string(drawView.getOptimiser().iterationCount), juce::dontSendNotification);
+    optItersLabel.setText ("We're Optimising... Iteration Number: " + std::to_string (drawView.getOptimiser().iterationCount), juce::dontSendNotification);
     if (drawView.getOptimiser().iterationCount > 100.0)
-        optItersLabel.setText("Hang In There... Iteration Number: " + std::to_string(drawView.getOptimiser().iterationCount), juce::dontSendNotification);
+        optItersLabel.setText ("Hang In There... Iteration Number: " + std::to_string (drawView.getOptimiser().iterationCount), juce::dontSendNotification);
     optItersLabel.repaint();
 }
 

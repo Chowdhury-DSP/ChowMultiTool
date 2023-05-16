@@ -50,7 +50,7 @@ void EQDrawView::paint (juce::Graphics& g)
 std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitudeResponse()
 {
     std::array<float, dsp::eq::EQOptimiser::numPoints> freqs = optimiser.freqs;
-    std::array<float, dsp::eq::EQOptimiser::numPoints> magnitudeResponse{};
+    std::array<float, dsp::eq::EQOptimiser::numPoints> magnitudeResponse {};
     for (size_t i = 0; i < dsp::eq::EQOptimiser::numPoints; i++)
     {
         magnitudeResponse[i] = gui::eq::getMagnitudeAtFrequency (eqPath, freqs[i], spectrumPlot.params);
@@ -61,11 +61,11 @@ std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitude
 
 void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters)
 {
-    juce::Thread::launch ([&] {
+    juce::Thread::launch ([&]
+                          {
                                                     auto desiredResponse = getDrawnMagnitudeResponse();
                                                     optimiser.runOptimiser (std::move (desiredResponse));
-                                                    optimiser.updateEQParameters (eqParameters);
-                                                  });
+                                                    optimiser.updateEQParameters (eqParameters); });
 }
 
 dsp::eq::EQOptimiser EQDrawView::getOptimiser()
