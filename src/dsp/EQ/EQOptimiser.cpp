@@ -9,6 +9,10 @@ namespace dsp::eq
 {
 using namespace LBFGSpp;
 
+EQOptimiser::EQOptimiser() : solver(param)
+{
+}
+
 float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_level)
 {
     const int n = x.size();
@@ -25,18 +29,6 @@ float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_le
         g[i] = x[num_bands + i]; //gain dB here
         q[i] = x[2 * num_bands + i];
     }
-    std::cout << "fc obj: ";
-    for (auto& f : fc)
-        std::cout << f << " ";
-    std::cout << "\n";
-    std::cout << "g obj: ";
-    for (auto& gain : g)
-        std::cout << gain << " ";
-    std::cout << "\n";
-    std::cout << "q obj: ";
-    for (auto& qs : q)
-        std::cout << qs << " ";
-    std::cout << "\n";
 
     //compute mag response from params (freq domain)
     std::array<float, numPoints> magResponse {};
@@ -45,7 +37,6 @@ float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_le
         chowdsp::EQ::BellPlot bellFilter;
         bellFilter.setQValue (q[band]);
         bellFilter.setCutoffFrequency (fc[band]);
-        //bell filter needs gain in dB
         bellFilter.setGainDecibels (g[band]);
         //get mag response for band
         std::vector<float> magBandResponse (freqs.size());
@@ -55,18 +46,7 @@ float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_le
         }
         //add magnitude responses to get the overall response
         std::transform (magResponse.begin(), magResponse.end(), magBandResponse.begin(), magResponse.begin(), std::plus<float>());
-    } //mag response should be equal to mag_actual in prototype
-    std::cout << "obj mag response: ";
-    for (auto& mag : magResponse)
-        std::cout << mag << " ";
-
-    std::cout << "\n";
-
-    std::cout << "obj desired mag response: ";
-    for (auto& desMag : desiredMagResponse)
-        std::cout << desMag << " ";
-
-    std::cout << "\n";
+    }
 
     //weighted average of absolute difference and squared difference
     float weight = 0.5f;
@@ -115,27 +95,20 @@ float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_le
             grad[2 * num_bands + band] = g_q;
         }
     }
-    std::cout << "obj : " << loss << std::endl;
+    iterationCount = solver.k;
+    std::cout << "Optimiser Iteration Count: " << iterationCount << std::endl;
+    std::cout << "Loss : " << loss << std::endl;
     return loss;
 }
 
 void EQOptimiser::runOptimiser (std::array<float, numPoints>&& desiredResponse)
 {
     desiredMagResponse = desiredResponse;
-    std::cout << "Magnitude Response - Run Optimiser: ";
-    for (auto& mag : desiredMagResponse)
-        std::cout << mag << " ";
-    std::cout << "\n";
-    // optimizer runs...
-    //Set up parameters
-    LBFGSBParam<float> param;
+
     param.ftol = 1e-6;
     param.epsilon_rel = 5e-7;
-    param.max_linesearch = 1'000.f;
-    param.max_iterations = 1'000.f;
-
-    // Initialize the solver
-    LBFGSBSolver<float> solver (param);
+    param.max_linesearch = 1'000;
+    param.max_iterations = maxIter;
 
     //random number gen
     std::random_device rd;
@@ -175,7 +148,6 @@ void EQOptimiser::runOptimiser (std::array<float, numPoints>&& desiredResponse)
 
     float best_cost;
 
-    int numIters = 0;
     try
     {
         numIters = solver.minimize (*this, initial, best_cost, lb, ub);

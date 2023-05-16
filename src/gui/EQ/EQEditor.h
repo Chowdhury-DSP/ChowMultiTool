@@ -26,6 +26,8 @@ private:
     chowdsp::ButtonAttachment linearPhaseAttach;
 
     IconButton drawButton;
+    IconButton drawCheckButton;
+    IconButton drawXButton;
 
     juce::TooltipWindow tooltips { this, 300 };
 

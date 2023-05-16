@@ -48,6 +48,7 @@ private:
 
     chowdsp::ScopedCallbackList callbacks;
     chowdsp::EQ::StandardEQParameters<numBands>& eqParameters;
+    juce::Label optItersLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQPlot)
 };

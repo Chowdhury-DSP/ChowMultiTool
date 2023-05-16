@@ -9,7 +9,9 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      drawButton ("Vector/pencil-solid.svg", colours::thumbColours[0], colours::linesColour)
+      drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
+      drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
+      drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);
 
@@ -20,12 +22,31 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     linearPhaseButton.setTooltip ("Linear Phase");
 
     addAndMakeVisible (drawButton);
-    drawButton.onStateChange = [this]
-    { plot.toggleDrawView (drawButton.getToggleState(), false); };
     drawButton.onClick = [this]
     {
-        std::cout << "Leaving Draw View: " << std::boolalpha << !drawButton.getToggleState() << "\n";
-        plot.toggleDrawView (drawButton.getToggleState(), true);
+        linearPhaseButton.setVisible (false);
+        drawButton.setVisible (false);
+        drawCheckButton.setVisible (true);
+        drawXButton.setVisible (true);
+        plot.toggleDrawView (true, true);
+    };
+    addChildComponent (drawCheckButton);
+    drawCheckButton.onClick = [this]
+    {
+        linearPhaseButton.setVisible (true);
+        drawButton.setVisible (true);
+        drawCheckButton.setVisible (false);
+        drawXButton.setVisible (false);
+        plot.toggleDrawView (false, true);
+    };
+    addChildComponent (drawXButton);
+    drawXButton.onClick = [this]
+    {
+        linearPhaseButton.setVisible (true);
+        drawButton.setVisible (true);
+        drawCheckButton.setVisible (false);
+        drawXButton.setVisible (false);
+        plot.toggleDrawView (false, false);
     };
 }
 
@@ -51,5 +72,7 @@ void EQEditor::resized()
     linearPhaseButton.setBounds (bounds.getWidth() - pad - buttonDim, pad, buttonDim, buttonDim);
 
     drawButton.setBounds (linearPhaseButton.getBoundsInParent().translated (-pad - buttonDim, 0));
+    drawCheckButton.setBounds (drawButton.getBoundsInParent());
+    drawXButton.setBounds (linearPhaseButton.getBoundsInParent());
 }
 } // namespace gui::eq

@@ -8,10 +8,12 @@
 namespace dsp::eq
 {
 using Eigen::VectorXf;
+using namespace LBFGSpp;
 
 class EQOptimiser
 {
 public:
+    EQOptimiser();
     static constexpr size_t numPoints = 600;
     float operator() (const VectorXf& x, VectorXf& grad, bool is_top_level = true);
     void runOptimiser (std::array<float, numPoints>&& desiredMagnitudeResponse);
@@ -29,10 +31,15 @@ public:
     }();
 
     void updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters) const;
+    int iterationCount;
 
 private:
     VectorXf optParams = VectorXf::Constant (24, 0.0f);
     std::array<float, numPoints> desiredMagResponse;
     const float stepSize = 0.0001f;
+    LBFGSBParam<float> param;
+    LBFGSBSolver<float> solver;
+    double maxIter = 1000.0;
+    int numIters = 0;
 };
 } // namespace dsp::eq
