@@ -17,7 +17,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& e) override;
-    void toggleDrawView (bool isDrawView, bool clicked);
+    void toggleDrawView (bool shouldShowDrawView, bool triggerOptimiser);
 
 private:
     void setSelectedBand (int bandIndex);
@@ -48,7 +48,16 @@ private:
 
     chowdsp::ScopedCallbackList callbacks;
     chowdsp::EQ::StandardEQParameters<numBands>& eqParameters;
-    juce::Label optItersLabel;
+
+    struct IterationsLabel : juce::Label, juce::Timer
+    {
+        explicit IterationsLabel (EQDrawView& view);
+        void visibilityChanged() override;
+        void timerCallback() override;
+        const EQDrawView& drawView;
+        chowdsp::ScopedCallback optimiserFinishedCallback;
+    };
+    IterationsLabel optItersLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQPlot)
 };

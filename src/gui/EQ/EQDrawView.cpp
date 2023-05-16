@@ -54,21 +54,23 @@ std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitude
     for (size_t i = 0; i < dsp::eq::EQOptimiser::numPoints; i++)
     {
         magnitudeResponse[i] = gui::eq::getMagnitudeAtFrequency (eqPath, freqs[i], spectrumPlot.params);
-        std::cout << magnitudeResponse[i] << " ";
     }
     return magnitudeResponse;
 }
 
 void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters)
 {
-    juce::Thread::launch ([&]
-                          {
-                                                    auto desiredResponse = getDrawnMagnitudeResponse();
-                                                    optimiser.runOptimiser (std::move (desiredResponse));
-                                                    optimiser.updateEQParameters (eqParameters); });
+    juce::Thread::launch (
+        [&]
+        {
+            auto desiredResponse = getDrawnMagnitudeResponse();
+            optimiser.runOptimiser (std::move (desiredResponse));
+            optimiser.updateEQParameters (eqParameters);
+            juce::MessageManager::callAsync ([this] { onCompletedOptimisation(); });
+        });
 }
 
-dsp::eq::EQOptimiser EQDrawView::getOptimiser()
+const dsp::eq::EQOptimiser& EQDrawView::getOptimiser() const
 {
     return this->optimiser;
 }

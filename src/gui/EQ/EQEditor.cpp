@@ -28,7 +28,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
         drawButton.setVisible (false);
         drawCheckButton.setVisible (true);
         drawXButton.setVisible (true);
-        plot.toggleDrawView (true, true);
+        plot.toggleDrawView (true, false);
     };
     addChildComponent (drawCheckButton);
     drawCheckButton.onClick = [this]
@@ -37,7 +37,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
         drawButton.setVisible (true);
         drawCheckButton.setVisible (false);
         drawXButton.setVisible (false);
-        plot.toggleDrawView (false, true);
+        plot.toggleDrawView (true, true);
     };
     addChildComponent (drawXButton);
     drawXButton.onClick = [this]

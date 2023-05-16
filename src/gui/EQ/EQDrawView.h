@@ -19,7 +19,9 @@ public:
     void paint (juce::Graphics& g) override;
     std::array<float, dsp::eq::EQOptimiser::numPoints> getDrawnMagnitudeResponse();
     void triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters);
-    dsp::eq::EQOptimiser getOptimiser();
+    const dsp::eq::EQOptimiser& getOptimiser() const;
+
+    chowdsp::Broadcaster<void()> onCompletedOptimisation;
 
 private:
     void setEQPathPoint (juce::Point<float> point);

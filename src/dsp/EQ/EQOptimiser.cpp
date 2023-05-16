@@ -5,13 +5,13 @@
 #include "EQProcessor.h"
 #include "LBFGSB.h"
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion", "-Wsign-compare", "-Wshorten-64-to-32", "-Wimplicit-float-conversion")
+
 namespace dsp::eq
 {
 using namespace LBFGSpp;
 
-EQOptimiser::EQOptimiser() : solver (param)
-{
-}
+EQOptimiser::EQOptimiser() = default;
 
 float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_level)
 {
@@ -89,20 +89,24 @@ float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_le
             x_plus[2 * num_bands + band] += stepSize; //f(x+h)
             x_minus = x;
             x_minus[2 * num_bands + band] -= stepSize; //f(x+h)
-            f_plus = this->operator() (x_plus, grad, false);
-            f_minus = this->operator() (x_minus, grad, false);
+            f_plus = (*this) (x_plus, grad, false);
+            f_minus = (*this) (x_minus, grad, false);
             float g_q = (f_plus - f_minus) / (2 * stepSize);
             grad[2 * num_bands + band] = g_q;
         }
     }
     iterationCount = solver.k;
-    std::cout << "Optimiser Iteration Count: " << iterationCount << std::endl;
-    std::cout << "Loss : " << loss << std::endl;
+    if (iterationCount % 10) // write to log every 10 iterations
+    {
+        juce::Logger::writeToLog ("Optimiser Iteration Count: " + juce::String { iterationCount });
+        juce::Logger::writeToLog ("Loss : " + juce::String { loss });
+    }
     return loss;
 }
 
 void EQOptimiser::runOptimiser (std::array<float, numPoints>&& desiredResponse)
 {
+    juce::Logger::writeToLog ("Running EQ optimisation...");
     desiredMagResponse = desiredResponse;
 
     param.ftol = 1e-6;
@@ -147,19 +151,21 @@ void EQOptimiser::runOptimiser (std::array<float, numPoints>&& desiredResponse)
     }
 
     float best_cost;
-
+    int numIters;
     try
     {
         numIters = solver.minimize (*this, initial, best_cost, lb, ub);
     }
     catch (const std::exception& e)
     {
-        // TODO...
-        std::cout << "EXCEPTION: " << e.what() << std::endl;
+        // TODO: should we alert the user if an exception has occured (I'm leaning towards no)
+        juce::Logger::writeToLog (juce::String { "Encountered exception during EQ optimization. Aborting! " } + e.what());
     }
 
-    std::cout << "Optimised Params: " << initial.transpose() << std::endl;
-    std::cout << "Max Optimiser Iter: " << numIters << std::endl;
+    std::stringstream ss;
+    ss << "Optimised Params: " << initial.transpose();
+    juce::Logger::writeToLog (ss.str());
+    juce::Logger::writeToLog ("Max Optimiser Iter: " + juce::String { numIters });
     optParams = initial.transpose();
 }
 
@@ -188,3 +194,5 @@ void EQOptimiser::updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolPa
     eqParameters.loadEQParameters (paramList, eqParameters);
 }
 } // namespace dsp::eq
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
