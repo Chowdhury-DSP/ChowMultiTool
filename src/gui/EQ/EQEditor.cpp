@@ -8,7 +8,10 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     : plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
-      linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton)
+      linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
+      drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
+      drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
+      drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);
 
@@ -17,6 +20,34 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     addAndMakeVisible (linearPhaseButton);
 
     linearPhaseButton.setTooltip ("Linear Phase");
+
+    addAndMakeVisible (drawButton);
+    drawButton.onClick = [this]
+    {
+        linearPhaseButton.setVisible (false);
+        drawButton.setVisible (false);
+        drawCheckButton.setVisible (true);
+        drawXButton.setVisible (true);
+        plot.toggleDrawView (true, true);
+    };
+    addChildComponent (drawCheckButton);
+    drawCheckButton.onClick = [this]
+    {
+        linearPhaseButton.setVisible (true);
+        drawButton.setVisible (true);
+        drawCheckButton.setVisible (false);
+        drawXButton.setVisible (false);
+        plot.toggleDrawView (false, true);
+    };
+    addChildComponent (drawXButton);
+    drawXButton.onClick = [this]
+    {
+        linearPhaseButton.setVisible (true);
+        drawButton.setVisible (true);
+        drawCheckButton.setVisible (false);
+        drawXButton.setVisible (false);
+        plot.toggleDrawView (false, false);
+    };
 }
 
 void EQEditor::paint (juce::Graphics& g)
@@ -39,5 +70,9 @@ void EQEditor::resized()
     const auto pad = proportionOfWidth (0.005f);
     const auto buttonDim = proportionOfWidth (0.035f);
     linearPhaseButton.setBounds (bounds.getWidth() - pad - buttonDim, pad, buttonDim, buttonDim);
+
+    drawButton.setBounds (linearPhaseButton.getBoundsInParent().translated (-pad - buttonDim, 0));
+    drawCheckButton.setBounds (drawButton.getBoundsInParent());
+    drawXButton.setBounds (linearPhaseButton.getBoundsInParent());
 }
 } // namespace gui::eq

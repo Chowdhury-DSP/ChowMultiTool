@@ -29,6 +29,8 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 // Other third-party libraries
 #include <chowdsp_wdf/chowdsp_wdf.h>
+#include <Eigen/Core>
+#include <LBFGSB.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
                                      "-Wsign-conversion",

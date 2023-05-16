@@ -52,8 +52,10 @@ $ cmake --build build --config Release
 ## Credits
 
 - Extra Icons - [FontAwesome](https://fontawesome.com/) and [FontAudio](https://github.com/fefanto/fontaudio)
-- Math expression parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
+- Math Expression Parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
 - UI Inspection - [melatonin_inspector](https://github.com/sudara/melatonin_inspector)
+- Limited-memory BFGS algorithm - [LBFGSpp](https://github.com/yixuan/LBFGSpp)
+- Vector Support - [Eigen](https://gitlab.com/libeigen/eigen) 
 
 ## License
 
