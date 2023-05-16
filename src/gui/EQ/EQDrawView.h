@@ -33,6 +33,7 @@ private:
     const chowdsp::SpectrumPlotBase& spectrumPlot;
     EQPath eqPath;
     dsp::eq::EQOptimiser optimiser;
+    bool isOptimising = false;
 
     std::optional<juce::Point<float>> mousePos;
     juce::Point<float> lastMouseDragPoint {};

@@ -45,6 +45,12 @@ void EQDrawView::paint (juce::Graphics& g)
 
     g.setColour (colours::thumbColours[0]);
     g.strokePath (eqPlotPath, juce::PathStrokeType { juce::PathStrokeType::curved });
+
+    if (isOptimising)
+    {
+        g.setColour (juce::Colours::black.withAlpha (0.25f));
+        g.fillRect (getParentComponent()->getLocalBounds());
+    }
 }
 
 std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitudeResponse()
@@ -60,13 +66,19 @@ std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitude
 
 void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters)
 {
+    isOptimising = true;
+    repaint();
     juce::Thread::launch (
         [&]
         {
             auto desiredResponse = getDrawnMagnitudeResponse();
             optimiser.runOptimiser (std::move (desiredResponse));
-            optimiser.updateEQParameters (eqParameters);
-            juce::MessageManager::callAsync ([this] { onCompletedOptimisation(); });
+            optimiser.updateEQParameters (eqParameters); // TODO: make this undo-able
+            juce::MessageManager::callAsync ([this]
+                                             {
+                                                 onCompletedOptimisation();
+                                                 isOptimising = false;
+                                             });
         });
 }
 
@@ -83,6 +95,9 @@ void EQDrawView::setEQPathPoint (juce::Point<float> point)
 
 void EQDrawView::mouseDown (const juce::MouseEvent& e)
 {
+    if (isOptimising)
+        return;
+
     lastMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
     setEQPathPoint (lastMouseDragPoint);
     repaint();
@@ -90,6 +105,9 @@ void EQDrawView::mouseDown (const juce::MouseEvent& e)
 
 void EQDrawView::mouseDrag (const juce::MouseEvent& e)
 {
+    if (isOptimising)
+        return;
+
     auto newMouseDragPoint = e.getEventRelativeTo (this).getPosition().toFloat();
     newMouseDragPoint.x = juce::jlimit (0.0f, (float) getWidth(), newMouseDragPoint.x);
     newMouseDragPoint.y = juce::jlimit (0.0f, (float) getHeight(), newMouseDragPoint.y);
