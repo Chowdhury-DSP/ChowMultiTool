@@ -13,9 +13,6 @@
 [submodule "modules/melatonin_inspector"]
 	path = modules/melatonin_inspector
 	url = https://github.com/sudara/melatonin_inspector
-[submodule "LBFGSpp"]
-	path = modules/LBFGSpp
-	url = https://github.com/yixuan/LBFGSpp.git
 [submodule "eigen"]
 	path = modules/eigen
 	url = https://gitlab.com/libeigen/eigen.git
