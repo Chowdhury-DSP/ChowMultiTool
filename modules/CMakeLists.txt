@@ -1,6 +1,8 @@
 add_subdirectory(JUCE)
 add_subdirectory(chowdsp_utils)
 add_subdirectory(chowdsp_wdf)
+add_subdirectory(eigen)
+add_subdirectory(LBFGSpp)
 
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
@@ -25,6 +27,8 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_wdf
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_visualizers
+        Eigen3::Eigen
+        lbfgspp
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

@@ -11,11 +11,7 @@ cmrc_add_resource_library(gui-resources
     ${TTF_FILES}
     gui_assets/logo.svg
 )
-
-set_target_properties(gui-resources
-    PROPERTIES
-        POSITION_INDEPENDENT_CODE TRUE
-)
+set_target_properties(gui-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 file(GLOB PRESET_FILES presets/*.chowpreset)
 #message(STATUS "Preset files: ${PRESET_FILES}")
@@ -25,8 +21,4 @@ cmrc_add_resource_library(presets-resources
     WHENCE presets
     ${PRESET_FILES}
 )
-
-set_target_properties(presets-resources
-    PROPERTIES
-        POSITION_INDEPENDENT_CODE TRUE
-)
+set_target_properties(presets-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)

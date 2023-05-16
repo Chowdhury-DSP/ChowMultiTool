@@ -13,3 +13,7 @@
 [submodule "modules/melatonin_inspector"]
 	path = modules/melatonin_inspector
 	url = https://github.com/sudara/melatonin_inspector
+[submodule "eigen"]
+	path = modules/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+	branch = 3.4

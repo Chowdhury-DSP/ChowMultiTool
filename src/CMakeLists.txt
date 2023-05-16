@@ -14,6 +14,7 @@ target_sources(ChowMultiTool PRIVATE
     dsp/Waveshaper/SignalSmithWaveshaper.cpp
     dsp/Waveshaper/SplineWaveshaper.cpp
 
+    dsp/EQ/EQOptimiser.cpp
     dsp/EQ/EQProcessor.cpp
     dsp/SignalGenerator/SignalGeneratorProcessor.cpp
     dsp/BandSplitter/BandSplitterProcessor.cpp
@@ -32,6 +33,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/EQ/BottomBar.cpp
     gui/EQ/EQBandBox.cpp
     gui/EQ/EQChyron.cpp
+    gui/EQ/EQDrawView.cpp
 
     gui/Waveshaper/WaveshaperEditor.cpp
     gui/Waveshaper/WaveshaperPlot.cpp

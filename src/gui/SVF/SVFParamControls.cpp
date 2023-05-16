@@ -56,7 +56,7 @@ void SVFParamControls::paint (juce::Graphics& g)
     g.setColour (colours::linesColour);
     auto labelBounds = getLocalBounds().removeFromTop (proportionOfHeight (0.05f));
 
-    g.setFont (juce::Font { SharedFonts{}->robotoBold }.withHeight (0.85f * (float) labelBounds.getHeight()));
+    g.setFont (juce::Font { SharedFonts {} -> robotoBold }.withHeight (0.85f * (float) labelBounds.getHeight()));
     g.setColour (colours::linesColour);
 
     if (modeSlider.isVisible() && dampingSlider.isVisible())

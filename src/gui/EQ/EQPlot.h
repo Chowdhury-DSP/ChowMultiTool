@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EQChyron.h"
+#include "EQDrawView.h"
 #include "gui/Shared/DotSlider.h"
 #include "state/PluginState.h"
 
@@ -16,6 +17,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& e) override;
+    void toggleDrawView (bool shouldShowDrawView, bool triggerOptimiser);
 
 private:
     void setSelectedBand (int bandIndex);
@@ -41,7 +43,21 @@ private:
 
     EQChyron chyron;
 
+    EQDrawView drawView;
+    bool drawMode = false;
+
     chowdsp::ScopedCallbackList callbacks;
+    chowdsp::EQ::StandardEQParameters<numBands>& eqParameters;
+
+    struct IterationsLabel : juce::Label, juce::Timer
+    {
+        explicit IterationsLabel (EQDrawView& view);
+        void visibilityChanged() override;
+        void timerCallback() override;
+        const EQDrawView& drawView;
+        chowdsp::ScopedCallback optimiserFinishedCallback;
+    };
+    IterationsLabel optItersLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQPlot)
 };
