@@ -77,8 +77,7 @@ void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQ
             juce::MessageManager::callAsync ([this]
                                              {
                                                  onCompletedOptimisation();
-                                                 isOptimising = false;
-                                             });
+                                                 isOptimising = false; });
         });
 }
 
