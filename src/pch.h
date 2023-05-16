@@ -28,6 +28,8 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif
 
 // Other third-party libraries
+#include <Eigen/Core>
+#include <LBFGSB.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",

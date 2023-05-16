@@ -24,7 +24,7 @@ void FoldFuzzControls::paint (juce::Graphics& g)
 
     auto labelBounds = getLocalBounds().removeFromTop (proportionOfHeight (0.05f));
 
-    g.setFont (juce::Font { SharedFonts{}->robotoBold }.withHeight (0.85f * (float) labelBounds.getHeight()));
+    g.setFont (juce::Font { SharedFonts {} -> robotoBold }.withHeight (0.85f * (float) labelBounds.getHeight()));
     g.setColour (colours::linesColour);
 
     g.drawFittedText ("Fold", labelBounds.removeFromLeft (proportionOfWidth (0.5f)), juce::Justification::centred, 1);

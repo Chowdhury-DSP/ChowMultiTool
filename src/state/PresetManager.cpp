@@ -13,7 +13,7 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
       toolParam (*plugin.getState().params.toolParam)
 {
     getPresetTree().treeInserter = &PresetTreeInserters::vendorCategoryInserter;
-    saverLoader.savePresetState = [this, &plugin] () -> nlohmann::json
+    saverLoader.savePresetState = [this, &plugin]() -> nlohmann::json
     {
         nlohmann::json state;
         state[presetParamsTag] = saverLoader.savePresetParameters();

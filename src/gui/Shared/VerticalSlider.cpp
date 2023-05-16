@@ -1,6 +1,6 @@
 #include "VerticalSlider.h"
-#include "LookAndFeels.h"
 #include "Colours.h"
+#include "LookAndFeels.h"
 
 namespace gui
 {
