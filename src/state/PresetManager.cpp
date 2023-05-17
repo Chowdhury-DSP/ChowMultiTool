@@ -76,6 +76,19 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
         }
     };
 
+    addPresets (getFactoryPresets());
+    setDefaultPreset (createPresetFromEmbeddedFile ("Init.chowpreset", cmrc::presets::get_filesystem()));
+
+    presetsSettings.emplace (*this,
+                             *pluginSettings,
+                             juce::File::getSpecialLocation (juce::File::userDocumentsDirectory)
+                                 .getChildFile ("Chowdhury DSP/Presets/ChowMultiTool"));
+
+    loadDefaultPreset();
+}
+
+std::vector<Preset> PresetManager::getFactoryPresets()
+{
     const auto fs = cmrc::presets::get_filesystem();
     std::vector<Preset> factoryPresets;
     for (auto&& entry : fs.iterate_directory (""))
@@ -84,15 +97,7 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
         jassert (fs.exists (entry.filename()));
         factoryPresets.emplace_back (createPresetFromEmbeddedFile (entry.filename(), fs));
     }
-    addPresets (std::move (factoryPresets));
-    setDefaultPreset (createPresetFromEmbeddedFile ("Init.chowpreset", fs));
-
-    presetsSettings.emplace (*this,
-                             *pluginSettings,
-                             juce::File::getSpecialLocation (juce::File::userDocumentsDirectory)
-                                 .getChildFile ("Chowdhury DSP/Presets/ChowMultiTool"));
-
-    loadDefaultPreset();
+    return factoryPresets;
 }
 
 Preset PresetManager::getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const

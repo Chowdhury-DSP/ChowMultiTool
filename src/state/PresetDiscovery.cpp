@@ -12,7 +12,7 @@ namespace state::presets::discovery
 {
 constexpr clap_plugin_id plugin_id {
     .abi = "clap",
-    .id = "org.chowdsp.ChowMultiTool" // TODO: get this in an automated way...
+    .id = CLAP_ID,
 };
 
 struct FactoryPresetDiscoveryProvider
@@ -56,13 +56,8 @@ struct FactoryPresetDiscoveryProvider
             return false;
 
         using chowdsp::presets::Preset;
-        const auto fs = cmrc::presets::get_filesystem();
-        for (auto&& entry : fs.iterate_directory (""))
+        for (const auto& factoryPreset : PresetManager::getFactoryPresets())
         {
-            jassert (entry.is_file());
-            jassert (fs.exists (entry.filename()));
-            const auto factoryPreset = createPresetFromEmbeddedFile (entry.filename(), fs);
-
             DBG ("Indexing factory preset: " + factoryPreset.getName());
             if (metadata_receiver->begin_preset (metadata_receiver, factoryPreset.getName().toRawUTF8(), factoryPreset.getName().toRawUTF8()))
             {
