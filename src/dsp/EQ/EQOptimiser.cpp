@@ -181,11 +181,11 @@ void EQOptimiser::updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolPa
     EQParamList paramList {};
     for (size_t bandIdx = 0; bandIdx < numBands; bandIdx++)
     {
-        paramList.bands[bandIdx].params.bandType = 6;
+        paramList.bands[bandIdx].params.bandType = 6; // all optimised filters are "Bell" filters (for now)
         paramList.bands[bandIdx].params.bandFreqHz = optParams[Eigen::Index (bandIdx)];
         paramList.bands[bandIdx].params.bandGainDB = optParams[Eigen::Index (numBands + bandIdx)];
         paramList.bands[bandIdx].params.bandQ = optParams[Eigen::Index (2 * numBands + bandIdx)];
-        paramList.bands[bandIdx].params.bandOnOff = std::abs (paramList.bands[bandIdx].params.bandGainDB) > 0.25f;
+        paramList.bands[bandIdx].params.bandOnOff = std::abs (paramList.bands[bandIdx].params.bandGainDB) > 0.25f; // If the filter gain is very small, we can pretend it's "Off"
     }
 
     struct UndoableEQLoadParameters : juce::UndoableAction
