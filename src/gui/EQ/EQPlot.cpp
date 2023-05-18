@@ -72,6 +72,7 @@ EQPlot::EQPlot (chowdsp::PluginState& pluginState,
                                                               .maxMagnitudeDB = 20.0f }),
       chyron (pluginState, eqParams, hcp),
       drawView (*this),
+      state (pluginState),
       eqParameters (eqParams),
       optItersLabel (drawView)
 {
@@ -213,7 +214,7 @@ void EQPlot::toggleDrawView (bool shouldShowDrawView, bool triggerOptimiser)
     if (triggerOptimiser)
     {
         optItersLabel.setVisible (true);
-        drawView.triggerOptimiser (eqParameters);
+        drawView.triggerOptimiser (eqParameters, *state.undoManager);
         return;
     }
 

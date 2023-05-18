@@ -47,6 +47,7 @@ private:
     bool drawMode = false;
 
     chowdsp::ScopedCallbackList callbacks;
+    chowdsp::PluginState& state;
     chowdsp::EQ::StandardEQParameters<numBands>& eqParameters;
 
     struct IterationsLabel : juce::Label, juce::Timer

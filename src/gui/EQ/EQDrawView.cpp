@@ -64,7 +64,8 @@ std::array<float, dsp::eq::EQOptimiser::numPoints> EQDrawView::getDrawnMagnitude
     return magnitudeResponse;
 }
 
-void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters)
+void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQToolParams::numBands>& eqParameters,
+                                   juce::UndoManager& um)
 {
     isOptimising = true;
     repaint();
@@ -73,7 +74,7 @@ void EQDrawView::triggerOptimiser (chowdsp::EQ::StandardEQParameters<dsp::eq::EQ
         {
             auto desiredResponse = getDrawnMagnitudeResponse();
             optimiser.runOptimiser (std::move (desiredResponse));
-            optimiser.updateEQParameters (eqParameters); // TODO: make this undo-able
+            optimiser.updateEQParameters (eqParameters, um);
             juce::MessageManager::callAsync ([this]
                                              {
                                                  onCompletedOptimisation();

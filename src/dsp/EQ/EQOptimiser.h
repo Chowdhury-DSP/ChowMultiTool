@@ -17,7 +17,8 @@ public:
     static constexpr size_t numPoints = 600;
     float operator() (const VectorXf& x, VectorXf& grad, bool is_top_level = true);
     void runOptimiser (std::array<float, numPoints>&& desiredMagnitudeResponse);
-    void updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters) const;
+    void updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters,
+                             juce::UndoManager& um) const;
 
     static constexpr std::array<float, numPoints> freqs = []
     {

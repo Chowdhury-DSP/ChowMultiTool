@@ -6,6 +6,7 @@
 #include "LBFGSB.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wsign-conversion", "-Wsign-compare", "-Wshorten-64-to-32", "-Wimplicit-float-conversion")
+// NOLINTBEGIN
 
 namespace dsp::eq
 {
@@ -15,7 +16,7 @@ EQOptimiser::EQOptimiser() = default;
 
 float EQOptimiser::operator() (const VectorXf& x, VectorXf& grad, bool is_top_level)
 {
-    const int n = x.size();
+    const int n = x.size(); // NOLINT
     const int num_bands = n / 3;
     const int num_points = desiredMagResponse.size();
 
@@ -169,30 +170,48 @@ void EQOptimiser::runOptimiser (std::array<float, numPoints>&& desiredResponse)
     optParams = initial.transpose();
 }
 
-void EQOptimiser::updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters) const
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+// NOLINTEND
+
+void EQOptimiser::updateEQParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters,
+                                      juce::UndoManager& um) const
 {
     static constexpr auto numBands = EQToolParams::numBands;
-    Eigen::VectorXf optFcs (numBands);
-    Eigen::VectorXf optG (numBands);
-    Eigen::VectorXf optQ (numBands);
-    for (int i = 0; i < numBands; i++)
-    {
-        optFcs[i] = optParams[i];
-        optG[i] = optParams[numBands + i];
-        optQ[i] = optParams[2 * numBands + i];
-    }
-
-    EQToolParams::EQParams::Params paramList {};
+    using EQParamList = EQToolParams::EQParams::Params;
+    EQParamList paramList {};
     for (size_t bandIdx = 0; bandIdx < numBands; bandIdx++)
     {
         paramList.bands[bandIdx].params.bandType = 6;
-        paramList.bands[bandIdx].params.bandFreqHz = optFcs[bandIdx];
-        paramList.bands[bandIdx].params.bandGainDB = optG[bandIdx];
-        paramList.bands[bandIdx].params.bandQ = optQ[bandIdx];
-        paramList.bands[bandIdx].params.bandOnOff = true;
+        paramList.bands[bandIdx].params.bandFreqHz = optParams[Eigen::Index (bandIdx)];
+        paramList.bands[bandIdx].params.bandGainDB = optParams[Eigen::Index (numBands + bandIdx)];
+        paramList.bands[bandIdx].params.bandQ = optParams[Eigen::Index (2 * numBands + bandIdx)];
+        paramList.bands[bandIdx].params.bandOnOff = std::abs (paramList.bands[bandIdx].params.bandGainDB) > 0.25f;
     }
-    eqParameters.loadEQParameters (paramList, eqParameters);
+
+    struct UndoableEQLoadParameters : juce::UndoableAction
+    {
+        chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParameters;
+        EQParamList eqParamList;
+
+        explicit UndoableEQLoadParameters (chowdsp::EQ::StandardEQParameters<EQToolParams::numBands>& eqParams, EQParamList&& newParamList)
+            : eqParameters (eqParams),
+              eqParamList (std::move (newParamList))
+        {
+        }
+
+        bool perform() override
+        {
+            const auto oldEQParams = eqParameters.getEQParameters (eqParameters.eqParams);
+            eqParameters.loadEQParameters (eqParamList, eqParameters);
+            eqParamList = oldEQParams;
+            return true;
+        }
+
+        bool undo() override { return perform(); }
+        int getSizeInUnits() override { return int (sizeof (*this)); }
+    };
+
+    um.beginNewTransaction ("Set Optimised EQ Parameters");
+    um.perform (new UndoableEQLoadParameters { eqParameters, std::move (paramList) });
 }
 } // namespace dsp::eq
-
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
