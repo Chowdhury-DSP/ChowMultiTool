@@ -3,7 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ta
 if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
-project(ChowMultiTool VERSION 0.1.0)
+project(ChowMultiTool VERSION 0.2.0)
 
 set(CMAKE_CXX_STANDARD 20)
 set(COMPANY_NAME "chowdsp")
