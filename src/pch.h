@@ -28,14 +28,16 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif
 
 // Other third-party libraries
-#include <Eigen/Core>
-#include <LBFGSB.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
                                      "-Wsign-conversion",
                                      "-Wimplicit-int-conversion",
-                                     "-Wshadow")
+                                     "-Wimplicit-float-conversion",
+                                     "-Wshadow",
+                                     "-Wshorten-64-to-32")
+#include <Eigen/Core>
+#include <LBFGSB.h>
 #include <exprtk.hpp>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
