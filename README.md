@@ -6,9 +6,13 @@
 ChowMultiTool is a swiss-army-knife sort of plugin, containing
 a handful of little effects and other things that I've found useful.
 
-**This software is currently in beta. We expect it to be mostly stable,
-but there may be breaking changes introduced in between now and version
-1.0.0.**
+## Screenshots
+
+<img src="./images/title_screen.png" alt="Title Screen" height="250">
+<img src="./images/drawn_eq.png" alt="Drawn EQ" height="250">
+<br/>
+<img src="./images/math_shaper.png" alt="Math Shaper" height="250">
+<img src="./images/band_split.png" alt="Band Splitter" height="250">
 
 ## Quick Links:
 
