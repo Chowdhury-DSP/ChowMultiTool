@@ -8,11 +8,9 @@ a handful of little effects and other things that I've found useful.
 
 ## Screenshots
 
-<img src="./images/title_screen.png" alt="Title Screen" height="250">
-<img src="./images/drawn_eq.png" alt="Drawn EQ" height="250">
+<img src="./images/title_screen.png" alt="Title Screen" height="250"><img src="./images/drawn_eq.png" alt="Drawn EQ" height="250">
 <br/>
-<img src="./images/math_shaper.png" alt="Math Shaper" height="250">
-<img src="./images/band_split.png" alt="Band Splitter" height="250">
+<img src="./images/math_shaper.png" alt="Math Shaper" height="250"><img src="./images/band_split.png" alt="Band Splitter" height="250">
 
 ## Quick Links:
 
