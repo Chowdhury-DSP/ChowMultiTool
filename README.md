@@ -14,8 +14,8 @@ a handful of little effects and other things that I've found useful.
 
 ## Quick Links:
 
-- Latest Release (coming soon)
-- ChowMultiTool for iOS (coming soon)
+- [Latest Release](https://chowdsp.com/products.html#multitool)
+- [ChowMultiTool for iOS](https://apps.apple.com/us/app/chowmultitool/id6448428301)
 - [Nightly Builds](https://chowdsp.com/nightly.html#multitool)
 - [TestFlight Builds](https://testflight.apple.com/join/KuFujgKZ)
 
@@ -56,8 +56,8 @@ $ cmake --build build --config Release
 - Extra Icons - [FontAwesome](https://fontawesome.com/) and [FontAudio](https://github.com/fefanto/fontaudio)
 - Math Expression Parsing - [ExprTk](http://www.partow.net/programming/exprtk/)
 - UI Inspection - [melatonin_inspector](https://github.com/sudara/melatonin_inspector)
-- Limited-memory BFGS algorithm - [LBFGSpp](https://github.com/yixuan/LBFGSpp)
-- Vector Support - [Eigen](https://gitlab.com/libeigen/eigen) 
+- Limited-memory BFGS Algorithm - [LBFGSpp](https://github.com/yixuan/LBFGSpp)
+- Matrix Operations and Vector Support - [Eigen](https://gitlab.com/libeigen/eigen)
 
 ## License
 
