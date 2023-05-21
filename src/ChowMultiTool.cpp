@@ -31,12 +31,12 @@ juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()
 bool ChowMultiTool::isBusesLayoutSupported (const BusesLayout& layout) const
 {
     const auto mainInputLayout = layout.getMainInputChannelSet();
-    if (mainInputLayout.isDisabled() && mainInputLayout.isDiscreteLayout())
+    if (mainInputLayout.isDisabled() || mainInputLayout.isDiscreteLayout())
         return false;
 
     for (const auto& bus : layout.outputBuses)
     {
-        if (! bus.isDiscreteLayout() && ! bus.isDisabled())
+        if (bus.isDiscreteLayout() || bus.isDisabled())
             return false;
     }
 
