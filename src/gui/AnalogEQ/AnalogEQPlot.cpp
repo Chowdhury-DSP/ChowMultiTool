@@ -10,7 +10,7 @@ namespace
     constexpr double sampleRate = 48000.0f;
     constexpr int fftOrder = 15;
     constexpr int blockSize = 1 << fftOrder;
-    constexpr int minFrequency = 16;
+    constexpr int minFrequency = 14;
     constexpr int maxFrequency = 22'000;
     constexpr auto thumbSizeFactor = 0.03f;
 
@@ -114,7 +114,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
     lbControl.bandID = BandID::Low;
     lbControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
-        return getXCoordinateForFrequency (bassFreqParam.get() * 0.9f);
+        return getXCoordinateForFrequency (bassFreqParam.get() * 0.7f);
     };
     addAndMakeVisible (lbControl);
 
@@ -129,7 +129,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
     lcControl.bandID = BandID::Low;
     lcControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
-        return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.9f);
+        return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.7f);
     };
     addAndMakeVisible (lcControl);
 

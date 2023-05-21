@@ -67,7 +67,7 @@ struct PluginExtraState : chowdsp::NonParamState
     ~PluginExtraState();
 
     std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
-    chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 900, 600 } };
+    chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state
 
