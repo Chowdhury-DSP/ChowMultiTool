@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2023-05-24
+- Fixed bugs related to saving and deleting presets.
+
 ## [0.2.0] - 2023-05-18
 - Added "draw mode" for EQ.
 - Added "Keytrack" mode for SVF.

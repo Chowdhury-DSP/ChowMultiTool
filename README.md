@@ -1,7 +1,9 @@
 # ChowMultiTool
 
+[![Download Latest](https://img.shields.io/badge/download-latest-blue.svg)](https://github.com/Chowdhury-DSP/ChowMultiTool/releases/latest)
 ![CI](https://github.com/Chowdhury-DSP/ChowMultiTool/workflows/CI/badge.svg)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://opensource.org/licenses/GPL-3.0)
+[![Downloads](https://img.shields.io/github/downloads/Chowdhury-DSP/ChowMultiTool/total)](https://somsubhra.github.io/github-release-stats/?username=Chowdhury-DSP&repository=ChowMultiTool&page=1&per_page=30)
 
 ChowMultiTool is a swiss-army-knife sort of plugin, containing
 a handful of little effects and other things that I've found useful.
