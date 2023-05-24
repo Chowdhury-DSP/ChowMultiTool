@@ -1,14 +1,16 @@
 #pragma once
 
 #include "gui/Shared/Fonts.h"
-#include <pch.h>
+#include "PresetsFileInterface.h"
 
 namespace gui::presets
 {
 class PresetsComponent : public chowdsp::presets::PresetsComponent
 {
 public:
-    PresetsComponent (chowdsp::presets::PresetManager& presetManager, chowdsp::presets::frontend::FileInterface& fileInterface);
+    PresetsComponent (chowdsp::presets::PresetManager& presetManager, PresetsFileInterface& fileInterface);
+
+    bool queryShouldDeletePreset (const chowdsp::presets::Preset& preset) override;
 
 private:
     SharedFonts fonts;

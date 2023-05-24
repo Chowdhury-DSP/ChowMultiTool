@@ -19,14 +19,12 @@ ErrorMessageView::ErrorMessageView()
     addAndMakeVisible (yesButton);
     yesButton.onClick = [this]
     {
-        result = 1;
         setVisible (false);
     };
 
     addAndMakeVisible (noButton);
     noButton.onClick = [this]
     {
-        result = 0;
         setVisible (false);
     };
 }
@@ -67,7 +65,10 @@ void ErrorMessageView::showErrorMessage (const juce::String& title, const juce::
     }
 }
 
-bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::String& message, juce::Component* comp)
+void ErrorMessageView::showYesNoBox (const juce::String& title,
+                                     const juce::String& message,
+                                     juce::Component* comp,
+                                     const std::function<void(bool)>& onChoice)
 {
     // similar to:
     //    return NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, title, message, comp) == 1;
@@ -75,16 +76,9 @@ bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::Stri
     if (auto* topLevelEditor = findTopLevelEditor (comp))
     {
         auto& errorMessageView = topLevelEditor->getErrorMessageView();
-        errorMessageView.setParametersYesNo (title, message);
+        errorMessageView.setParametersYesNo (title, message, onChoice);
         errorMessageView.setVisible (true);
-
-        //        while (errorMessageView.result < 0)
-        //            juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
-
-        return errorMessageView.result > 0;
     }
-
-    return false;
 }
 
 void ErrorMessageView::setParameters (const juce::String& titleText,
@@ -101,9 +95,10 @@ void ErrorMessageView::setParameters (const juce::String& titleText,
     noButton.setVisible (false);
 }
 
-void ErrorMessageView::setParametersYesNo (const juce::String& titleText, const juce::String& messageText)
+void ErrorMessageView::setParametersYesNo (const juce::String& titleText,
+                                           const juce::String& messageText,
+                                           const std::function<void(bool)>& onChoice)
 {
-    result = -1;
     setAlwaysOnTop (true);
     title.setText (titleText, juce::dontSendNotification);
     message.setText (messageText, juce::dontSendNotification);
@@ -111,6 +106,17 @@ void ErrorMessageView::setParametersYesNo (const juce::String& titleText, const 
     closeButton.setVisible (false);
     yesButton.setVisible (true);
     noButton.setVisible (true);
+
+    yesButton.onClick = [this, onChoice]
+    {
+        setVisible (false);
+        onChoice (true);
+    };
+    noButton.onClick = [this, onChoice]
+    {
+        setVisible (false);
+        onChoice (false);
+    };
 }
 
 void ErrorMessageView::paint (juce::Graphics& g)

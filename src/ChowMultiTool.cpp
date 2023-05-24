@@ -16,6 +16,7 @@ ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, creat
     pluginSettings->initialise (settingsFilePath);
 
     presetManager = std::make_unique<state::presets::PresetManager> (*this);
+    programAdaptor = std::make_unique<chowdsp::ProgramAdapter::BaseProgramAdapter>();
 }
 
 juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()
