@@ -63,7 +63,7 @@ struct FactoryPresetDiscoveryProvider
             jassert (fs.exists (entry.filename()));
             const auto factoryPreset = createPresetFromEmbeddedFile (entry.filename(), fs);
 
-            std::cout << "Indexing factory preset: " << factoryPreset.getName() << std::endl;
+            DBG ("Indexing factory preset: " + factoryPreset.getName());
             if (metadata_receiver->begin_preset (metadata_receiver, factoryPreset.getName().toRawUTF8(), factoryPreset.getName().toRawUTF8()))
             {
                 metadata_receiver->add_plugin_id (metadata_receiver, &plugin_id);
@@ -155,10 +155,10 @@ struct UserPresetDiscoveryProvider
         if (! preset.isValid())
             return true;
 
-        std::cout << "Indexing user preset: " << preset.getName() << std::endl;
+        DBG ("Indexing user preset: " + preset.getName());
         if (metadata_receiver->begin_preset (metadata_receiver,
                                              preset.getName().toRawUTF8(),
-                                             preset.getPresetFile().getFullPathName().toRawUTF8()))
+                                             ""))
         {
             metadata_receiver->add_plugin_id (metadata_receiver, &plugin_id);
             metadata_receiver->add_creator (metadata_receiver, preset.getVendor().toRawUTF8());
@@ -235,7 +235,7 @@ bool presetLoadFromLocation (chowdsp::presets::PresetManager& presetManager,
     }
     else if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_FILE)
     {
-        const auto presetFile = juce::File { load_key };
+        const auto presetFile = juce::File { location };
         if (presetFile.getFullPathName().isEmpty())
         {
             presetManager.loadDefaultPreset();
