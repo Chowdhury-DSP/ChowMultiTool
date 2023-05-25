@@ -26,7 +26,6 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/Toolbar/Toolbar.cpp
     gui/Toolbar/PresetsComponent.cpp
-    gui/Toolbar/PresetsFileInterface.cpp
     gui/Toolbar/SettingsButton.cpp
 
     gui/EQ/EQEditor.cpp

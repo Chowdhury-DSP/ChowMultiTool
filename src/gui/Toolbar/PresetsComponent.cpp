@@ -4,7 +4,8 @@
 
 namespace gui::presets
 {
-PresetsComponent::PresetsComponent (chowdsp::presets::PresetManager& presetMgr, PresetsFileInterface& fileFace)
+PresetsComponent::PresetsComponent (chowdsp::presets::PresetManager& presetMgr,
+                                    chowdsp::presets::frontend::FileInterface& fileFace)
     : chowdsp::presets::PresetsComponent (presetMgr, &fileFace)
 {
     setColour (juce::Label::backgroundColourId, colours::linesColour.withAlpha (0.5f));
@@ -13,23 +14,32 @@ PresetsComponent::PresetsComponent (chowdsp::presets::PresetManager& presetMgr, 
     presetNameEditor.setFont (juce::Font { fonts->robotoBold }.withHeight (18.0f));
 }
 
-bool PresetsComponent::queryShouldDeletePreset (const chowdsp::presets::Preset& preset)
+void PresetsComponent::confirmAndDeletePreset (const chowdsp::presets::Preset& presetToDelete,
+                                               std::function<void (const chowdsp::presets::Preset&)>&& presetDeleter)
 {
     ErrorMessageView::showYesNoBox ("Preset Deletion Warning!",
                                     "Are you sure you want to delete the following preset? "
                                     "This action cannot be undone!\n"
-                                        + preset.getName(),
+                                        + presetToDelete.getName(),
                                     this,
-                                    [this, &preset] (bool shouldDelete)
+                                    [&presetToDelete, deleter = std::move (presetDeleter)] (bool shouldDelete)
                                     {
                                         if (shouldDelete)
-                                        {
-                                            preset.getPresetFile().deleteFile();
-                                            if (presetManager.getDefaultPreset() != nullptr)
-                                                presetManager.loadPreset (*presetManager.getDefaultPreset());
-                                            presetManager.loadUserPresetsFromFolder (presetManager.getUserPresetPath());
-                                        }
+                                            deleter (presetToDelete);
                                     });
-    return true;
+}
+
+void PresetsComponent::confirmAndOverwritePresetFile (const juce::File& presetFile,
+                                                      chowdsp::presets::Preset&& preset,
+                                                      std::function<void (const juce::File&, chowdsp::presets::Preset&&)>&& presetSaver)
+{
+    ErrorMessageView::showYesNoBox ("Preset Overwrite Warning!",
+                                    "Saving this preset will overwrite an existing file. Are you sure you want to continue?",
+                                    this,
+                                    [presetFile, preset = std::move (preset), saver = std::move (presetSaver)] (bool shouldOverwrite) mutable
+                                    {
+                                        if (shouldOverwrite)
+                                            saver (presetFile, std::move (preset));
+                                    });
 }
 } // namespace gui::presets

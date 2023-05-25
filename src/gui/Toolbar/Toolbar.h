@@ -32,7 +32,7 @@ private:
     juce::ComboBox toolChoiceBox;
     chowdsp::ComboBoxAttachment toolChoiceAttachment;
 
-    gui::presets::PresetsFileInterface presetsFileInterface;
+    chowdsp::presets::frontend::FileInterface presetsFileInterface;
     presets::PresetsComponent presetsComp;
 
     SettingsButton settingsButton;
