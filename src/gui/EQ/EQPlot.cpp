@@ -6,7 +6,7 @@
 namespace gui::eq
 {
 
-void drawDbText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float maxGain)
+void drawDbText (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float maxGain)
 {
     const int numValues = 7;
     const int textWidth = 50;
@@ -15,7 +15,8 @@ void drawDbText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float 
     int yPosition[numValues];
     int xPosition = plot.getX() + 3;
 
-    for (int i = 0; i < numValues; i++) {
+    for (int i = 0; i < numValues; i++)
+    {
         float dBValue;
         if (i == numValues / 2)
             dBValue = 0.0f;
@@ -24,24 +25,24 @@ void drawDbText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float 
         else
             dBValue = step * (numValues / 2 - i);
 
-        yPosition[i] = int(plot.getYCoordinateForDecibels(dBValue));
-        juce::String text = juce::String(dBValue) + " dB";
+        yPosition[i] = int (plot.getYCoordinateForDecibels (dBValue));
+        juce::String text = juce::String (dBValue) + " dB";
 
-        g.setColour(juce::Colours::white.withAlpha (0.5f));
-        g.drawFittedText(text, xPosition, yPosition[i], textWidth, textHeight, juce::Justification::left, 1);
+        g.setColour (juce::Colours::white.withAlpha (0.5f));
+        g.drawFittedText (text, xPosition, yPosition[i], textWidth, textHeight, juce::Justification::left, 1);
     }
 }
 
-void drawFrequencyText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float frequency, float minGain)
+void drawFrequencyText (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float frequency, float minGain)
 {
-    int xPosition = int(plot.getXCoordinateForFrequency(frequency));
-    int yPosition = int(plot.getYCoordinateForDecibels(minGain));
+    int xPosition = int (plot.getXCoordinateForFrequency (frequency));
+    int yPosition = int (plot.getYCoordinateForDecibels (minGain));
 
     juce::String unit = (frequency >= 1000) ? "KHz" : "Hz";
-    juce::String text = juce::String(frequency / ((frequency >= 1000) ? 1000 : 1)) + " " + unit;
+    juce::String text = juce::String (frequency / ((frequency >= 1000) ? 1000 : 1)) + " " + unit;
 
-    g.setColour(juce::Colours::white.withAlpha (0.5f));
-    g.drawFittedText(text, xPosition, yPosition, 100, 28, juce::Justification::topLeft, 1);
+    g.setColour (juce::Colours::white.withAlpha (0.5f));
+    g.drawFittedText (text, xPosition, yPosition, 100, 28, juce::Justification::topLeft, 1);
 }
 
 juce::Rectangle<float> EQPlot::QDotSlider::getThumbBounds() const noexcept
@@ -280,10 +281,10 @@ void EQPlot::setSelectedBand (int bandIndex)
 void EQPlot::paint (juce::Graphics& g)
 {
     const float maxGain = 18.0f;
-    gui::eq::drawDbText(g, *this, maxGain);
-    gui::eq::drawFrequencyText(g, *this, 100, -maxGain);
-    gui::eq::drawFrequencyText(g, *this, 1000, -maxGain);
-    gui::eq::drawFrequencyText(g, *this, 10000, -maxGain);
+    gui::eq::drawDbText (g, *this, maxGain);
+    gui::eq::drawFrequencyText (g, *this, 100, -maxGain);
+    gui::eq::drawFrequencyText (g, *this, 1000, -maxGain);
+    gui::eq::drawFrequencyText (g, *this, 10000, -maxGain);
 
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
                                                          g,

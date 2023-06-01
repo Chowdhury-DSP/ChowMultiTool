@@ -19,10 +19,10 @@ EQDrawView::EQDrawView (const chowdsp::SpectrumPlotBase& plotBase)
 void EQDrawView::paint (juce::Graphics& g)
 {
     const float maxGain = 18.0f;
-    gui::eq::drawDbText(g, spectrumPlot, maxGain);
-    gui::eq::drawFrequencyText(g, spectrumPlot, 100, -maxGain);
-    gui::eq::drawFrequencyText(g, spectrumPlot, 1000, -maxGain);
-    gui::eq::drawFrequencyText(g, spectrumPlot, 10000, -maxGain);
+    gui::eq::drawDbText (g, spectrumPlot, maxGain);
+    gui::eq::drawFrequencyText (g, spectrumPlot, 100, -maxGain);
+    gui::eq::drawFrequencyText (g, spectrumPlot, 1000, -maxGain);
+    gui::eq::drawFrequencyText (g, spectrumPlot, 10000, -maxGain);
 
     const auto drawCircle = [&g, dim = 0.035f * (float) getHeight()] (juce::Point<float> pos)
     {
