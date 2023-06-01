@@ -7,6 +7,10 @@
 
 namespace gui::eq
 {
+
+void drawDbText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float maxGain);
+void drawFrequencyText(juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float frequency, float minGain);
+
 class EQPlot : public chowdsp::EQ::EqualizerPlotWithParameters<numBands>
 {
 public:
