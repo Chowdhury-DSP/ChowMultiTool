@@ -91,4 +91,44 @@ inline void drawMagnitudeLines (const chowdsp::SpectrumPlotBase& plotBase,
     g.setColour (majorLinesColour);
     plotBase.drawMagnitudeLines (g, majorLines);
 }
+
+static constexpr auto labelMagnitudeDb = 18.0f;
+
+inline void drawMagnitudeLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float maxGain, int numDbValues)
+{
+    const int textWidth = 50;
+    const int textHeight = plot.getHeight()/25;
+    const float step = maxGain / int(numDbValues/2);
+    int yPosition[numDbValues];
+    int xPosition = plot.getX() + 3;
+
+    for (int i = 0; i < numDbValues; i++) {
+        float dBValue;
+        if (i == numDbValues / 2)
+            dBValue = 0.0f;
+        else if (i > numDbValues / 2)
+            dBValue = -step * float (i - numDbValues / 2);
+        else
+            dBValue = step * float (numDbValues / 2 - i);
+
+        yPosition[i] = int(plot.getYCoordinateForDecibels(dBValue));
+        juce::String text = juce::String(dBValue) + " dB";
+
+        g.setFont(textHeight);
+        g.setColour(juce::Colours::white.withAlpha (0.5f));
+        g.drawFittedText(text, xPosition, yPosition[i], textWidth, textHeight, juce::Justification::left, 1);
+    }
+}
+
+inline void drawFrequencyLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float frequency, float maxGain)
+{
+    int xPosition = int(plot.getXCoordinateForFrequency(frequency));
+    int yPosition = int(plot.getYCoordinateForDecibels(maxGain));
+
+    juce::String unit = (frequency >= 1000) ? "KHz" : "Hz";
+    juce::String text = juce::String(frequency / ((frequency >= 1000) ? 1000 : 1)) + " " + unit;
+
+    g.setColour(juce::Colours::white.withAlpha (0.5f));
+    g.drawFittedText(text, xPosition, yPosition, 100, 28, juce::Justification::topLeft, 1);
+}
 } // namespace gui
