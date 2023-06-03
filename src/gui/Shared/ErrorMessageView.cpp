@@ -68,7 +68,7 @@ void ErrorMessageView::showErrorMessage (const juce::String& title, const juce::
 void ErrorMessageView::showYesNoBox (const juce::String& title,
                                      const juce::String& message,
                                      juce::Component* comp,
-                                     const std::function<void(bool)>& onChoice)
+                                     const std::function<void (bool)>& onChoice)
 {
     // similar to:
     //    return NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, title, message, comp) == 1;
@@ -97,7 +97,7 @@ void ErrorMessageView::setParameters (const juce::String& titleText,
 
 void ErrorMessageView::setParametersYesNo (const juce::String& titleText,
                                            const juce::String& messageText,
-                                           const std::function<void(bool)>& onChoice)
+                                           const std::function<void (bool)>& onChoice)
 {
     setAlwaysOnTop (true);
     title.setText (titleText, juce::dontSendNotification);

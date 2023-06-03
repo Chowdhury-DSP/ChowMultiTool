@@ -5,6 +5,7 @@
 
 namespace gui::eq
 {
+
 juce::Rectangle<float> EQPlot::QDotSlider::getThumbBounds() const noexcept
 {
     const auto dim = plotBase.getLocalBounds().proportionOfWidth (0.025f);
@@ -240,6 +241,11 @@ void EQPlot::setSelectedBand (int bandIndex)
 
 void EQPlot::paint (juce::Graphics& g)
 {
+    drawMagnitudeLabels(g, *this, gui::labelMagnitudeDb, 7);
+    drawFrequencyLabels(g, *this, 100, gui::labelMagnitudeDb);
+    drawFrequencyLabels(g, *this, 1000, gui::labelMagnitudeDb);
+    drawFrequencyLabels(g, *this, 10000, gui::labelMagnitudeDb);
+
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
                                                          g,
                                                          { 100.0f, 1'000.0f, 10'000.0f },
