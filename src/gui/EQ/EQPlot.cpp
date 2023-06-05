@@ -242,7 +242,7 @@ void EQPlot::setSelectedBand (int bandIndex)
 void EQPlot::paint (juce::Graphics& g)
 {
     drawMagnitudeLabels (g, *this, { -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f });
-    drawFrequencyLabels (g, *this, { 100.0f, 1000.0f, 10'000.0f } , 18.0f);
+    drawFrequencyLabels (g, *this, { 100.0f, 1000.0f, 10'000.0f }, 18.0f);
 
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
                                                          g,
