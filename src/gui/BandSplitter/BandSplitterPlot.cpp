@@ -176,6 +176,8 @@ void BandSplitterPlot::updateFilterSlope()
 
 void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 {
+    drawMagnitudeLabels (g, *this, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
+    drawFrequencyLabels (g, *this, { 100.0f, 1'000.0f, 10'000.0f }, 2.0f);
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
                                                          g,
                                                          { 100.0f, 1'000.0f, 10'000.0f },

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Fonts.h"
 #include <pch.h>
 
 namespace gui
@@ -92,44 +93,45 @@ inline void drawMagnitudeLines (const chowdsp::SpectrumPlotBase& plotBase,
     plotBase.drawMagnitudeLines (g, majorLines);
 }
 
-static constexpr auto labelMagnitudeDb = 18.0f;
-
-inline void drawMagnitudeLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float maxGain, int numDbValues)
+inline void drawMagnitudeLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, std::initializer_list<float> dBValues)
 {
-    const int textWidth = 50;
-    const int textHeight = plot.getHeight() / 25;
-    const float step = maxGain / int (numDbValues / 2);
-    int yPosition[numDbValues];
-    int xPosition = plot.getX() + 3;
+    const auto textHeight = plot.proportionOfHeight (0.03f);
+    const auto textPad = plot.proportionOfWidth (0.002f);
+    const auto font = juce::Font { SharedFonts()->robotoBold }.withHeight ((float) textHeight);
+    g.setFont (font);
 
-    for (int i = 0; i < numDbValues; i++)
+    for (auto dBValue : dBValues)
     {
-        float dBValue;
-        if (i == numDbValues / 2)
-            dBValue = 0.0f;
-        else if (i > numDbValues / 2)
-            dBValue = -step * float (i - numDbValues / 2);
-        else
-            dBValue = step * float (numDbValues / 2 - i);
-
-        yPosition[i] = int (plot.getYCoordinateForDecibels (dBValue));
+        const auto yPosition = int (plot.getYCoordinateForDecibels (dBValue));
         juce::String text = juce::String (dBValue) + " dB";
+        const auto textWidth = font.getStringWidth (text);
 
-        g.setFont (textHeight);
         g.setColour (juce::Colours::white.withAlpha (0.5f));
-        g.drawFittedText (text, xPosition, yPosition[i], textWidth, textHeight, juce::Justification::left, 1);
+        g.drawFittedText (text, textPad, yPosition + textPad, textWidth, textHeight, juce::Justification::left, 1);
     }
 }
 
-inline void drawFrequencyLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, float frequency, float maxGain)
+inline void drawFrequencyLabels (juce::Graphics& g,
+                                 const chowdsp::SpectrumPlotBase& plot,
+                                 std::initializer_list<float> frequencies,
+                                 float labelDBPosition)
 {
-    int xPosition = int (plot.getXCoordinateForFrequency (frequency));
-    int yPosition = int (plot.getYCoordinateForDecibels (maxGain));
+    const auto textHeight = plot.proportionOfHeight (0.03f);
+    const auto textPad = plot.proportionOfWidth (0.002f);
+    const auto font = juce::Font { SharedFonts()->robotoBold }.withHeight ((float) textHeight);
+    g.setFont (font);
 
-    juce::String unit = (frequency >= 1000) ? "KHz" : "Hz";
-    juce::String text = juce::String (frequency / ((frequency >= 1000) ? 1000 : 1)) + " " + unit;
+    for (auto frequency : frequencies)
+    {
+        int xPosition = int (plot.getXCoordinateForFrequency (frequency));
+        int yPosition = int (plot.getYCoordinateForDecibels (labelDBPosition));
 
-    g.setColour (juce::Colours::white.withAlpha (0.5f));
-    g.drawFittedText (text, xPosition, yPosition, 100, 28, juce::Justification::topLeft, 1);
+        juce::String unit = (frequency >= 1000) ? "kHz" : "Hz";
+        juce::String text = juce::String (frequency / ((frequency >= 1000.0f) ? 1000.0f : 1.0f)) + " " + unit;
+        const auto textWidth = font.getStringWidth (text);
+
+        g.setColour (juce::Colours::white.withAlpha (0.5f));
+        g.drawFittedText (text, xPosition + textPad, yPosition, textWidth, textHeight, juce::Justification::topLeft, 1);
+    }
 }
 } // namespace gui

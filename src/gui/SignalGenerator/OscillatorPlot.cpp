@@ -19,6 +19,8 @@ OscillatorPlot::OscillatorPlot()
 
 void OscillatorPlot::paint (juce::Graphics& g)
 {
+    drawMagnitudeLabels (g, *this, { -72.0f, -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f });
+    drawFrequencyLabels (g, *this, { 100.0f, 1'000.0f, 10'000.0f }, 2.5f);
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1'000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
     gui::drawMagnitudeLines (*this, g, { -72.0f, -60.0f, -48.0f, -36.0f, -24.0f, -12.0f, 0.0f, 12.0f, 24.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
 
