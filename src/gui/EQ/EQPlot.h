@@ -7,6 +7,7 @@
 
 namespace gui::eq
 {
+
 class EQPlot : public chowdsp::EQ::EqualizerPlotWithParameters<numBands>
 {
 public:

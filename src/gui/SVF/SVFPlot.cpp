@@ -119,6 +119,8 @@ void SVFPlot::updatePlot()
 
 void SVFPlot::paint (juce::Graphics& g)
 {
+    drawMagnitudeLabels (g, *this, { -42.0f, -36.0f, -30.0f, -24.0f, -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f, 24.0f });
+    drawFrequencyLabels (g, *this, { 100.0f, 1'000.0f, 10'000.0f }, 29.5f);
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
                                                          g,
                                                          { 100.0f, 1'000.0f, 10'000.0f },
@@ -126,7 +128,7 @@ void SVFPlot::paint (juce::Graphics& g)
                                                          colours::minorLinesColour);
     gui::drawMagnitudeLines (*this,
                              g,
-                             { -42.0f, -36.0f, -24.0f, -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f },
+                             { -42.0f, -36.0f, -30.0f, -24.0f, -18.0f, -12.0f, -6.0f, 0.0f, 6.0f, 12.0f, 18.0f, 24.0f },
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);

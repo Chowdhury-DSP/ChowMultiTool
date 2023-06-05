@@ -231,6 +231,9 @@ void AnalogEQPlot::setSelectedBand (BandID band)
 
 void AnalogEQPlot::paint (juce::Graphics& g)
 {
+    drawMagnitudeLabels (g, *this, { -20.0f, -15.0f, -10.0f, -5.0f, 0.0f, 5.0f, 10.0f, 15.0f, 20.0f });
+    drawFrequencyLabels (g, *this, { 100.0f, 1000.0f, 10'000.0f }, 20.0f);
+
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
     gui::drawMagnitudeLines (*this, g, { -20.0f, -15.0f, -10.0f, -5.0f, 5.0f, 10.0f, 15.0f, 20.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
 

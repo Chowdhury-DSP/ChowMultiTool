@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Fonts.h"
 #include <pch.h>
 
 namespace gui
@@ -90,5 +91,47 @@ inline void drawMagnitudeLines (const chowdsp::SpectrumPlotBase& plotBase,
 
     g.setColour (majorLinesColour);
     plotBase.drawMagnitudeLines (g, majorLines);
+}
+
+inline void drawMagnitudeLabels (juce::Graphics& g, const chowdsp::SpectrumPlotBase& plot, std::initializer_list<float> dBValues)
+{
+    const auto textHeight = plot.proportionOfHeight (0.03f);
+    const auto textPad = plot.proportionOfWidth (0.002f);
+    const auto font = juce::Font { SharedFonts()->robotoBold }.withHeight ((float) textHeight);
+    g.setFont (font);
+
+    for (auto dBValue : dBValues)
+    {
+        const auto yPosition = int (plot.getYCoordinateForDecibels (dBValue));
+        juce::String text = juce::String (dBValue) + " dB";
+        const auto textWidth = font.getStringWidth (text);
+
+        g.setColour (juce::Colours::white.withAlpha (0.5f));
+        g.drawFittedText (text, textPad, yPosition + textPad, textWidth, textHeight, juce::Justification::left, 1);
+    }
+}
+
+inline void drawFrequencyLabels (juce::Graphics& g,
+                                 const chowdsp::SpectrumPlotBase& plot,
+                                 std::initializer_list<float> frequencies,
+                                 float labelDBPosition)
+{
+    const auto textHeight = plot.proportionOfHeight (0.03f);
+    const auto textPad = plot.proportionOfWidth (0.002f);
+    const auto font = juce::Font { SharedFonts()->robotoBold }.withHeight ((float) textHeight);
+    g.setFont (font);
+
+    for (auto frequency : frequencies)
+    {
+        int xPosition = int (plot.getXCoordinateForFrequency (frequency));
+        int yPosition = int (plot.getYCoordinateForDecibels (labelDBPosition));
+
+        juce::String unit = (frequency >= 1000) ? "kHz" : "Hz";
+        juce::String text = juce::String (frequency / ((frequency >= 1000.0f) ? 1000.0f : 1.0f)) + " " + unit;
+        const auto textWidth = font.getStringWidth (text);
+
+        g.setColour (juce::Colours::white.withAlpha (0.5f));
+        g.drawFittedText (text, xPosition + textPad, yPosition, textWidth, textHeight, juce::Justification::topLeft, 1);
+    }
 }
 } // namespace gui
