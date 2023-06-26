@@ -135,7 +135,6 @@ private:
                                        chowdsp::PeakingFilter<FloatType, DecrampedMode>,
                                        chowdsp::NotchFilter<FloatType, DecrampedMode>,
                                        chowdsp::HighShelfFilter<FloatType, DecrampedMode>,
-                                       chowdsp::SecondOrderBPF<FloatType, DecrampedMode>,
                                        chowdsp::FirstOrderLPF<FloatType>,
                                        chowdsp::SecondOrderLPF<FloatType, DecrampedMode>,
                                        chowdsp::ButterworthFilter<3, chowdsp::ButterworthFilterType::Lowpass, FloatType>,

@@ -1,7 +1,5 @@
 #include "EQProcessor.h"
 
-// @TODO: handle latency from linear phase mode
-
 namespace dsp::eq
 {
 void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
