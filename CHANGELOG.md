@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Added gain and frequency labels to spectrum plots.
+- Fixed incorrect EQ filter type for First-Order Lowpass Filter.
+
 ## [1.0.0] - 2023-05-24
 - Fixed bugs related to saving and deleting presets.
 
