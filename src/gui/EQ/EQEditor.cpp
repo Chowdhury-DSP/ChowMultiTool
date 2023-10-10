@@ -4,11 +4,12 @@
 
 namespace gui::eq
 {
-EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp)
+EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, EQHelpers& eqHelper)
     : plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
+      spectrumAnalyser(std::make_unique<SpectrumAnalyser>(plot, eqHelper)),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
@@ -18,6 +19,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
     addAndMakeVisible (plot);
     addAndMakeVisible (bottomBar.get());
     addAndMakeVisible (linearPhaseButton);
+    addAndMakeVisible(*spectrumAnalyser);
 
     linearPhaseButton.setTooltip ("Linear Phase");
 
@@ -74,5 +76,6 @@ void EQEditor::resized()
     drawButton.setBounds (linearPhaseButton.getBoundsInParent().translated (-pad - buttonDim, 0));
     drawCheckButton.setBounds (drawButton.getBoundsInParent());
     drawXButton.setBounds (linearPhaseButton.getBoundsInParent());
+    spectrumAnalyser->setBounds(getLocalBounds());
 }
 } // namespace gui::eq

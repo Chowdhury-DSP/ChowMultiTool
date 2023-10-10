@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "dsp/Shared/EQHelpers.h"
 
 namespace dsp::eq
 {
@@ -108,12 +109,13 @@ struct EQToolParams : chowdsp::ParamHolder
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams) {}
+    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams), eqHelper(std::make_unique<EQHelpers>()) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
+    EQHelpers& getHelper() { return *eqHelper; }
 
 private:
     const EQToolParams& params;
@@ -148,6 +150,7 @@ private:
 
     using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;
     chowdsp::EQ::LinearPhaseEQ<LinearPhaseProtoEQ> linPhaseEQ;
+    std::unique_ptr<EQHelpers> eqHelper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };
