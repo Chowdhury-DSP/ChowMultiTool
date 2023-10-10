@@ -14,7 +14,7 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     eq.prepare (spec);
     linPhaseEQ.prepare (spec, getEQParams());
-    eqHelper->prepareToPlay(spec.sampleRate, (int)spec.maximumBlockSize, (int)spec.numChannels);
+    eqHelper->prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
@@ -43,9 +43,9 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     }
 
     juce::AudioBuffer<float> audioBuffer;
-    audioBuffer.setSize(numChannels, numSamples);
-    chowdsp::BufferMath::copyBufferData(buffer, audioBuffer);
-    eqHelper->processBlockInput(audioBuffer);
+    audioBuffer.setSize (numChannels, numSamples);
+    chowdsp::BufferMath::copyBufferData (buffer, audioBuffer);
+    eqHelper->processBlockInput (audioBuffer);
 }
 
 int EQProcessor::getLatencySamples() const

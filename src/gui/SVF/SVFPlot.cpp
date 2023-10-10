@@ -52,7 +52,7 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp
     keytrackSlider.widthProportion = 0.03f;
     addAndMakeVisible (keytrackSlider);
     addAndMakeVisible (chyron);
-//    addAndMakeVisible(spectrumAnalyser);
+    //    addAndMakeVisible(spectrumAnalyser);
 
     keytrackSlider.getXCoordinate = [this, &svfParams = std::as_const (svfParams)]
     {
@@ -137,7 +137,7 @@ void SVFPlot::paint (juce::Graphics& g)
     g.setColour (colours::plotColour);
     g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.5f });
     //draw the spectrum analyser
-//    spectrumAnalyser.updatePlotPath(g);
+    //    spectrumAnalyser.updatePlotPath(g);
 }
 
 void SVFPlot::resized()
@@ -153,6 +153,6 @@ void SVFPlot::resized()
                       getHeight() - 5 * pad - chyronHeight,
                       chyronWidth,
                       chyronHeight);
-//    spectrumAnalyser.setBounds(getLocalBounds());
+    //    spectrumAnalyser.setBounds(getLocalBounds());
 }
 } // namespace gui::svf

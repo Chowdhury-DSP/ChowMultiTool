@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "dsp/Shared/EQHelpers.h"
+#include <pch.h>
 
 namespace dsp::eq
 {
@@ -109,7 +109,7 @@ struct EQToolParams : chowdsp::ParamHolder
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams), eqHelper(std::make_unique<EQHelpers>()) {}
+    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams), eqHelper (std::make_unique<EQHelpers>()) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);

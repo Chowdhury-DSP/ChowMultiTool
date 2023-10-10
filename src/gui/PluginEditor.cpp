@@ -49,9 +49,8 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
 
     juce::LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
 
-//    const auto& processor =  plugin.getProcessor();
-//    const auto& tools = processor.getTools();
-
+    //    const auto& processor =  plugin.getProcessor();
+    //    const auto& tools = processor.getTools();
 }
 
 PluginEditor::~PluginEditor()
@@ -74,7 +73,7 @@ void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingI
 
 EQHelpers& PluginEditor::getProcessorHelper()
 {
-    auto& tools = std::get<0>(plugin.getProcessor().getTools());
+    auto& tools = std::get<0> (plugin.getProcessor().getTools());
     return tools.getHelper();
 }
 

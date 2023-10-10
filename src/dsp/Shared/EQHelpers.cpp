@@ -1,19 +1,17 @@
 #include "EQHelpers.h"
 
-
 EQHelpers::EQHelpers()
 {
-
 }
 
 void EQHelpers::prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels)
 {
-    SpectrumAnalyserTask.prepare(sampleRate, samplesPerBlock, numChannels);
+    SpectrumAnalyserTask.prepare (sampleRate, samplesPerBlock, numChannels);
 }
 
 void EQHelpers::processBlockInput (juce::AudioBuffer<float>& buffer)
 {
-    SpectrumAnalyserTask.pushSamples(buffer);
+    SpectrumAnalyserTask.pushSamples (buffer);
 }
 
 static std::vector<float> getFFTFreqs (int N, float T)
@@ -40,7 +38,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
     }
 }
 
-void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask(double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
+void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
 {
     static constexpr auto maxBinWidth = 6.0;
     fftSize = juce::nextPowerOfTwo (int (sampleRate / maxBinWidth));
@@ -63,7 +61,7 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::resetTask()
 {
     std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), -100.0f);
 }
-void EQHelpers::SpectrumAnalyserBackgroundTask::runTask(const juce::AudioBuffer<float> &data)
+void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
 {
     jassert (data.getNumSamples() == fftSize);
 

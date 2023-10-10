@@ -1,7 +1,7 @@
 #include "SpectrumAnalyser.h"
 
-SpectrumAnalyser::SpectrumAnalyser(const chowdsp::SpectrumPlotBase& eqPlot, EQHelpers& helper) :  eqPlot(eqPlot),
-                                                                                                  task(helper.SpectrumAnalyserTask)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, EQHelpers& helper) : eqPlot (eqPlot),
+                                                                                                  task (helper.SpectrumAnalyserTask)
 
 {
 }
@@ -14,9 +14,9 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::teal.withAlpha(0.4f));
-    g.fillPath(path);
-    g.setColour(juce::Colours::orange);
+    g.fillAll (juce::Colours::teal.withAlpha (0.4f));
+    g.fillPath (path);
+    g.setColour (juce::Colours::orange);
     g.strokePath (path, juce::PathStrokeType (2.0f));
 }
 

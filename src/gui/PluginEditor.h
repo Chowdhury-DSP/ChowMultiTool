@@ -1,9 +1,9 @@
 #pragma once
 
-#include <pch.h>
 #include "Toolbar/Toolbar.h"
-#include "gui/Shared/ErrorMessageView.h"
 #include "dsp/Shared/EQHelpers.h"
+#include "gui/Shared/ErrorMessageView.h"
+#include <pch.h>
 //#include "chowdsp_TupleHelpers.h"
 
 class ChowMultiTool;
