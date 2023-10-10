@@ -48,6 +48,10 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
                                                                  { refreshEditor(); });
 
     juce::LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
+
+//    const auto& processor =  plugin.getProcessor();
+//    const auto& tools = processor.getTools();
+
 }
 
 PluginEditor::~PluginEditor()
@@ -66,6 +70,12 @@ void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingI
 
     juce::Logger::writeToLog ("Using OpenGL: " + juce::String (shouldUseOpenGL ? "TRUE" : "FALSE"));
     shouldUseOpenGL ? oglHelper.attach() : oglHelper.detach();
+}
+
+EQHelpers& PluginEditor::getProcessorHelper()
+{
+    auto& tools = std::get<0>(plugin.getProcessor().getTools());
+    return tools.getHelper();
 }
 
 void PluginEditor::setResizeBehaviour()
@@ -101,7 +111,7 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider);
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, getProcessorHelper());
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                     editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
