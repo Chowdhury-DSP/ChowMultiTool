@@ -85,7 +85,7 @@ struct Params : chowdsp::ParamHolder
     chowdsp::EnumChoiceParameter<OversamplingRatio>::Ptr oversampleParam {
         juce::ParameterID { "waveshaper_oversample", ParameterVersionHints::version1_0_0 },
         "Waveshaper Oversampling",
-        OversamplingRatio::TwoX
+        OversamplingRatio::FourX
     };
 };
 
@@ -117,7 +117,7 @@ private:
 
     using AAFilter = chowdsp::EllipticFilter<8>;
     chowdsp::Upsampler<float, AAFilter> upsampler;
-    chowdsp::Downsampler<float, AAFilter> downsampler;
+    chowdsp::Downsampler<float, AAFilter, false> downsampler;
 
     chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<xsimd::batch<double>> doubleSIMDBuffer;
@@ -134,6 +134,8 @@ private:
     spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> freeDrawShaper;
     spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> mathShaper;
     spline::SplineWaveshaper<spline::VectorSplinePoints, spline::VectorSplineADAA> pointsShaper;
+
+    chowdsp::OvershootLimiter<float> clipGuard { 64 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };
