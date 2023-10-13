@@ -52,7 +52,8 @@ MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, Stat
       tools (detail::generate_tools (pluginState))
 {
     for (auto param : std::initializer_list<const juce::RangedAudioParameter*> { params.toolParam.get(),
-                                                                                 params.eqParams->linearPhaseMode.get() })
+                                                                                 params.eqParams->linearPhaseMode.get(),
+                                                                                 params.waveshaperParams->clipGuardParam.get() })
     {
         latencyChangeCallbacks += {
             pluginState.addParameterListener (*param,
@@ -63,11 +64,13 @@ MultiToolProcessor::MultiToolProcessor (juce::AudioProcessor& parentPlugin, Stat
     }
 }
 
+CHOWDSP_CHECK_HAS_METHOD (HasGetLatencySamples, getLatencySamples)
 void MultiToolProcessor::recalculateLatency()
 {
     const auto toolChoice = params.toolParam->getIndex() - 1;
     if (toolChoice < 0) // no tool!
     {
+        bypass.setLatencySamples (0);
         plugin.setLatencySamples (0);
         return;
     }
@@ -77,10 +80,17 @@ void MultiToolProcessor::recalculateLatency()
                                      [this] (auto& tool)
                                      {
                                          using ToolType [[maybe_unused]] = std::decay_t<decltype (tool)>;
-                                         if constexpr (std::is_same_v<ToolType, eq::EQProcessor>)
-                                             plugin.setLatencySamples (tool.getLatencySamples());
+                                         if constexpr (HasGetLatencySamples<ToolType>)
+                                         {
+                                             const auto latencySamples = tool.getLatencySamples();
+                                             bypass.setLatencySamples (latencySamples);
+                                             plugin.setLatencySamples (latencySamples);
+                                         }
                                          else
+                                         {
+                                             bypass.setLatencySamples (0);
                                              plugin.setLatencySamples (0);
+                                         }
                                      });
 }
 
@@ -89,18 +99,31 @@ void MultiToolProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     chowdsp::TupleHelpers::forEachInTuple ([&spec] (auto& tool, size_t)
                                            { tool.prepare (spec); },
                                            tools);
+    bypass.prepare (spec, ! params.bypassParam->get());
     recalculateLatency();
 }
 
 void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& midiBuffer)
 {
+    auto mainBusBuffer = plugin.getBusBuffer (buffer, true, 0);
+    const auto clearExtraBusses = [&buffer, &mainBusBuffer]
+    {
+        for (int ch = mainBusBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
+            buffer.clear (ch, 0, buffer.getNumSamples());
+    };
+
+
+    const auto isOn = ! params.bypassParam->get();
+    if (! bypass.processBlockIn (mainBusBuffer, isOn))
+    {
+        clearExtraBusses();
+        return;
+    }
+
     const auto toolChoice = params.toolParam->getIndex() - 1;
     if (toolChoice < 0) // no tool!
     {
-        auto busBuffer = plugin.getBusBuffer (buffer, true, 0);
-        for (int ch = busBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
-            buffer.clear (ch, 0, buffer.getNumSamples());
-
+        clearExtraBusses();
         return;
     }
 
@@ -138,5 +161,6 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const j
                                                  buffer.clear (ch, 0, buffer.getNumSamples());
                                          }
                                      });
+    bypass.processBlockOut (mainBusBuffer, isOn);
 }
 } // namespace dsp

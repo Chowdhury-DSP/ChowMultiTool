@@ -8,6 +8,8 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
     : params (wsParams),
       plot (pluginState, wsParams, hcp),
       foldFuzzControls (pluginState, wsParams, hcp),
+      clipGuardButton ("Vector/arrows-up-to-line-solid.svg", colours::plotColour, colours::linesColour),
+      clipGuardAttach (wsParams.clipGuardParam, pluginState, clipGuardButton),
       freeDrawButton ("Vector/pencil-solid.svg", colours::plotColour, colours::linesColour),
       mathButton ("Vector/calculator-solid.svg", colours::plotColour, colours::linesColour),
       pointsButton ("Vector/eye-dropper-solid.svg", colours::plotColour, colours::linesColour)
@@ -19,6 +21,10 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
 
     addChildComponent (foldFuzzControls);
     foldFuzzControls.setVisible (params.shapeParam->get() == dsp::waveshaper::Shapes::Fold_Fuzz);
+
+    addChildComponent (clipGuardButton);
+    clipGuardButton.setVisible (dsp::waveshaper::WaveshaperProcessor::modeUsesClipGuard (wsParams.shapeParam->get()));
+    clipGuardButton.setTooltip ("Enables \"clip guard\" mode (requires added latency).");
 
     addChildComponent (freeDrawButton);
     freeDrawButton.setVisible (wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Free_Draw);
@@ -49,6 +55,8 @@ WaveshaperEditor::WaveshaperEditor (State& pluginState, dsp::waveshaper::Params&
             chowdsp::ParameterListenerThread::MessageThread,
             [this, &wsParams]
             {
+                clipGuardButton.setVisible (dsp::waveshaper::WaveshaperProcessor::modeUsesClipGuard (wsParams.shapeParam->get()));
+
                 const auto isFreeDrawMode = wsParams.shapeParam->get() == dsp::waveshaper::Shapes::Free_Draw;
                 freeDrawButton.setVisible (isFreeDrawMode);
                 if (! isFreeDrawMode)
@@ -80,6 +88,7 @@ void WaveshaperEditor::resized()
     const auto pad = proportionOfWidth (0.005f);
     const auto dim = proportionOfWidth (0.05f);
     const auto editButtonBounds = juce::Rectangle { bounds.getWidth() - pad - dim, pad, dim, dim };
+    clipGuardButton.setBounds (editButtonBounds);
     freeDrawButton.setBounds (editButtonBounds);
     mathButton.setBounds (editButtonBounds);
     pointsButton.setBounds (editButtonBounds);

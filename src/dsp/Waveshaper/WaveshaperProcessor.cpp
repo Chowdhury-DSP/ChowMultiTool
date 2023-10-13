@@ -16,6 +16,13 @@ WaveshaperProcessor::WaveshaperProcessor (chowdsp::PluginState& state, Params& w
                                                    {
                                                        oversamplingRateChanged();
                                                    });
+    clipGuardChangeCallback = state.addParameterListener (*params.clipGuardParam,
+                                                          chowdsp::ParameterListenerThread::AudioThread,
+                                                          [this]
+                                                          {
+                                                              if (params.clipGuardParam->get())
+                                                                  clipGuard.reset();
+                                                          });
 }
 
 void WaveshaperProcessor::prepare (const juce::dsp::ProcessSpec& spec)
@@ -125,12 +132,25 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
 
     downsampler.process (osBufferView, buffer);
 
-    clipGuard.setCeiling ((shapeParam == Shapes::Hard_Clip
-                           || shapeParam == Shapes::Tanh_Clip
-                           || shapeParam == Shapes::Cubic_Clip
-                           || shapeParam == Shapes::Nonic_Clip)
-                              ? 1.0f
-                              : 100.0f);
-    clipGuard.processBlock (buffer);
+    if (params.clipGuardParam->get())
+    {
+        clipGuard.setCeiling (modeUsesClipGuard (shapeParam)
+                                  ? 1.0f
+                                  : 100.0f);
+        clipGuard.processBlock (buffer);
+    }
+}
+
+bool WaveshaperProcessor::modeUsesClipGuard (Shapes shape)
+{
+    return shape == Shapes::Hard_Clip
+           || shape == Shapes::Tanh_Clip
+           || shape == Shapes::Cubic_Clip
+           || shape == Shapes::Nonic_Clip;
+}
+
+int WaveshaperProcessor::getLatencySamples() const
+{
+    return params.clipGuardParam->get() ? clipGuardLookaheadSamples : 0;
 }
 } // namespace dsp::waveshaper

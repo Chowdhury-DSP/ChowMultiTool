@@ -38,6 +38,9 @@ private:
 
     ToolTypes::Types tools;
 
+    // at the moment all tools are expected to have integer latency
+    chowdsp::BypassProcessor<float, chowdsp::DelayLineInterpolationTypes::None> bypass;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiToolProcessor)
 };
 } // namespace dsp

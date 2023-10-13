@@ -3,7 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ta
 if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
-project(ChowMultiTool VERSION 1.0.1)
+project(ChowMultiTool VERSION 1.0.2)
 
 set(CMAKE_CXX_STANDARD 20)
 set(COMPANY_NAME "chowdsp")
@@ -70,7 +70,7 @@ if(CHOWMULTITOOL_BUILD_CLAP)
     clap_juce_extensions_plugin(
         TARGET ChowMultiTool
         CLAP_ID "org.chowdsp.ChowMultiTool"
-        CLAP_FEATURES audio-effect
+        CLAP_FEATURES audio-effect win32-dpi-aware
         CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
         CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
     )

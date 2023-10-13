@@ -22,6 +22,7 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
       plugin (p),
       hostContextProvider (plugin, *this),
+      paintBypassCover (plugin.getState().params.bypassParam->get()),
       toolbar (plugin, oglHelper)
 {
     oglHelper.setComponent (this);
@@ -48,6 +49,14 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
                                                                  { refreshEditor(); });
 
     juce::LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
+
+    bypassChangeCallback = plugin.getState().addParameterListener (plugin.getState().params.bypassParam,
+                                                                   chowdsp::ParameterListenerThread::MessageThread,
+                                                                   [this]
+                                                                   {
+                                                                       paintBypassCover = plugin.getState().params.bypassParam->get();
+                                                                       repaint();
+                                                                   });
 }
 
 PluginEditor::~PluginEditor()
@@ -129,6 +138,17 @@ void PluginEditor::paint (juce::Graphics& g)
                                               juce::Point { (float) getWidth() * 0.35f, (float) getHeight() * 0.5f },
                                               false });
     g.fillAll();
+}
+
+void PluginEditor::paintOverChildren (juce::Graphics& g)
+{
+    const auto toolChoice = plugin.getState().params.toolParam->getIndex();
+    if (! paintBypassCover || toolChoice == 0)
+        return;
+
+    g.setColour (colours::linesColour.withAlpha (0.25f));
+    if (editorComponent != nullptr)
+        g.fillRect (editorComponent->getBoundsInParent());
 }
 
 void PluginEditor::resized()
