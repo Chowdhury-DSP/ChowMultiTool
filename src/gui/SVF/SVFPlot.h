@@ -3,8 +3,8 @@
 #include "SVFChyron.h"
 #include "dsp/SVF/SVFProcessor.h"
 #include "gui/Shared/DotSlider.h"
-#include "state/PluginState.h"
 #include "gui/shared/SpectrumAnalyser.h"
+#include "state/PluginState.h"
 
 namespace gui::svf
 {
@@ -36,7 +36,7 @@ private:
     KeytrackDotSlider keytrackSlider;
 
     SVFChyron chyron;
-//    SpectrumAnalyser spectrumAnalyser;
+    //    SpectrumAnalyser spectrumAnalyser;
 
     chowdsp::ScopedCallbackList callbacks;
 
