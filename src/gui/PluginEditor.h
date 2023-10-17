@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Toolbar/Toolbar.h"
+#include "dsp/Shared/EQHelpers.h"
 #include "gui/Shared/ErrorMessageView.h"
+#include <pch.h>
+//#include "chowdsp_TupleHelpers.h"
 
 class ChowMultiTool;
 
@@ -14,6 +17,7 @@ public:
     explicit PluginEditor (ChowMultiTool& plugin);
     ~PluginEditor() override;
 
+    EQHelpers& getProcessorHelper();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
