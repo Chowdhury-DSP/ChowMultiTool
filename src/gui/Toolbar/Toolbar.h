@@ -35,6 +35,9 @@ private:
     chowdsp::presets::frontend::FileInterface presetsFileInterface;
     presets::PresetsComponent presetsComp;
 
+    juce::TextButton bypassButton { "Bypass" };
+    chowdsp::ButtonAttachment bypassAttach { state.params.bypassParam, state, bypassButton };
+
     SettingsButton settingsButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Toolbar)

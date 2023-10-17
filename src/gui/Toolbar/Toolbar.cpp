@@ -28,6 +28,15 @@ Toolbar::Toolbar (ChowMultiTool& plugin, chowdsp::OpenGLHelper& oglHelper)
     presetsComp.setLookAndFeel (lnfAllocator->getLookAndFeel<gui::lnf::MenuLNF>());
     addAndMakeVisible (presetsComp);
 
+    bypassButton.setColour (juce::ComboBox::ColourIds::outlineColourId, juce::Colours::transparentWhite);
+    bypassButton.setColour (juce::TextButton::ColourIds::buttonColourId, colours::linesColour);
+    bypassButton.setColour (juce::TextButton::ColourIds::buttonOnColourId, logo::colours::accentRed);
+    bypassButton.setColour (juce::TextButton::ColourIds::textColourOffId, colours::backgroundLight);
+    bypassButton.setColour (juce::TextButton::ColourIds::textColourOnId, colours::linesColour);
+    bypassButton.setClickingTogglesState (true);
+    bypassButton.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+    addAndMakeVisible (bypassButton);
+
     addAndMakeVisible (settingsButton);
 }
 
@@ -99,7 +108,7 @@ void Toolbar::resized()
     const auto buttonDim = proportionOfHeight (0.7f);
     const auto buttonY = (getHeight() - buttonDim) / 2;
 
-    bounds.reduce (proportionOfWidth (0.01875f), 0);
+    bounds.reduce (proportionOfWidth (0.01f), 0);
     undoButton.setBounds (juce::Rectangle { buttonDim, buttonDim }.withY (buttonY).withX (bounds.getX()));
 
     bounds.removeFromLeft (buttonDim + proportionOfWidth (0.0125f));
@@ -114,6 +123,12 @@ void Toolbar::resized()
                            proportionOfHeight (10.0f / 75.0f),
                            proportionOfWidth (0.3125f),
                            proportionOfHeight (55.0f / 75.0f));
+
+    bypassButton.setBounds (juce::Rectangle { 2 * buttonDim, buttonDim }
+                                .withY (buttonY)
+                                .withRight (bounds.getRight() - buttonDim)
+                                .withLeft (presetsComp.getRight())
+                                .reduced (proportionOfWidth (0.01f), 0));
 
     settingsButton.setBounds (juce::Rectangle { buttonDim, buttonDim }.withY (buttonY).withRightX (bounds.getRight()));
 }

@@ -5,6 +5,7 @@
 #include "WaveshaperPointsView.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
 #include "state/PluginState.h"
+#include "WaveshaperChyron.h"
 
 namespace gui::waveshaper
 {
@@ -26,6 +27,8 @@ private:
     WaveshaperDrawer drawArea;
     WaveshaperMathView mathArea;
     WaveshaperPointsView pointsArea;
+
+    WaveshaperChyron chyron;
 
     chowdsp::ScopedCallbackList callbacks;
     const chowdsp::EnumChoiceParameter<dsp::waveshaper::Shapes>& shapeParam;

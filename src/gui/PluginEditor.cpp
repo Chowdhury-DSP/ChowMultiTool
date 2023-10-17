@@ -22,6 +22,7 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
     : juce::AudioProcessorEditor (p),
       plugin (p),
       hostContextProvider (plugin, *this),
+      paintBypassCover (plugin.getState().params.bypassParam->get()),
       toolbar (plugin, oglHelper)
 {
     oglHelper.setComponent (this);
@@ -49,8 +50,13 @@ PluginEditor::PluginEditor (ChowMultiTool& p)
 
     juce::LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
 
-    //    const auto& processor =  plugin.getProcessor();
-    //    const auto& tools = processor.getTools();
+    bypassChangeCallback = plugin.getState().addParameterListener (plugin.getState().params.bypassParam,
+                                                                   chowdsp::ParameterListenerThread::MessageThread,
+                                                                   [this]
+                                                                   {
+                                                                       paintBypassCover = plugin.getState().params.bypassParam->get();
+                                                                       repaint();
+                                                                   });
 }
 
 PluginEditor::~PluginEditor()
@@ -69,12 +75,6 @@ void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingI
 
     juce::Logger::writeToLog ("Using OpenGL: " + juce::String (shouldUseOpenGL ? "TRUE" : "FALSE"));
     shouldUseOpenGL ? oglHelper.attach() : oglHelper.detach();
-}
-
-EQHelpers& PluginEditor::getProcessorHelper()
-{
-    auto& tools = std::get<0> (plugin.getProcessor().getTools());
-    return tools.getHelper();
 }
 
 void PluginEditor::setResizeBehaviour()
@@ -110,7 +110,7 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, getProcessorHelper());
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                     editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
@@ -138,6 +138,17 @@ void PluginEditor::paint (juce::Graphics& g)
                                               juce::Point { (float) getWidth() * 0.35f, (float) getHeight() * 0.5f },
                                               false });
     g.fillAll();
+}
+
+void PluginEditor::paintOverChildren (juce::Graphics& g)
+{
+    const auto toolChoice = plugin.getState().params.toolParam->getIndex();
+    if (! paintBypassCover || toolChoice == 0)
+        return;
+
+    g.setColour (colours::linesColour.withAlpha (0.25f));
+    if (editorComponent != nullptr)
+        g.fillRect (editorComponent->getBoundsInParent());
 }
 
 void PluginEditor::resized()

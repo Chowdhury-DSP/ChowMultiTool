@@ -32,6 +32,7 @@ PluginParams::PluginParams()
     svfParams.emplace();
 
     add (toolParam,
+         bypassParam,
          *eqParams,
          *waveshaperParams,
          *signalGenParams,

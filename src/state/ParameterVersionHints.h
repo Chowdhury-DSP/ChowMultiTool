@@ -9,4 +9,7 @@ using namespace chowdsp::version_literals;
 
 /** Version Hint 1.0.0 */
 static constexpr auto version1_0_0 = "1.0.0"_v.getVersionHint();
+
+/** Version Hint 1.1.0 */
+static constexpr auto version1_1_0 = "1.1.0"_v.getVersionHint();
 } // namespace ParameterVersionHints

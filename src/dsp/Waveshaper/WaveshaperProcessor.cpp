@@ -16,6 +16,13 @@ WaveshaperProcessor::WaveshaperProcessor (chowdsp::PluginState& state, Params& w
                                                    {
                                                        oversamplingRateChanged();
                                                    });
+    clipGuardChangeCallback = state.addParameterListener (*params.clipGuardParam,
+                                                          chowdsp::ParameterListenerThread::AudioThread,
+                                                          [this]
+                                                          {
+                                                              if (params.clipGuardParam->get())
+                                                                  clipGuard.reset();
+                                                          });
 }
 
 void WaveshaperProcessor::prepare (const juce::dsp::ProcessSpec& spec)
@@ -35,6 +42,7 @@ void WaveshaperProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     freeDrawShaper.prepare (spec);
     mathShaper.prepare (spec);
     pointsShaper.prepare (spec);
+    clipGuard.prepare (spec);
 
     static constexpr auto maxOSRatio = static_cast<int> (magic_enum::enum_values<OversamplingRatio>().back());
     doubleBuffer.setMaxSize ((int) spec.numChannels, (int) spec.maximumBlockSize * maxOSRatio);
@@ -48,15 +56,12 @@ void WaveshaperProcessor::oversamplingRateChanged()
     const juce::SpinLock::ScopedLockType lock { processingMutex };
 
     const auto osRatio = static_cast<int> (params.oversampleParam->get());
-    if (osRatio > 1)
-    {
-        upsampler.prepare (processSpec, osRatio);
+    upsampler.prepare (processSpec, osRatio);
 
-        auto osProcessSpec = processSpec;
-        osProcessSpec.sampleRate *= (double) osRatio;
-        osProcessSpec.maximumBlockSize *= (uint32_t) osRatio;
-        downsampler.prepare (osProcessSpec, osRatio);
-    }
+    auto osProcessSpec = processSpec;
+    osProcessSpec.sampleRate *= (double) osRatio;
+    osProcessSpec.maximumBlockSize *= (uint32_t) osRatio;
+    downsampler.prepare (osProcessSpec, osRatio);
 
     ssWaveshaper.prepare (processSpec.sampleRate * osRatio,
                           (int) processSpec.maximumBlockSize * osRatio,
@@ -72,40 +77,37 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
     gain.setGainDecibels (params.gainParam->getCurrentValue());
     gain.process (buffer);
 
-    const auto osRatio = static_cast<int> (params.oversampleParam->get());
-    std::optional<chowdsp::BufferView<float>> osBufferView;
-    if (osRatio > 1)
-    {
-        osBufferView.emplace (upsampler.process (buffer), 0, -1);
-    }
-    else
-    {
-        osBufferView.emplace (buffer, 0, -1);
-    }
-    doubleBuffer.setCurrentSize (osBufferView->getNumChannels(), osBufferView->getNumSamples());
-    chowdsp::BufferMath::copyBufferData (*osBufferView, doubleBuffer);
+    const auto osBufferView = upsampler.process (buffer);
 
-    if (params.shapeParam->get() == Shapes::Hard_Clip)
+    const auto clipLevel = juce::Decibels::decibelsToGain (18.0f);
+    for (auto [ch, data] : chowdsp::buffer_iters::channels (osBufferView))
+        juce::FloatVectorOperations::clip (data.data(), data.data(), -clipLevel, clipLevel, data.size());
+
+    doubleBuffer.setCurrentSize (osBufferView.getNumChannels(), osBufferView.getNumSamples());
+    chowdsp::BufferMath::copyBufferData (osBufferView, doubleBuffer);
+
+    const auto shapeParam = params.shapeParam->get();
+    if (shapeParam == Shapes::Hard_Clip)
         adaaHardClipper.processBlock (doubleBuffer);
-    else if (params.shapeParam->get() == Shapes::Tanh_Clip)
+    else if (shapeParam == Shapes::Tanh_Clip)
         adaaTanhClipper.processBlock (doubleBuffer);
-    else if (params.shapeParam->get() == Shapes::Cubic_Clip)
+    else if (shapeParam == Shapes::Cubic_Clip)
         adaaCubicClipper.processBlock (doubleBuffer);
-    else if (params.shapeParam->get() == Shapes::Nonic_Clip)
+    else if (shapeParam == Shapes::Nonic_Clip)
         adaa9thOrderClipper.processBlock (doubleBuffer);
-    else if (params.shapeParam->get() == Shapes::Full_Wave_Rectify)
+    else if (shapeParam == Shapes::Full_Wave_Rectify)
         fullWaveRectifier.processBlock (doubleBuffer);
-    else if (params.shapeParam->get() == Shapes::West_Coast)
+    else if (shapeParam == Shapes::West_Coast)
     {
         westCoastFolder.processBlock (doubleBuffer);
         chowdsp::BufferMath::applyGain (doubleBuffer, juce::Decibels::decibelsToGain (-10.0));
     }
-    else if (params.shapeParam->get() == Shapes::Wave_Multiply)
+    else if (shapeParam == Shapes::Wave_Multiply)
     {
         waveMultiplyFolder.processBlock (doubleBuffer);
         chowdsp::BufferMath::applyGain (doubleBuffer, juce::Decibels::decibelsToGain (16.0));
     }
-    else if (params.shapeParam->get() == Shapes::Fold_Fuzz)
+    else if (shapeParam == Shapes::Fold_Fuzz)
     {
         chowdsp::copyToSIMDBuffer (doubleBuffer, doubleSIMDBuffer);
         ssWaveshaper.processBlock (doubleSIMDBuffer,
@@ -113,25 +115,42 @@ void WaveshaperProcessor::processBlock (const chowdsp::BufferView<float>& buffer
                                    MRange.convertFrom0to1 (params.MParam->getCurrentValue()));
         chowdsp::copyFromSIMDBuffer (doubleSIMDBuffer, doubleBuffer);
     }
-    else if (params.shapeParam->get() == Shapes::Free_Draw)
+    else if (shapeParam == Shapes::Free_Draw)
     {
         freeDrawShaper.processBlock (doubleBuffer);
     }
-    else if (params.shapeParam->get() == Shapes::Math)
+    else if (shapeParam == Shapes::Math)
     {
         mathShaper.processBlock (doubleBuffer);
     }
-    else if (params.shapeParam->get() == Shapes::Spline)
+    else if (shapeParam == Shapes::Spline)
     {
         pointsShaper.processBlock (doubleBuffer);
     }
 
-    chowdsp::BufferMath::copyBufferData (doubleBuffer, *osBufferView);
+    chowdsp::BufferMath::copyBufferData (doubleBuffer, osBufferView);
 
-    if (osRatio > 1)
+    downsampler.process (osBufferView, buffer);
+
+    if (params.clipGuardParam->get())
     {
-        const auto dsBuffer = downsampler.process (*osBufferView);
-        chowdsp::BufferMath::copyBufferData (dsBuffer, buffer);
+        clipGuard.setCeiling (modeUsesClipGuard (shapeParam)
+                                  ? 1.0f
+                                  : 100.0f);
+        clipGuard.processBlock (buffer);
     }
+}
+
+bool WaveshaperProcessor::modeUsesClipGuard (Shapes shape)
+{
+    return shape == Shapes::Hard_Clip
+           || shape == Shapes::Tanh_Clip
+           || shape == Shapes::Cubic_Clip
+           || shape == Shapes::Nonic_Clip;
+}
+
+int WaveshaperProcessor::getLatencySamples() const
+{
+    return params.clipGuardParam->get() ? clipGuardLookaheadSamples : 0;
 }
 } // namespace dsp::waveshaper

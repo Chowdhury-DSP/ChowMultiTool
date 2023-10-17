@@ -54,7 +54,13 @@ struct Params : chowdsp::ParamHolder
 {
     Params()
     {
-        add (gainParam, shapeParam, kParam, MParam, oversampleParam);
+        add (gainParam, shapeParam, kParam, MParam, oversampleParam, clipGuardParam);
+        versionStreamingCallback = [this] (const chowdsp::Version& version)
+        {
+            using namespace chowdsp::version_literals;
+            if (version < "1.0.2"_v)
+                clipGuardParam->setValueNotifyingHost (0.0f);
+        };
     }
 
     chowdsp::GainDBParameter::Ptr gainParam {
@@ -85,7 +91,13 @@ struct Params : chowdsp::ParamHolder
     chowdsp::EnumChoiceParameter<OversamplingRatio>::Ptr oversampleParam {
         juce::ParameterID { "waveshaper_oversample", ParameterVersionHints::version1_0_0 },
         "Waveshaper Oversampling",
-        OversamplingRatio::TwoX
+        OversamplingRatio::FourX
+    };
+
+    chowdsp::BoolParameter::Ptr clipGuardParam {
+        juce::ParameterID { "waveshaper_clip_guard", ParameterVersionHints::version1_1_0 },
+        "Waveshaper Clip Guard",
+        true
     };
 };
 
@@ -104,11 +116,15 @@ public:
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
+    int getLatencySamples() const;
+    static bool modeUsesClipGuard (Shapes shape);
+
 private:
     void oversamplingRateChanged();
 
     const Params& params;
     chowdsp::ScopedCallback osChangeCallback;
+    chowdsp::ScopedCallback clipGuardChangeCallback;
 
     juce::dsp::ProcessSpec processSpec {};
     juce::SpinLock processingMutex;
@@ -117,7 +133,7 @@ private:
 
     using AAFilter = chowdsp::EllipticFilter<8>;
     chowdsp::Upsampler<float, AAFilter> upsampler;
-    chowdsp::Downsampler<float, AAFilter> downsampler;
+    chowdsp::Downsampler<float, AAFilter, false> downsampler;
 
     chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<xsimd::batch<double>> doubleSIMDBuffer;
@@ -134,6 +150,9 @@ private:
     spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> freeDrawShaper;
     spline::SplineWaveshaper<spline::SplinePoints, spline::SplineADAA> mathShaper;
     spline::SplineWaveshaper<spline::VectorSplinePoints, spline::VectorSplineADAA> pointsShaper;
+
+    static constexpr int clipGuardLookaheadSamples = 64;
+    chowdsp::OvershootLimiter<float> clipGuard { clipGuardLookaheadSamples };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperProcessor)
 };

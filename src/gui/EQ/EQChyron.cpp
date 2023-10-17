@@ -18,6 +18,9 @@ void EQChyron::setSelectedBand (int newSelectedBand)
 {
     setVisible (newSelectedBand >= 0);
 
+    if (newSelectedBand < 0)
+        return;
+
     auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
     const auto newFilterType = helpers::getFilterType (activeParams.typeParam->getIndex());
 

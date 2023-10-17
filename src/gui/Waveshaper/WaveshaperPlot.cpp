@@ -12,6 +12,7 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
       drawArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       mathArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
       pointsArea (*pluginState.nonParams.waveshaperExtraState, *pluginState.undoManager),
+      chyron (pluginState, wsParams, hcp),
       shapeParam (*wsParams.shapeParam),
       gainAttach (*wsParams.gainParam, pluginState, *this),
       hostContextProvider (hcp)
@@ -177,6 +178,8 @@ WaveshaperPlot::WaveshaperPlot (State& pluginState, dsp::waveshaper::Params& wsP
     addChildComponent (drawArea);
     addChildComponent (mathArea);
     addChildComponent (pointsArea);
+
+    addAndMakeVisible (chyron);
 }
 
 void WaveshaperPlot::toggleDrawMode (bool isDrawMode)
@@ -184,6 +187,7 @@ void WaveshaperPlot::toggleDrawMode (bool isDrawMode)
     drawMode = isDrawMode;
 
     drawArea.setVisible (drawMode);
+    chyron.setVisible (! drawMode);
 
     if (drawMode)
     {
@@ -202,6 +206,7 @@ void WaveshaperPlot::toggleMathMode (bool isMathMode)
     mathMode = isMathMode;
 
     mathArea.setVisible (mathMode);
+    chyron.setVisible (! mathMode);
 
     if (mathMode)
     {
@@ -220,6 +225,7 @@ void WaveshaperPlot::togglePointsMode (bool isPointsMode)
     pointsMode = isPointsMode;
 
     pointsArea.setVisible (pointsMode);
+    chyron.setVisible (! pointsMode);
 
     if (mathMode)
     {
@@ -291,6 +297,14 @@ void WaveshaperPlot::resized()
     drawArea.setBounds (getLocalBounds());
     mathArea.setBounds (getLocalBounds());
     pointsArea.setBounds (getLocalBounds());
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.15f);
+    const auto chyronHeight = proportionOfWidth (0.05f);
+    chyron.setBounds (getWidth() - pad - chyronWidth,
+                      getHeight() - pad - chyronHeight,
+                      chyronWidth,
+                      chyronHeight);
 }
 
 void WaveshaperPlot::mouseDown (const juce::MouseEvent& e)
@@ -298,7 +312,7 @@ void WaveshaperPlot::mouseDown (const juce::MouseEvent& e)
     if (e.mods.isPopupMenu())
     {
         chowdsp::SharedLNFAllocator lnfAllocator;
-        hostContextProvider.showParameterContextPopupMenu (gainAttach.getParameter(),
+        hostContextProvider.showParameterContextPopupMenu (*gainAttach.getParameter(),
                                                            {},
                                                            lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
         return;

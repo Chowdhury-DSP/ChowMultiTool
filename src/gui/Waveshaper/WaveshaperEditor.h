@@ -21,11 +21,16 @@ private:
     std::unique_ptr<juce::Component> bottomBar;
     FoldFuzzControls foldFuzzControls;
 
+    IconButton clipGuardButton;
+    chowdsp::ButtonAttachment clipGuardAttach;
+
     IconButton freeDrawButton;
     IconButton mathButton;
     IconButton pointsButton;
 
     chowdsp::ScopedCallbackList callbacks;
+
+    juce::TooltipWindow tooltips { this, 300 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WaveshaperEditor)
 };

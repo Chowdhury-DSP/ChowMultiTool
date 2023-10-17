@@ -21,5 +21,10 @@ public:
                             const juce::Drawable* icon,
                             const juce::Colour* const textColourToUse) override;
     void drawPopupMenuBackground (juce::Graphics& g, int width, int height) override;
+
+    juce::Font getTextButtonFont (juce::TextButton&, int buttonHeight) override
+    {
+        return juce::Font { juce::jmin (18.0f, (float) buttonHeight * 0.8f) }.boldened();
+    }
 };
 } // namespace gui::lnf

@@ -19,6 +19,7 @@ public:
 
     EQHelpers& getProcessorHelper();
     void paint (juce::Graphics& g) override;
+    void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
 
     auto& getErrorMessageView() { return errorMessageView; }
@@ -33,6 +34,9 @@ private:
 
     ChowMultiTool& plugin;
     chowdsp::HostContextProvider hostContextProvider;
+
+    bool paintBypassCover;
+    chowdsp::ScopedCallback bypassChangeCallback;
 
     Toolbar toolbar;
     std::unique_ptr<juce::Component> editorComponent;
