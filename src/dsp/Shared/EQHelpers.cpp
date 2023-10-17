@@ -1,19 +1,17 @@
 #include "EQHelpers.h"
 
-
 EQHelpers::EQHelpers()
 {
-
 }
 
 void EQHelpers::prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels)
 {
-    SpectrumAnalyserTask.prepare(sampleRate, samplesPerBlock, numChannels);
+    SpectrumAnalyserTask.prepare (sampleRate, samplesPerBlock, numChannels);
 }
 
 void EQHelpers::processBlockInput (juce::AudioBuffer<float>& buffer)
 {
-    SpectrumAnalyserTask.pushSamples(buffer);
+    SpectrumAnalyserTask.pushSamples (buffer);
 }
 
 static std::vector<float> getFFTFreqs (int N, float T)
@@ -41,7 +39,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
 }
 
 //alternative to moving average
-[[maybe_unused]] static void expSmooth(const float* inData, float* outData, int numSamples, float alpha = 0.5f)
+[[maybe_unused]] static void expSmooth (const float* inData, float* outData, int numSamples, float alpha = 0.5f)
 {
     float previous = inData[0];
 
@@ -52,8 +50,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
     }
 }
 
-
-void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask(double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
+void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
 {
     static constexpr auto maxBinWidth = 6.0;
     fftSize = juce::nextPowerOfTwo (int (sampleRate / maxBinWidth));
@@ -76,7 +73,7 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::resetTask()
 {
     std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), -100.0f);
 }
-void EQHelpers::SpectrumAnalyserBackgroundTask::runTask(const juce::AudioBuffer<float> &data)
+void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
 {
     jassert (data.getNumSamples() == fftSize);
 
@@ -87,19 +84,20 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::runTask(const juce::AudioBuffer<
     window->multiplyWithWindowingTable (scratchData, (size_t) fftSize);
     fft->performFrequencyOnlyForwardTransform (scratchData, true);
 
-//    juce::FloatVectorOperations::multiply (scratchData, 16.0f / (float) fftSize, fftOutSize);
+    //    juce::FloatVectorOperations::multiply (scratchData, 16.0f / (float) fftSize, fftOutSize);
     for (size_t i = 0; i < (size_t) fftOutSize; ++i)
         fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i]); // + 0.95f * fftMagsUnsmoothedDB[i];
 
-    auto minMax = std::minmax_element(fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
-    float dynamicRange = std::max(std::abs(*minMax.first), std::abs(*minMax.second));
+    auto minMax = std::minmax_element (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
+    float dynamicRange = std::max (std::abs (*minMax.first), std::abs (*minMax.second));
 
-    dynamicRange = std::max(dynamicRange, 36.0f);
+    dynamicRange = std::max (dynamicRange, 36.0f);
 
-    for (auto &dB : fftMagsUnsmoothedDB) {
+    for (auto& dB : fftMagsUnsmoothedDB)
+    {
         dB = 18.0f * (dB / dynamicRange);
     }
 
     const juce::CriticalSection::ScopedLockType lock { mutex };
-    freqSmooth(fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f/128.0f);
+    freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 128.0f);
 }
