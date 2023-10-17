@@ -40,13 +40,26 @@ static std::vector<float> getFFTFreqs (int N, float T)
     }
 }
 
+//alternative to moving average
+[[maybe_unused]] static void expSmooth(const float* inData, float* outData, int numSamples, float alpha = 0.5f)
+{
+    float previous = inData[0];
+
+    for (int i = 0; i < numSamples; ++i)
+    {
+        outData[i] = alpha * inData[i] + (1 - alpha) * previous;
+        previous = outData[i];
+    }
+}
+
+
 void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask(double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
 {
     static constexpr auto maxBinWidth = 6.0;
     fftSize = juce::nextPowerOfTwo (int (sampleRate / maxBinWidth));
 
     fft.emplace (chowdsp::Math::log2 (fftSize));
-    window.emplace ((size_t) fftSize, juce::dsp::WindowingFunction<float>::WindowingMethod::triangular);
+    window.emplace ((size_t) fftSize, juce::dsp::WindowingFunction<float>::WindowingMethod::hann);
 
     fftDataSize = fftSize * 2;
     fftOutSize = fftSize / 2 + 1;
@@ -74,10 +87,19 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::runTask(const juce::AudioBuffer<
     window->multiplyWithWindowingTable (scratchData, (size_t) fftSize);
     fft->performFrequencyOnlyForwardTransform (scratchData, true);
 
-    juce::FloatVectorOperations::multiply (scratchData, 16.0f / (float) fftSize, fftOutSize);
+//    juce::FloatVectorOperations::multiply (scratchData, 16.0f / (float) fftSize, fftOutSize);
     for (size_t i = 0; i < (size_t) fftOutSize; ++i)
-        fftMagsUnsmoothedDB[i] = 0.05f * juce::Decibels::gainToDecibels (scratchData[i]) + 0.95f * fftMagsUnsmoothedDB[i];
+        fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i]); // + 0.95f * fftMagsUnsmoothedDB[i];
+
+    auto minMax = std::minmax_element(fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
+    float dynamicRange = std::max(std::abs(*minMax.first), std::abs(*minMax.second));
+
+    dynamicRange = std::max(dynamicRange, 36.0f);
+
+    for (auto &dB : fftMagsUnsmoothedDB) {
+        dB = 18.0f * (dB / dynamicRange);
+    }
 
     const juce::CriticalSection::ScopedLockType lock { mutex };
-    freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 64.0f);
+    freqSmooth(fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f/128.0f);
 }

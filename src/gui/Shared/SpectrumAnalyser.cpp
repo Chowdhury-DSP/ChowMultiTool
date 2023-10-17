@@ -14,10 +14,15 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    g.fillAll(juce::Colours::teal.withAlpha(0.4f));
+
+
+//    g.fillAll(juce::Colours::hotpink.withAlpha(0.4f));
+
+    g.setGradientFill (juce::ColourGradient::vertical (juce::Colours::grey,
+                                                 eqPlot.getYCoordinateForDecibels (0.0f),
+                                                 juce::Colours::black,
+                                                 (float) getHeight()));
     g.fillPath(path);
-    g.setColour(juce::Colours::orange);
-    g.strokePath (path, juce::PathStrokeType (2.0f));
 }
 
 void SpectrumAnalyser::visibilityChanged()

@@ -77,5 +77,6 @@ void EQEditor::resized()
     drawCheckButton.setBounds (drawButton.getBoundsInParent());
     drawXButton.setBounds (linearPhaseButton.getBoundsInParent());
     spectrumAnalyser->setBounds(getLocalBounds());
+    spectrumAnalyser->toBack();
 }
 } // namespace gui::eq
