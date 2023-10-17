@@ -66,7 +66,7 @@ PluginEditor::~PluginEditor()
 
 EQHelpers& PluginEditor::getProcessorHelper()
 {
-    auto& tools = std::get<0>(plugin.getProcessor().getTools());
+    auto& tools = std::get<0> (plugin.getProcessor().getTools());
     return tools.getHelper();
 }
 
