@@ -64,6 +64,12 @@ PluginEditor::~PluginEditor()
     juce::LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
+EQHelpers& PluginEditor::getProcessorHelper()
+{
+    auto& tools = std::get<0> (plugin.getProcessor().getTools());
+    return tools.getHelper();
+}
+
 void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingID settingID)
 {
     if (settingID != openGLSettingID)
@@ -110,7 +116,7 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider);
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, getProcessorHelper());
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                     editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)
