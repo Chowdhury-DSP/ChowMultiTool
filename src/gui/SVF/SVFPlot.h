@@ -3,7 +3,7 @@
 #include "SVFChyron.h"
 #include "dsp/SVF/SVFProcessor.h"
 #include "gui/Shared/DotSlider.h"
-#include "gui/shared/SpectrumAnalyser.h"
+#include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
 
 namespace gui::svf

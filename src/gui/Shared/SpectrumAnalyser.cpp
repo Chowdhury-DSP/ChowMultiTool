@@ -47,7 +47,7 @@ void SpectrumAnalyser::updatePlotPath()
     path.clear();
 
     const auto& freqAxis = task.fftFreqs; //spectrum's frequency axis
-    const auto& magResponseDBSmoothed = task.fftMagsSmoothedDB; //magnitude response
+    const auto& magResponseDBSmoothed = task.fftMagsUnsmoothedDB; //magnitude response
 
     bool started = false;
     const auto nPoints = freqAxis.size(); //number of points on the frequency axis
