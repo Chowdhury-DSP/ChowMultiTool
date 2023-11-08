@@ -14,7 +14,7 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::pink.withAlpha(0.4f));
+    //    g.fillAll(juce::Colours::pink.withAlpha(0.4f));
 
     g.setGradientFill (juce::ColourGradient::vertical (juce::Colours::grey,
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
