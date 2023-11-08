@@ -66,13 +66,15 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, 
 
     scratchMonoBuffer.setMaxSize (1, fftDataSize);
     fftFreqs = getFFTFreqs (fftOutSize, 1.0f / (float) sampleRate);
-    fftMagsUnsmoothedDB = std::vector<float> ((size_t) fftOutSize, -100.0f);
-    fftMagsSmoothedDB = std::vector<float> ((size_t) fftOutSize, -100.0f);
+    fftMagsUnsmoothedDB = std::vector<float> ((size_t) fftOutSize, 0.0f);
+    fftMagsSmoothedDB = std::vector<float> ((size_t) fftOutSize, 0.0f);
 }
+
 void EQHelpers::SpectrumAnalyserBackgroundTask::resetTask()
 {
-    std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), -100.0f);
+    std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), 0.0f);
 }
+
 void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
 {
     jassert (data.getNumSamples() == fftSize);
@@ -84,18 +86,17 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer
     window->multiplyWithWindowingTable (scratchData, (size_t) fftSize);
     fft->performFrequencyOnlyForwardTransform (scratchData, true);
 
-    //    juce::FloatVectorOperations::multiply (scratchData, 16.0f / (float) fftSize, fftOutSize);
     for (size_t i = 0; i < (size_t) fftOutSize; ++i)
-        fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i]); // + 0.95f * fftMagsUnsmoothedDB[i];
+        fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i]);
 
     auto minMax = std::minmax_element (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
     float dynamicRange = std::max (std::abs (*minMax.first), std::abs (*minMax.second));
 
-    dynamicRange = std::max (dynamicRange, 36.0f);
+    dynamicRange = std::max (dynamicRange, 40.0f);
 
     for (auto& dB : fftMagsUnsmoothedDB)
     {
-        dB = 18.0f * (dB / dynamicRange);
+        dB = 20.0f * (dB / dynamicRange);
     }
 
     const juce::CriticalSection::ScopedLockType lock { mutex };
