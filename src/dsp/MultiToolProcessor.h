@@ -28,6 +28,7 @@ public:
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (juce::AudioBuffer<float>& buffer, const juce::MidiBuffer& midiBuffer);
+    ToolTypes::Types& getTools() { return tools; }
 
 private:
     void recalculateLatency();

@@ -22,7 +22,7 @@ public:
 private:
     void updateValues();
 
-    int selectedBand = -1;
+    std::optional<int> selectedBand { std::nullopt };
     chowdsp::EQ::EQPlotFilterType filterType = chowdsp::EQ::EQPlotFilterType::LPF1;
 
     chowdsp::PluginState& state;
