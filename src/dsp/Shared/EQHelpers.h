@@ -29,6 +29,7 @@ public:
 
         chowdsp::Buffer<float> scratchMonoBuffer;
         std::vector<float> fftMagsUnsmoothedDB {};
+        std::vector<float> magsPrevious {};
     } SpectrumAnalyserTask;
 
 private:
