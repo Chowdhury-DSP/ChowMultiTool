@@ -32,7 +32,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
         auto i1 = std::max (int ((float) i / s), 0);
         auto i2 = std::min (int ((float) i * s) + 1, numSamples - 1);
 
-//        outData[i] = i2 > i1 ? std::accumulate (inData + i1, inData + i2, 0.0f) / std::pow (float (i2 - i1), 1.0f) : 0.0f;
+        //        outData[i] = i2 > i1 ? std::accumulate (inData + i1, inData + i2, 0.0f) / std::pow (float (i2 - i1), 1.0f) : 0.0f;
         outData[i] = *std::max_element (inData + i1, inData + i2);
     }
 }
