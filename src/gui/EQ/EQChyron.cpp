@@ -16,19 +16,26 @@ EQChyron::EQChyron (chowdsp::PluginState& pluginState,
 
 void EQChyron::setSelectedBand (int newSelectedBand)
 {
-    setVisible (newSelectedBand >= 0);
+    if (! selectedBand.has_value() && newSelectedBand < 0)
+        return; // no band selected -> no band selected
 
-    if (newSelectedBand < 0)
-        return;
+    if (selectedBand.has_value() && newSelectedBand == *selectedBand)
+    {
+        const auto& activeParams = eqParams.eqParams[(size_t) *selectedBand];
+        const auto newFilterType = helpers::getFilterType (activeParams.typeParam->getIndex());
 
-    auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
-    const auto newFilterType = helpers::getFilterType (activeParams.typeParam->getIndex());
+        if (filterType == newFilterType)
+            return;
+    }
 
-    if (selectedBand == newSelectedBand && filterType == newFilterType)
-        return;
+    if (newSelectedBand >= 0)
+        selectedBand.emplace (newSelectedBand);
+    else
+        selectedBand.reset();
 
-    selectedBand = newSelectedBand;
     updateValues();
+
+    setVisible (selectedBand.has_value());
 }
 
 void EQChyron::updateValues()
@@ -40,13 +47,13 @@ void EQChyron::updateValues()
         gainSlider.reset();
     };
 
-    if (selectedBand < 0)
+    if (! selectedBand.has_value())
     {
         reset();
         return;
     }
 
-    auto& activeParams = eqParams.eqParams[(size_t) selectedBand];
+    auto& activeParams = eqParams.eqParams[(size_t) *selectedBand];
     if (! activeParams.onOffParam->get())
     {
         reset();
