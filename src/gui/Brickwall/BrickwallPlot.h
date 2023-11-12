@@ -2,6 +2,7 @@
 
 #include "dsp/Brickwall/BrickwallProcessor.h"
 #include "state/PluginState.h"
+#include "BrickwallChyron.h"
 
 namespace gui::brickwall
 {
@@ -40,6 +41,8 @@ private:
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider;
+
+    BrickwallChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallPlot)
 };
