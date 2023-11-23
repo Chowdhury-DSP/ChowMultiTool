@@ -64,10 +64,10 @@ PluginEditor::~PluginEditor()
     juce::LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
-EQHelpers& PluginEditor::getProcessorHelper()
+SpectrumAnalyserTask& PluginEditor::getSpectrumAnalyserTask()
 {
     auto& tools = std::get<0> (plugin.getProcessor().getTools());
-    return tools.getHelper();
+    return tools.getSpectrumAnalyserTask();
 }
 
 void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingID settingID)
@@ -116,7 +116,7 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, getProcessorHelper());
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, std::get<0> (plugin.getProcessor().getTools()).getSpectrumAnalyserTask());
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                     editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)

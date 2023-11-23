@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Toolbar/Toolbar.h"
-#include "dsp/Shared/EQHelpers.h"
 #include "gui/Shared/ErrorMessageView.h"
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 //#include "chowdsp_TupleHelpers.h"
 
@@ -17,7 +17,7 @@ public:
     explicit PluginEditor (ChowMultiTool& plugin);
     ~PluginEditor() override;
 
-    EQHelpers& getProcessorHelper();
+    SpectrumAnalyserTask& getSpectrumAnalyserTask();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;

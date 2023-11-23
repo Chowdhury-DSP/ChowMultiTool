@@ -14,13 +14,23 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     eq.prepare (spec);
     linPhaseEQ.prepare (spec, getEQParams());
-    eqHelper->prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    //have this called only if bool is true
+    //if (params.isOpen.load())
+    spectrumAnalyserTask->prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
     auto numChannels = buffer.getNumChannels();
     auto numSamples = buffer.getNumSamples();
+
+    //pre-EQ??
+
+    juce::AudioBuffer<float> preEqAudioBuffer;
+    preEqAudioBuffer.setSize (numChannels, numSamples);
+    chowdsp::BufferMath::copyBufferData (buffer, preEqAudioBuffer);
+    spectrumAnalyserTask->processBlockInput (preEqAudioBuffer);
+
 
     const auto&& eqParams = getEQParams();
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
@@ -42,10 +52,16 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
         chowdsp::BufferMath::copyBufferData (doubleBuffer, buffer);
     }
 
-    juce::AudioBuffer<float> audioBuffer;
-    audioBuffer.setSize (numChannels, numSamples);
-    chowdsp::BufferMath::copyBufferData (buffer, audioBuffer);
-    eqHelper->processBlockInput (audioBuffer);
+    //post-EQ??
+//    if (params.isOpen.load())
+//    {
+//        juce::AudioBuffer<float> postEqAudioBuffer;
+//        postEqAudioBuffer.setSize (numChannels, numSamples);
+//        chowdsp::BufferMath::copyBufferData (buffer, postEqAudioBuffer);
+//        //decide which buffer to send based on whether we are displaying pre or post spectrum analyser
+//        //have this called only if bool is true
+////        spectrumAnalyserTask->processBlockInput (postEqAudioBuffer);
+//    }
 }
 
 int EQProcessor::getLatencySamples() const

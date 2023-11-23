@@ -1,8 +1,9 @@
 #include "SpectrumAnalyser.h"
+#include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, EQHelpers& helper)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, gui::SpectrumAnalyserTask& spectrumAnalyserTask)
     : eqPlot (eqPlot),
-      task (helper.SpectrumAnalyserTask)
+      task (spectrumAnalyserTask.SpectrumAnalyserUITask)
 
 {
 }
@@ -15,13 +16,14 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    //    g.fillAll(juce::Colours::pink.withAlpha(0.4f));
-
-    g.setGradientFill (juce::ColourGradient::vertical (juce::Colours::grey,
+//    g.fillAll(juce::Colours::wheat.withAlpha(0.4f));
+//    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
+//    g.strokePath(prePath, juce::PathStrokeType(1));
+    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha(0.4f),
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
-                                                       juce::Colours::black,
+                                                       gui::logo::colours::backgroundBlue.darker().withAlpha(0.4f),
                                                        (float) getHeight()));
-    g.fillPath (path);
+    g.fillPath (postPath);
 }
 
 void SpectrumAnalyser::visibilityChanged()
@@ -40,12 +42,13 @@ void SpectrumAnalyser::visibilityChanged()
 
 void SpectrumAnalyser::timerCallback()
 {
-    updatePlotPath();
+    updatePlotPath(postPath);
+//    updatePlotPath(prePath);
 }
 
-void SpectrumAnalyser::updatePlotPath()
+void SpectrumAnalyser::updatePlotPath(juce::Path& pathToUpdate)
 {
-    path.clear();
+    pathToUpdate.clear();
 
     const juce::ScopedLock sl { task.mutex };
     const auto& freqAxis = task.fftFreqs; //spectrum's frequency axis
@@ -65,7 +68,7 @@ void SpectrumAnalyser::updatePlotPath()
         {
             auto xDraw = eqPlot.getXCoordinateForFrequency (freqAxis[i]);
             auto yDraw = eqPlot.getYCoordinateForDecibels (magResponseDBSmoothed[i]);
-            path.startNewSubPath (xDraw, yDraw);
+            pathToUpdate.startNewSubPath (xDraw, yDraw);
             started = true;
             i += 1;
         }
@@ -79,15 +82,15 @@ void SpectrumAnalyser::updatePlotPath()
                 auto yDraw2 = eqPlot.getYCoordinateForDecibels (magResponseDBSmoothed[i + 1]);
                 auto xDraw3 = eqPlot.getXCoordinateForFrequency (freqAxis[i + 2]);
                 auto yDraw3 = eqPlot.getYCoordinateForDecibels (magResponseDBSmoothed[i + 2]);
-                path.cubicTo ({ xDraw1, yDraw1 }, { xDraw2, yDraw2 }, { xDraw3, yDraw3 });
+                pathToUpdate.cubicTo ({ xDraw1, yDraw1 }, { xDraw2, yDraw2 }, { xDraw3, yDraw3 });
             }
             i += 3;
         }
     }
 
-    path.lineTo (juce::Point { getWidth(), getHeight() }.toFloat());
-    path.lineTo (juce::Point { 0, getHeight() }.toFloat());
-    path.closeSubPath();
+    pathToUpdate.lineTo (juce::Point { getWidth(), getHeight() }.toFloat());
+    pathToUpdate.lineTo (juce::Point { 0, getHeight() }.toFloat());
+    pathToUpdate.closeSubPath();
 
     repaint();
 }

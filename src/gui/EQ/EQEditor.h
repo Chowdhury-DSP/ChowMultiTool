@@ -13,12 +13,14 @@ namespace gui::eq
 class EQEditor : public juce::Component
 {
 public:
-    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, EQHelpers& eqHelper);
+    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, SpectrumAnalyserTask& spectrumAnalyserTask);
+    ~EQEditor();
 
     void paint (juce::Graphics& g) override;
     void resized() override;
 
 private:
+    dsp::eq::EQToolParams& params;
     EQPlot plot;
     std::unique_ptr<juce::Component> bottomBar;
     chowdsp::ParametersView paramsView;

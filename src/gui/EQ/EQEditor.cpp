@@ -4,16 +4,19 @@
 
 namespace gui::eq
 {
-EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, EQHelpers& eqHelper)
-    : plot (pluginState, eqParams.eqParams, hcp),
+EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, SpectrumAnalyserTask& spectrumAnalyserTask)
+    : params (eqParams),
+      plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      spectrumAnalyser (std::make_unique<SpectrumAnalyser> (plot, eqHelper)),
+      spectrumAnalyser (std::make_unique<SpectrumAnalyser> (plot, spectrumAnalyserTask)),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
 {
+    params.isOpen.store(true);
+
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);
 
     addAndMakeVisible (plot);
@@ -50,6 +53,11 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
         drawXButton.setVisible (false);
         plot.toggleDrawView (false, false);
     };
+}
+
+EQEditor::~EQEditor()
+{
+    params.isOpen.store(false);
 }
 
 void EQEditor::paint (juce::Graphics& g)

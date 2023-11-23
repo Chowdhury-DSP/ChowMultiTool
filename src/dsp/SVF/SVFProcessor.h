@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dsp/Shared/EQHelpers.h"
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 
 namespace dsp::svf
@@ -180,8 +180,6 @@ public:
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept;
-    const auto& getEQHelper() const { return eqHelper; }
-    const auto& getHelper() { return eqHelper; }
 
     static float midiNoteToHz (float midiNote);
 
@@ -208,7 +206,6 @@ private:
     chowdsp::WernerFilter wernerFilter;
 
     chowdsp::Gain<float> driveInGain, driveOutGain;
-    EQHelpers eqHelper;
 
     static constexpr size_t maxPolyphony = 32;
     std::array<int, maxPolyphony> playingNotes {};

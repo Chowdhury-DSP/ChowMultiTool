@@ -1,15 +1,17 @@
-#include "EQHelpers.h"
+#include "SpectrumAnalyserTask.h"
 
-EQHelpers::EQHelpers() = default;
-
-void EQHelpers::prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels)
+namespace gui
 {
-    SpectrumAnalyserTask.prepare (sampleRate, samplesPerBlock, numChannels);
+SpectrumAnalyserTask::SpectrumAnalyserTask() = default;
+
+void SpectrumAnalyserTask::prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels)
+{
+    SpectrumAnalyserUITask.prepare (sampleRate, samplesPerBlock, numChannels);
 }
 
-void EQHelpers::processBlockInput (juce::AudioBuffer<float>& buffer)
+void SpectrumAnalyserTask::processBlockInput (juce::AudioBuffer<float>& buffer)
 {
-    SpectrumAnalyserTask.pushSamples (buffer);
+    SpectrumAnalyserUITask.pushSamples (buffer);
 }
 
 static std::vector<float> getFFTFreqs (int N, float T)
@@ -47,7 +49,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
     }
 }
 
-void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
+void gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
 {
     static constexpr auto maxBinWidth = 6.0;
     fftSize = juce::nextPowerOfTwo (int (sampleRate / maxBinWidth));
@@ -68,13 +70,13 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, 
     magsPrevious = std::vector<float> ((size_t) fftOutSize, 0.0f);
 }
 
-void EQHelpers::SpectrumAnalyserBackgroundTask::resetTask()
+void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::resetTask()
 {
     std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), 0.0f);
     std::fill (magsPrevious.begin(), magsPrevious.end(), 0.0f);
 }
 
-void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
+void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
 {
     jassert (data.getNumSamples() == fftSize);
 
@@ -99,11 +101,11 @@ void EQHelpers::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer
     freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 128.0f);
     expSmooth (magsPrevious.data(), fftMagsSmoothedDB.data(), fftOutSize, 0.2f);
 }
-
+}
 // notes for Rachel:
 // - dynamic range trick is cool!
 // - tweaked some things re: painting, frequency band smoothing, smoothing across time, and threading stuff
 // - probably could use some slightly different coloring?
 // - Could the spectrum task stuff live in the UI? That way the DSP can ignore it when the UI is closed.
-// - namespaces and maybe new name/location for "EQHelpers" class
+// - namespaces and maybe new name/location for "SpectrumAnalyserTask" class
 // - Add analyzer to other tools that have a frequency plot (could be a separate PR)

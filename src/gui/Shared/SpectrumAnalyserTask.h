@@ -1,9 +1,11 @@
 #pragma once
 
-class EQHelpers
+namespace gui
+{
+class SpectrumAnalyserTask
 {
 public:
-    EQHelpers();
+    SpectrumAnalyserTask();
     void prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels);
     void processBlockInput (juce::AudioBuffer<float>& buffer);
 
@@ -30,8 +32,9 @@ public:
         chowdsp::Buffer<float> scratchMonoBuffer;
         std::vector<float> fftMagsUnsmoothedDB {};
         std::vector<float> magsPrevious {};
-    } SpectrumAnalyserTask;
+    } SpectrumAnalyserUITask;
 
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQHelpers)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyserTask)
 };
+}

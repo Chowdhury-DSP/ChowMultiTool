@@ -21,7 +21,7 @@ target_sources(ChowMultiTool PRIVATE
     dsp/Brickwall/BrickwallProcessor.cpp
     dsp/SVF/SVFProcessor.cpp
 
-    dsp/Shared/EQHelpers.cpp
+    gui/Shared/SpectrumAnalyserTask.cpp
 
     gui/PluginEditor.cpp
     gui/InitPage/InitPage.cpp
