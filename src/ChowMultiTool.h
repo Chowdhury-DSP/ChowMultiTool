@@ -15,6 +15,7 @@ public:
     void processAudioBlock (juce::AudioBuffer<float>&) override {}
     bool isBusesLayoutSupported (const BusesLayout& layout) const override;
     bool acceptsMidi() const override { return true; }
+    dsp::MultiToolProcessor& getProcessor() { return processor; }
 
     juce::AudioProcessorEditor* createEditor() override;
 

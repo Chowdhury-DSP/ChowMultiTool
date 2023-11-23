@@ -2,6 +2,9 @@
 
 #include "Toolbar/Toolbar.h"
 #include "gui/Shared/ErrorMessageView.h"
+#include "gui/Shared/SpectrumAnalyserTask.h"
+#include <pch.h>
+//#include "chowdsp_TupleHelpers.h"
 
 class ChowMultiTool;
 
@@ -14,6 +17,7 @@ public:
     explicit PluginEditor (ChowMultiTool& plugin);
     ~PluginEditor() override;
 
+    SpectrumAnalyserTask& getSpectrumAnalyserTask();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
