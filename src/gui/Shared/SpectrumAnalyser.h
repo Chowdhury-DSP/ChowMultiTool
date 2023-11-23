@@ -11,11 +11,11 @@ public:
     void paint (juce::Graphics& g) override;
     void visibilityChanged() override;
     void timerCallback() override;
-    void updatePlotPath(juce::Path& pathToUpdate);
+    void updatePlotPath (juce::Path& pathToUpdate);
 
 private:
     juce::Path postPath;
-//    juce::Path prePath;
+    //    juce::Path prePath;
     const chowdsp::SpectrumPlotBase& eqPlot;
     gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& task;
 

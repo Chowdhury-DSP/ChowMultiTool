@@ -31,7 +31,6 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     chowdsp::BufferMath::copyBufferData (buffer, preEqAudioBuffer);
     spectrumAnalyserTask->processBlockInput (preEqAudioBuffer);
 
-
     const auto&& eqParams = getEQParams();
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     linPhaseEQ.setParameters (eqParams);
@@ -53,15 +52,15 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     }
 
     //post-EQ??
-//    if (params.isOpen.load())
-//    {
-//        juce::AudioBuffer<float> postEqAudioBuffer;
-//        postEqAudioBuffer.setSize (numChannels, numSamples);
-//        chowdsp::BufferMath::copyBufferData (buffer, postEqAudioBuffer);
-//        //decide which buffer to send based on whether we are displaying pre or post spectrum analyser
-//        //have this called only if bool is true
-////        spectrumAnalyserTask->processBlockInput (postEqAudioBuffer);
-//    }
+    //    if (params.isOpen.load())
+    //    {
+    //        juce::AudioBuffer<float> postEqAudioBuffer;
+    //        postEqAudioBuffer.setSize (numChannels, numSamples);
+    //        chowdsp::BufferMath::copyBufferData (buffer, postEqAudioBuffer);
+    //        //decide which buffer to send based on whether we are displaying pre or post spectrum analyser
+    //        //have this called only if bool is true
+    ////        spectrumAnalyserTask->processBlockInput (postEqAudioBuffer);
+    //    }
 }
 
 int EQProcessor::getLatencySamples() const

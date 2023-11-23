@@ -16,12 +16,12 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::wheat.withAlpha(0.4f));
-//    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
-//    g.strokePath(prePath, juce::PathStrokeType(1));
-    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha(0.4f),
+    //    g.fillAll(juce::Colours::wheat.withAlpha(0.4f));
+    //    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
+    //    g.strokePath(prePath, juce::PathStrokeType(1));
+    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
-                                                       gui::logo::colours::backgroundBlue.darker().withAlpha(0.4f),
+                                                       gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
                                                        (float) getHeight()));
     g.fillPath (postPath);
 }
@@ -42,11 +42,11 @@ void SpectrumAnalyser::visibilityChanged()
 
 void SpectrumAnalyser::timerCallback()
 {
-    updatePlotPath(postPath);
-//    updatePlotPath(prePath);
+    updatePlotPath (postPath);
+    //    updatePlotPath(prePath);
 }
 
-void SpectrumAnalyser::updatePlotPath(juce::Path& pathToUpdate)
+void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate)
 {
     pathToUpdate.clear();
 

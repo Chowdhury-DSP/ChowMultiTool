@@ -15,7 +15,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
 {
-    params.isOpen.store(true);
+    params.isOpen.store (true);
 
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);
 
@@ -57,7 +57,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
 
 EQEditor::~EQEditor()
 {
-    params.isOpen.store(false);
+    params.isOpen.store (false);
 }
 
 void EQEditor::paint (juce::Graphics& g)

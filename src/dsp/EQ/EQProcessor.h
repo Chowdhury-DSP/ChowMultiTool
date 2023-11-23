@@ -105,13 +105,13 @@ struct EQToolParams : chowdsp::ParamHolder
                                                   "Linear Phase On/Off",
                                                   false };
 
-    std::atomic<bool> isOpen {false};
+    std::atomic<bool> isOpen { false };
 };
 
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams), spectrumAnalyserTask(std::make_unique<gui::SpectrumAnalyserTask>()){}
+    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams), spectrumAnalyserTask (std::make_unique<gui::SpectrumAnalyserTask>()) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
