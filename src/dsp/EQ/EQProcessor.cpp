@@ -36,7 +36,6 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
         preSpectrumAnalyserTask->processBlockInput (preEqAudioBuffer);
     }
 
-
     const auto&& eqParams = getEQParams();
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     linPhaseEQ.setParameters (eqParams);

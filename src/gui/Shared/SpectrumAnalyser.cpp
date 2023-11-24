@@ -24,7 +24,7 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
     g.strokePath(prePath, juce::PathStrokeType(1));
     g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha(0.4f),
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
-                                                       gui::logo::colours::backgroundBlue.darker().withAlpha(0.4f),
+                                                       gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
                                                        (float) getHeight()));
     g.fillPath (postPath);
 }

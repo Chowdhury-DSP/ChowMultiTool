@@ -101,7 +101,7 @@ void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::
     freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 128.0f);
     expSmooth (magsPrevious.data(), fftMagsSmoothedDB.data(), fftOutSize, 0.2f);
 }
-}
+} // namespace gui
 // notes for Rachel:
 // - dynamic range trick is cool!
 // - tweaked some things re: painting, frequency band smoothing, smoothing across time, and threading stuff

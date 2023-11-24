@@ -48,6 +48,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/Brickwall/BrickwallEditor.cpp
     gui/Brickwall/BrickwallPlot.cpp
+    gui/Brickwall/BrickwallChyron.cpp
     gui/Brickwall/BottomBar.cpp
 
     gui/AnalogEQ/AnalogEQEditor.cpp

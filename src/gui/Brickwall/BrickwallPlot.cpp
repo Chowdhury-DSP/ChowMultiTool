@@ -99,9 +99,11 @@ BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickw
                                 .fftOrder = fftOrder,
                             }),
       brickwall (brickwallParams),
-      cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
+      cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp),
+      chyron (pluginState, brickwallParams, hcp)
 {
     addAndMakeVisible (cutoffSlider);
+    addAndMakeVisible (chyron);
 
     brickwall.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
@@ -162,5 +164,13 @@ void BrickwallPlot::resized()
 {
     updatePlot();
     cutoffSlider.setBounds (getLocalBounds());
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.15f);
+    const auto chyronHeight = proportionOfWidth (0.05f);
+    chyron.setBounds (getWidth() - pad - chyronWidth,
+                      getHeight() - pad - proportionOfHeight (0.075f) - chyronHeight,
+                      chyronWidth,
+                      chyronHeight);
 }
 } // namespace gui::brickwall

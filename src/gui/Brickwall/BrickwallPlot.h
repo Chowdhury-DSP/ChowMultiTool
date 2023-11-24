@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BrickwallChyron.h"
 #include "dsp/Brickwall/BrickwallProcessor.h"
 #include "state/PluginState.h"
 
@@ -40,6 +41,8 @@ private:
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider;
+
+    BrickwallChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallPlot)
 };
