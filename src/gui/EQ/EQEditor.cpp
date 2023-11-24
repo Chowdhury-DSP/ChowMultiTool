@@ -10,7 +10,7 @@ EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const c
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      spectrumAnalyser (std::make_unique<SpectrumAnalyser>(plot, spectrumAnalyserTasks)),
+      spectrumAnalyser (std::make_unique<SpectrumAnalyser> (plot, spectrumAnalyserTasks)),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)

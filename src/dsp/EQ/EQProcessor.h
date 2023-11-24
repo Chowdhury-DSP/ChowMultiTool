@@ -112,14 +112,14 @@ class EQProcessor
 {
 public:
     explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams),
-                                                          preSpectrumAnalyserTask(std::make_unique<gui::SpectrumAnalyserTask>()),
-                                                          postSpectrumAnalyserTask(std::make_unique<gui::SpectrumAnalyserTask>()){}
+                                                          preSpectrumAnalyserTask (std::make_unique<gui::SpectrumAnalyserTask>()),
+                                                          postSpectrumAnalyserTask (std::make_unique<gui::SpectrumAnalyserTask>()) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
-    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return {*preSpectrumAnalyserTask, *postSpectrumAnalyserTask}; }
+    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return { *preSpectrumAnalyserTask, *postSpectrumAnalyserTask }; }
 
 private:
     const EQToolParams& params;

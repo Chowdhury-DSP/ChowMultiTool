@@ -19,10 +19,10 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
-    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
-    g.strokePath(prePath, juce::PathStrokeType(1));
-    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha(0.4f),
+    //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+    g.setColour (gui::logo::colours::backgroundBlue.brighter (0.4f));
+    g.strokePath (prePath, juce::PathStrokeType (1));
+    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
                                                        gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
                                                        (float) getHeight()));
@@ -33,13 +33,13 @@ void SpectrumAnalyser::visibilityChanged()
 {
     if (isVisible())
     {
-        preTask.setShouldBeRunning(true);
+        preTask.setShouldBeRunning (true);
         postTask.setShouldBeRunning (true);
         startTimerHz (32);
     }
     else
     {
-        preTask.setShouldBeRunning(true);
+        preTask.setShouldBeRunning (true);
         postTask.setShouldBeRunning (false);
         stopTimer();
     }
@@ -47,11 +47,11 @@ void SpectrumAnalyser::visibilityChanged()
 
 void SpectrumAnalyser::timerCallback()
 {
-    updatePlotPath(prePath, preTask);
-    updatePlotPath(postPath, postTask);
+    updatePlotPath (prePath, preTask);
+    updatePlotPath (postPath, postTask);
 }
 
-void SpectrumAnalyser::updatePlotPath(juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)
+void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)
 {
     pathToUpdate.clear();
 
