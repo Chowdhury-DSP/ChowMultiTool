@@ -1,24 +1,27 @@
 #include "SpectrumAnalyser.h"
 #include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, gui::SpectrumAnalyserTask& spectrumAnalyserTask)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> spectrumAnalyserTasks)
     : eqPlot (eqPlot),
-      task (spectrumAnalyserTask.SpectrumAnalyserUITask)
+      preTask (spectrumAnalyserTasks.first.SpectrumAnalyserUITask),
+      postTask (spectrumAnalyserTasks.second.SpectrumAnalyserUITask)
 
 {
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
 {
-    if (task.isTaskRunning())
-        task.setShouldBeRunning (false);
+    if (preTask.isTaskRunning())
+        preTask.setShouldBeRunning (false);
+    if (postTask.isTaskRunning())
+        postTask.setShouldBeRunning (false);
 }
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::wheat.withAlpha(0.4f));
-//    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
-//    g.strokePath(prePath, juce::PathStrokeType(1));
+//    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+    g.setColour(gui::logo::colours::backgroundBlue.brighter(0.4f));
+    g.strokePath(prePath, juce::PathStrokeType(1));
     g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha(0.4f),
                                                        eqPlot.getYCoordinateForDecibels (0.0f),
                                                        gui::logo::colours::backgroundBlue.darker().withAlpha(0.4f),
@@ -30,29 +33,31 @@ void SpectrumAnalyser::visibilityChanged()
 {
     if (isVisible())
     {
-        task.setShouldBeRunning (true);
+        preTask.setShouldBeRunning(true);
+        postTask.setShouldBeRunning (true);
         startTimerHz (32);
     }
     else
     {
-        task.setShouldBeRunning (false);
+        preTask.setShouldBeRunning(true);
+        postTask.setShouldBeRunning (false);
         stopTimer();
     }
 }
 
 void SpectrumAnalyser::timerCallback()
 {
-    updatePlotPath(postPath);
-//    updatePlotPath(prePath);
+    updatePlotPath(prePath, preTask);
+    updatePlotPath(postPath, postTask);
 }
 
-void SpectrumAnalyser::updatePlotPath(juce::Path& pathToUpdate)
+void SpectrumAnalyser::updatePlotPath(juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)
 {
     pathToUpdate.clear();
 
-    const juce::ScopedLock sl { task.mutex };
-    const auto& freqAxis = task.fftFreqs; //spectrum's frequency axis
-    const auto& magResponseDBSmoothed = task.fftMagsSmoothedDB; //magnitude response
+    const juce::ScopedLock sl { taskToUpdate.mutex };
+    const auto& freqAxis = taskToUpdate.fftFreqs; //spectrum's frequency axis
+    const auto& magResponseDBSmoothed = taskToUpdate.fftMagsSmoothedDB; //magnitude response
 
     bool started = false;
     const auto nPoints = freqAxis.size(); //number of points on the frequency axis

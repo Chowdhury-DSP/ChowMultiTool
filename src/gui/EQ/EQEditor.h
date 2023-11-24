@@ -13,8 +13,8 @@ namespace gui::eq
 class EQEditor : public juce::Component
 {
 public:
-    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, SpectrumAnalyserTask& spectrumAnalyserTask);
-    ~EQEditor();
+    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> spectrumAnalyserTasks);
+    ~EQEditor() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;

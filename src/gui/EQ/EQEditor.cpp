@@ -4,13 +4,13 @@
 
 namespace gui::eq
 {
-EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, SpectrumAnalyserTask& spectrumAnalyserTask)
+EQEditor::EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> spectrumAnalyserTasks)
     : params (eqParams),
       plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      spectrumAnalyser (std::make_unique<SpectrumAnalyser> (plot, spectrumAnalyserTask)),
+      spectrumAnalyser (std::make_unique<SpectrumAnalyser>(plot, spectrumAnalyserTasks)),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)

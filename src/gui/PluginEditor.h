@@ -17,7 +17,7 @@ public:
     explicit PluginEditor (ChowMultiTool& plugin);
     ~PluginEditor() override;
 
-    SpectrumAnalyserTask& getSpectrumAnalyserTask();
+    std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> getSpectrumAnalyserTasks();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
