@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 
 namespace dsp::eq
@@ -103,17 +104,22 @@ struct EQToolParams : chowdsp::ParamHolder
     chowdsp::BoolParameter::Ptr linearPhaseMode { juce::ParameterID { "eq_linear_phase", ParameterVersionHints::version1_0_0 },
                                                   "Linear Phase On/Off",
                                                   false };
+
+    std::atomic<bool> isOpen;
 };
 
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams) {}
+    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams),
+                                                          preSpectrumAnalyserTask(std::make_unique<gui::SpectrumAnalyserTask>()),
+                                                          postSpectrumAnalyserTask(std::make_unique<gui::SpectrumAnalyserTask>()){}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
+    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return {*preSpectrumAnalyserTask, *postSpectrumAnalyserTask}; }
 
 private:
     const EQToolParams& params;
@@ -148,6 +154,8 @@ private:
 
     using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;
     chowdsp::EQ::LinearPhaseEQ<LinearPhaseProtoEQ> linPhaseEQ;
+    std::unique_ptr<gui::SpectrumAnalyserTask> preSpectrumAnalyserTask;
+    std::unique_ptr<gui::SpectrumAnalyserTask> postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

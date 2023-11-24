@@ -112,7 +112,6 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const j
             buffer.clear (ch, 0, buffer.getNumSamples());
     };
 
-
     const auto isOn = ! params.bypassParam->get();
     if (! bypass.processBlockIn (mainBusBuffer, isOn))
     {

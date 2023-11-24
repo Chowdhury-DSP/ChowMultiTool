@@ -21,6 +21,8 @@ target_sources(ChowMultiTool PRIVATE
     dsp/Brickwall/BrickwallProcessor.cpp
     dsp/SVF/SVFProcessor.cpp
 
+    gui/Shared/SpectrumAnalyserTask.cpp
+
     gui/PluginEditor.cpp
     gui/InitPage/InitPage.cpp
 
@@ -74,6 +76,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/Shared/TextSlider.cpp
     gui/Shared/LookAndFeels.cpp
     gui/Shared/VerticalSlider.cpp
+    gui/Shared/SpectrumAnalyser.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)
