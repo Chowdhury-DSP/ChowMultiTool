@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 
 namespace dsp::svf

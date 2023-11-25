@@ -24,8 +24,8 @@ namespace detail
     {
         const auto& params = pluginState.params;
         return {
-            tool_maker<eq::EQProcessor> ([&params]
-                                         { return eq::EQProcessor { *params.eqParams }; }),
+            tool_maker<eq::EQProcessor> ([&params, &pluginState]
+                                         { return eq::EQProcessor { *params.eqParams, *pluginState.nonParams.eqExtraState }; }),
             tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState]
                                                          { return waveshaper::WaveshaperProcessor {
                                                                pluginState,
@@ -111,7 +111,6 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const j
         for (int ch = mainBusBuffer.getNumChannels(); ch < buffer.getNumChannels(); ++ch)
             buffer.clear (ch, 0, buffer.getNumSamples());
     };
-
 
     const auto isOn = ! params.bypassParam->get();
     if (! bypass.processBlockIn (mainBusBuffer, isOn))

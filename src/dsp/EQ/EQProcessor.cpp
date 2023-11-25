@@ -2,6 +2,12 @@
 
 namespace dsp::eq
 {
+EQProcessor::EQProcessor (const EQToolParams& eqParams, const ExtraState& es)
+    : params (eqParams),
+      extraState (es)
+{
+}
+
 void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& pEQ, auto& eqParams)
@@ -14,10 +20,17 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     eq.prepare (spec);
     linPhaseEQ.prepare (spec, getEQParams());
+
+    preSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
+    //pre-EQ
+    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
+        preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
+
     const auto&& eqParams = getEQParams();
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     linPhaseEQ.setParameters (eqParams);
@@ -37,6 +50,10 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 
         chowdsp::BufferMath::copyBufferData (doubleBuffer, buffer);
     }
+
+    //post-EQ
+    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+        postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 
 int EQProcessor::getLatencySamples() const
