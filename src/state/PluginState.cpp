@@ -47,10 +47,13 @@ PluginParams::~PluginParams() = default;
 PluginExtraState::PluginExtraState()
 {
     waveshaperExtraState = std::make_unique<dsp::waveshaper::ExtraState>();
+    eqExtraState.emplace();
 
     addStateValues ({ &waveshaperExtraState->freeDrawState,
                       &waveshaperExtraState->mathState,
                       &waveshaperExtraState->pointsState,
+                      &eqExtraState->showPreSpectrum,
+                      &eqExtraState->showPostSpectrum,
                       &editorBounds });
 }
 

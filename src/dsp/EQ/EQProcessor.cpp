@@ -2,6 +2,12 @@
 
 namespace dsp::eq
 {
+EQProcessor::EQProcessor (const EQToolParams& eqParams, const ExtraState& es)
+    : params (eqParams),
+      extraState (es)
+{
+}
+
 void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     linPhaseEQ.updatePrototypeEQParameters = [] (auto& pEQ, auto& eqParams)
@@ -14,27 +20,16 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
     eq.prepare (spec);
     linPhaseEQ.prepare (spec, getEQParams());
-    //have this called only if bool is true
-    if (params.isOpen.load()) //causing crash
-    {
-        preSpectrumAnalyserTask->prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
-        postSpectrumAnalyserTask->prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
-    }
+
+    preSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
-    auto numChannels = buffer.getNumChannels();
-    auto numSamples = buffer.getNumSamples();
-
     //pre-EQ
-    if (params.isOpen.load()) //causing crash
-    {
-        juce::AudioBuffer<float> preEqAudioBuffer;
-        preEqAudioBuffer.setSize (numChannels, numSamples);
-        chowdsp::BufferMath::copyBufferData (buffer, preEqAudioBuffer);
-        preSpectrumAnalyserTask->processBlockInput (preEqAudioBuffer);
-    }
+    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
+        preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 
     const auto&& eqParams = getEQParams();
     EQToolParams::EQParams::setEQParameters (eq, eqParams);
@@ -57,13 +52,8 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     }
 
     //post-EQ
-    if (params.isOpen.load()) //causing crash
-    {
-        juce::AudioBuffer<float> postEqAudioBuffer;
-        postEqAudioBuffer.setSize (numChannels, numSamples);
-        chowdsp::BufferMath::copyBufferData (buffer, postEqAudioBuffer);
-        postSpectrumAnalyserTask->processBlockInput (postEqAudioBuffer);
-    }
+    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+        postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 
 int EQProcessor::getLatencySamples() const

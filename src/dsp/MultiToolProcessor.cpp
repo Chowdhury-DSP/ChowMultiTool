@@ -24,8 +24,8 @@ namespace detail
     {
         const auto& params = pluginState.params;
         return {
-            tool_maker<eq::EQProcessor> ([&params]
-                                         { return eq::EQProcessor { *params.eqParams }; }),
+            tool_maker<eq::EQProcessor> ([&params, &pluginState]
+                                         { return eq::EQProcessor { *params.eqParams, *pluginState.nonParams.eqExtraState }; }),
             tool_maker<waveshaper::WaveshaperProcessor> ([&pluginState]
                                                          { return waveshaper::WaveshaperProcessor {
                                                                pluginState,

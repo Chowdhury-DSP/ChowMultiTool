@@ -104,25 +104,29 @@ struct EQToolParams : chowdsp::ParamHolder
     chowdsp::BoolParameter::Ptr linearPhaseMode { juce::ParameterID { "eq_linear_phase", ParameterVersionHints::version1_0_0 },
                                                   "Linear Phase On/Off",
                                                   false };
+};
 
-    std::atomic<bool> isOpen;
+struct ExtraState
+{
+    std::atomic<bool> isEditorOpen { false };
+    chowdsp::StateValue<std::atomic_bool, bool> showPreSpectrum { "eq_show_pre_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "eq_show_post_spectrum", true };
 };
 
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams),
-                                                          preSpectrumAnalyserTask (std::make_unique<gui::SpectrumAnalyserTask>()),
-                                                          postSpectrumAnalyserTask (std::make_unique<gui::SpectrumAnalyserTask>()) {}
+    EQProcessor (const EQToolParams& eqParams, const ExtraState& extraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
-    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return { *preSpectrumAnalyserTask, *postSpectrumAnalyserTask }; }
+    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return { preSpectrumAnalyserTask, postSpectrumAnalyserTask }; }
 
 private:
     const EQToolParams& params;
+    const ExtraState& extraState;
 
     auto getEQParams()
     {
@@ -154,8 +158,8 @@ private:
 
     using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;
     chowdsp::EQ::LinearPhaseEQ<LinearPhaseProtoEQ> linPhaseEQ;
-    std::unique_ptr<gui::SpectrumAnalyserTask> preSpectrumAnalyserTask;
-    std::unique_ptr<gui::SpectrumAnalyserTask> postSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask preSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

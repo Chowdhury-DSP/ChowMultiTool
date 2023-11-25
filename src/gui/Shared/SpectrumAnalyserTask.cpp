@@ -9,7 +9,7 @@ void SpectrumAnalyserTask::prepareToPlay (double sampleRate, int samplesPerBlock
     SpectrumAnalyserUITask.prepare (sampleRate, samplesPerBlock, numChannels);
 }
 
-void SpectrumAnalyserTask::processBlockInput (juce::AudioBuffer<float>& buffer)
+void SpectrumAnalyserTask::processBlockInput (const juce::AudioBuffer<float>& buffer)
 {
     SpectrumAnalyserUITask.pushSamples (buffer);
 }

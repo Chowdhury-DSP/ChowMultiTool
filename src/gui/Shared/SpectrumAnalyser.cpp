@@ -20,13 +20,21 @@ SpectrumAnalyser::~SpectrumAnalyser()
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
     //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
-    g.setColour (gui::logo::colours::backgroundBlue.brighter (0.4f));
-    g.strokePath (prePath, juce::PathStrokeType (1));
-    g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
-                                                       eqPlot.getYCoordinateForDecibels (0.0f),
-                                                       gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
-                                                       (float) getHeight()));
-    g.fillPath (postPath);
+
+    if (showPreEQ)
+    {
+        g.setColour (gui::logo::colours::backgroundBlue.brighter (0.4f));
+        g.strokePath (prePath, juce::PathStrokeType (1));
+    }
+
+    if (showPostEQ)
+    {
+        g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
+                                                           eqPlot.getYCoordinateForDecibels (0.0f),
+                                                           gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
+                                                           (float) getHeight()));
+        g.fillPath (postPath);
+    }
 }
 
 void SpectrumAnalyser::visibilityChanged()
@@ -47,8 +55,10 @@ void SpectrumAnalyser::visibilityChanged()
 
 void SpectrumAnalyser::timerCallback()
 {
-    updatePlotPath (prePath, preTask);
-    updatePlotPath (postPath, postTask);
+    if (showPreEQ)
+        updatePlotPath (prePath, preTask);
+    if (showPostEQ)
+        updatePlotPath (postPath, postTask);
 }
 
 void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)

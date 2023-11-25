@@ -116,7 +116,11 @@ void PluginEditor::refreshEditor()
                 auto& pluginState = plugin.getState();
 
                 if constexpr (std::is_same_v<ToolType, dsp::eq::EQProcessor>)
-                    editorComponent = std::make_unique<eq::EQEditor> (pluginState, *pluginState.params.eqParams, hostContextProvider, std::get<0> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasks());
+                    editorComponent = std::make_unique<eq::EQEditor> (pluginState,
+                                                                      *pluginState.params.eqParams,
+                                                                      *pluginState.nonParams.eqExtraState,
+                                                                      hostContextProvider,
+                                                                      std::get<dsp::eq::EQProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasks());
                 else if constexpr (std::is_same_v<ToolType, dsp::waveshaper::WaveshaperProcessor>)
                     editorComponent = std::make_unique<waveshaper::WaveshaperEditor> (pluginState, *pluginState.params.waveshaperParams, hostContextProvider);
                 else if constexpr (std::is_same_v<ToolType, dsp::signal_gen::SignalGeneratorProcessor>)

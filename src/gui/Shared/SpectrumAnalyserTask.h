@@ -7,7 +7,7 @@ class SpectrumAnalyserTask
 public:
     SpectrumAnalyserTask();
     void prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels);
-    void processBlockInput (juce::AudioBuffer<float>& buffer);
+    void processBlockInput (const juce::AudioBuffer<float>& buffer);
 
     struct SpectrumAnalyserBackgroundTask : chowdsp::TimeSliceAudioUIBackgroundTask
     {
@@ -17,19 +17,19 @@ public:
         void resetTask() override;
         void runTask (const juce::AudioBuffer<float>& data) override;
 
-        juce::CriticalSection mutex;
+        juce::CriticalSection mutex {};
         std::vector<float> fftFreqs {};
         std::vector<float> fftMagsSmoothedDB {};
 
         //    private:
-        std::optional<juce::dsp::FFT> fft;
-        std::optional<juce::dsp::WindowingFunction<float>> window;
+        std::optional<juce::dsp::FFT> fft {};
+        std::optional<juce::dsp::WindowingFunction<float>> window {};
 
         int fftSize = 0;
         int fftDataSize = 0;
         int fftOutSize = 0;
 
-        chowdsp::Buffer<float> scratchMonoBuffer;
+        chowdsp::Buffer<float> scratchMonoBuffer {};
         std::vector<float> fftMagsUnsmoothedDB {};
         std::vector<float> magsPrevious {};
     } SpectrumAnalyserUITask;

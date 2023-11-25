@@ -13,21 +13,30 @@ namespace gui::eq
 class EQEditor : public juce::Component
 {
 public:
-    EQEditor (State& pluginState, dsp::eq::EQToolParams& eqParams, const chowdsp::HostContextProvider& hcp, std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> spectrumAnalyserTasks);
+    EQEditor (State& pluginState,
+              dsp::eq::EQToolParams& eqParams,
+              dsp::eq::ExtraState& extraState,
+              const chowdsp::HostContextProvider& hcp,
+              std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> spectrumAnalyserTasks);
     ~EQEditor() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
 
+    void mouseDown(const juce::MouseEvent& event) override;
+
 private:
     dsp::eq::EQToolParams& params;
+    dsp::eq::ExtraState& extraState;
+    chowdsp::ScopedCallbackList callbacks;
+
     EQPlot plot;
     std::unique_ptr<juce::Component> bottomBar;
     chowdsp::ParametersView paramsView;
 
     IconButton linearPhaseButton;
     chowdsp::ButtonAttachment linearPhaseAttach;
-    std::unique_ptr<SpectrumAnalyser> spectrumAnalyser;
+    SpectrumAnalyser spectrumAnalyser;
 
     IconButton drawButton;
     IconButton drawCheckButton;

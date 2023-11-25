@@ -7,11 +7,14 @@ class SpectrumAnalyser : public juce::Component,
 {
 public:
     SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> spectrumAnalyserTasks);
-    ~SpectrumAnalyser();
+    ~SpectrumAnalyser() override;
     void paint (juce::Graphics& g) override;
     void visibilityChanged() override;
     void timerCallback() override;
     void updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate);
+
+    bool showPreEQ = true;
+    bool showPostEQ = true;
 
 private:
     juce::Path prePath;
