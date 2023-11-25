@@ -8,7 +8,7 @@ namespace eq
 {
     struct EQToolParams;
     struct ExtraState;
-}
+} // namespace eq
 namespace waveshaper
 {
     struct Params;

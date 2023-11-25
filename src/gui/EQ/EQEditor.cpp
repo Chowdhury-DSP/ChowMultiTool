@@ -27,15 +27,13 @@ EQEditor::EQEditor (State& pluginState,
     spectrumAnalyser.showPostEQ = extraState.showPostSpectrum.get();
     callbacks += {
         extraState.showPreSpectrum.changeBroadcaster.connect ([this]
-        {
+                                                              {
             spectrumAnalyser.showPreEQ = extraState.showPreSpectrum.get();
-            spectrumAnalyser.repaint();
-        }),
+            spectrumAnalyser.repaint(); }),
         extraState.showPostSpectrum.changeBroadcaster.connect ([this]
-        {
+                                                               {
             spectrumAnalyser.showPostEQ = extraState.showPostSpectrum.get();
-            spectrumAnalyser.repaint();
-        }),
+            spectrumAnalyser.repaint(); }),
     };
 
     bottomBar = std::make_unique<BottomBar> (pluginState, eqParams);

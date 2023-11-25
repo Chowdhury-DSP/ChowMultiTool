@@ -23,7 +23,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
-    void mouseDown(const juce::MouseEvent& event) override;
+    void mouseDown (const juce::MouseEvent& event) override;
 
 private:
     dsp::eq::EQToolParams& params;
