@@ -64,12 +64,6 @@ PluginEditor::~PluginEditor()
     juce::LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
-std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> PluginEditor::getSpectrumAnalyserTasks()
-{
-    auto& tools = std::get<0> (plugin.getProcessor().getTools());
-    return tools.getSpectrumAnalyserTasks();
-}
-
 void PluginEditor::openGLChangeCallback (chowdsp::GlobalPluginSettings::SettingID settingID)
 {
     if (settingID != openGLSettingID)

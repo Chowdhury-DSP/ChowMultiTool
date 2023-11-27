@@ -136,8 +136,6 @@ void SVFPlot::paint (juce::Graphics& g)
 
     g.setColour (colours::plotColour);
     g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.5f });
-    //draw the spectrum analyser
-    //    spectrumAnalyser.updatePlotPath(g);
 }
 
 void SVFPlot::resized()
@@ -153,6 +151,5 @@ void SVFPlot::resized()
                       getHeight() - 5 * pad - chyronHeight,
                       chyronWidth,
                       chyronHeight);
-    //    spectrumAnalyser.setBounds(getLocalBounds());
 }
 } // namespace gui::svf

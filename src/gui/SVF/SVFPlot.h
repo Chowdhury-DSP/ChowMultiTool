@@ -36,7 +36,6 @@ private:
     KeytrackDotSlider keytrackSlider;
 
     SVFChyron chyron;
-    //    SpectrumAnalyser spectrumAnalyser;
 
     chowdsp::ScopedCallbackList callbacks;
 

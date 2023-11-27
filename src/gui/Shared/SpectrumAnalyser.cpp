@@ -66,12 +66,12 @@ void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAn
     pathToUpdate.clear();
 
     const juce::ScopedLock sl { taskToUpdate.mutex };
-    const auto& freqAxis = taskToUpdate.fftFreqs; //spectrum's frequency axis
-    const auto& magResponseDBSmoothed = taskToUpdate.fftMagsSmoothedDB; //magnitude response
+    const auto& freqAxis = taskToUpdate.fftFreqs;
+    const auto& magResponseDBSmoothed = taskToUpdate.fftMagsSmoothedDB;
 
     bool started = false;
-    const auto nPoints = freqAxis.size(); //number of points on the frequency axis
-    for (size_t i = 0; i < nPoints;) //loop over frequency points
+    const auto nPoints = freqAxis.size();
+    for (size_t i = 0; i < nPoints;)
     {
         if (freqAxis[i] < eqPlot.params.minFrequencyHz / 2.0f || freqAxis[i] > eqPlot.params.maxFrequencyHz * 1.01f)
         {

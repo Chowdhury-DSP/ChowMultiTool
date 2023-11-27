@@ -27,7 +27,6 @@ void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 
 void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
-    //pre-EQ
     if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
         preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 
@@ -51,7 +50,6 @@ void EQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
         chowdsp::BufferMath::copyBufferData (doubleBuffer, buffer);
     }
 
-    //post-EQ
     if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
         postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
