@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 
 namespace dsp::eq
@@ -105,18 +106,27 @@ struct EQToolParams : chowdsp::ParamHolder
                                                   false };
 };
 
+struct ExtraState
+{
+    std::atomic<bool> isEditorOpen { false };
+    chowdsp::StateValue<std::atomic_bool, bool> showPreSpectrum { "eq_show_pre_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "eq_show_post_spectrum", true };
+};
+
 class EQProcessor
 {
 public:
-    explicit EQProcessor (const EQToolParams& eqParams) : params (eqParams) {}
+    EQProcessor (const EQToolParams& eqParams, const ExtraState& extraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
+    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return { preSpectrumAnalyserTask, postSpectrumAnalyserTask }; }
 
 private:
     const EQToolParams& params;
+    const ExtraState& extraState;
 
     auto getEQParams()
     {
@@ -148,6 +158,8 @@ private:
 
     using LinearPhaseProtoEQ = chowdsp::EQ::LinearPhasePrototypeEQ<double, EQToolParams::EQParams::Params, EQToolParams::EQParams::EQNumBands, EQBand<double>>;
     chowdsp::EQ::LinearPhaseEQ<LinearPhaseProtoEQ> linPhaseEQ;
+    gui::SpectrumAnalyserTask preSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQProcessor)
 };

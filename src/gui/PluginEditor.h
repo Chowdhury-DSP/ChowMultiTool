@@ -2,6 +2,8 @@
 
 #include "Toolbar/Toolbar.h"
 #include "gui/Shared/ErrorMessageView.h"
+#include "gui/Shared/SpectrumAnalyserTask.h"
+#include <pch.h>
 
 class ChowMultiTool;
 
