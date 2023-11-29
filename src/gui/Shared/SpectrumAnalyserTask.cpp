@@ -102,10 +102,3 @@ void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::
     expSmooth (magsPrevious.data(), fftMagsSmoothedDB.data(), fftOutSize, 0.2f);
 }
 } // namespace gui
-// notes for Rachel:
-// - dynamic range trick is cool!
-// - tweaked some things re: painting, frequency band smoothing, smoothing across time, and threading stuff
-// - probably could use some slightly different coloring?
-// - Could the spectrum task stuff live in the UI? That way the DSP can ignore it when the UI is closed.
-// - namespaces and maybe new name/location for "SpectrumAnalyserTask" class
-// - Add analyzer to other tools that have a frequency plot (could be a separate PR)

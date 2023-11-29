@@ -23,16 +23,16 @@ EQEditor::EQEditor (State& pluginState,
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
-    spectrumAnalyser.showPreEQ = extraState.showPreSpectrum.get();
-    spectrumAnalyser.showPostEQ = extraState.showPostSpectrum.get();
+    spectrumAnalyser.setShowPreEQ(extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShowPostEQ(extraState.showPostSpectrum.get());
     callbacks += {
         extraState.showPreSpectrum.changeBroadcaster.connect ([this]
                                                               {
-            spectrumAnalyser.showPreEQ = extraState.showPreSpectrum.get();
+            spectrumAnalyser.setShowPreEQ(extraState.showPreSpectrum.get());
             spectrumAnalyser.repaint(); }),
         extraState.showPostSpectrum.changeBroadcaster.connect ([this]
                                                                {
-            spectrumAnalyser.showPostEQ = extraState.showPostSpectrum.get();
+            spectrumAnalyser.setShowPostEQ(extraState.showPostSpectrum.get());
             spectrumAnalyser.repaint(); }),
     };
 
@@ -42,6 +42,7 @@ EQEditor::EQEditor (State& pluginState,
     addAndMakeVisible (bottomBar.get());
     addAndMakeVisible (linearPhaseButton);
     addAndMakeVisible (spectrumAnalyser);
+    spectrumAnalyser.toBack();
 
     linearPhaseButton.setTooltip ("Linear Phase");
 
@@ -136,6 +137,5 @@ void EQEditor::resized()
     drawCheckButton.setBounds (drawButton.getBoundsInParent());
     drawXButton.setBounds (linearPhaseButton.getBoundsInParent());
     spectrumAnalyser.setBounds (getLocalBounds());
-    spectrumAnalyser.toBack();
 }
 } // namespace gui::eq

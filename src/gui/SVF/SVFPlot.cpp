@@ -52,7 +52,6 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp
     keytrackSlider.widthProportion = 0.03f;
     addAndMakeVisible (keytrackSlider);
     addAndMakeVisible (chyron);
-    //    addAndMakeVisible(spectrumAnalyser);
 
     keytrackSlider.getXCoordinate = [this, &svfParams = std::as_const (svfParams)]
     {

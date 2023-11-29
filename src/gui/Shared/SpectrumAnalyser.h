@@ -12,9 +12,10 @@ public:
     void visibilityChanged() override;
     void timerCallback() override;
     void updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate);
-
-    bool showPreEQ = true;
-    bool showPostEQ = true;
+    bool getShowPreEQ() { return showPreEQ; }
+    bool getShowPostEQ() { return showPostEQ; }
+    void setShowPreEQ(bool showPreSpectrum) { showPreEQ = showPreSpectrum; }
+    void setShowPostEQ(bool showPostSpectrum) { showPostEQ = showPostSpectrum; }
 
 private:
     juce::Path prePath;
@@ -22,6 +23,8 @@ private:
     const chowdsp::SpectrumPlotBase& eqPlot;
     gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& preTask;
     gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& postTask;
+    bool showPreEQ = true;
+    bool showPostEQ = true;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyser)
 };

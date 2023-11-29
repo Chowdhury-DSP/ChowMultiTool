@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pch.h>
+
 namespace gui
 {
 class SpectrumAnalyserTask
@@ -21,7 +23,7 @@ public:
         std::vector<float> fftFreqs {};
         std::vector<float> fftMagsSmoothedDB {};
 
-        //    private:
+private:
         std::optional<juce::dsp::FFT> fft {};
         std::optional<juce::dsp::WindowingFunction<float>> window {};
 
