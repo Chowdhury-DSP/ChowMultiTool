@@ -23,8 +23,8 @@ EQEditor::EQEditor (State& pluginState,
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
-    spectrumAnalyser.setShowPreEQ(extraState.showPreSpectrum.get());
-    spectrumAnalyser.setShowPostEQ(extraState.showPostSpectrum.get());
+    spectrumAnalyser.setShowPreEQ (extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShowPostEQ (extraState.showPostSpectrum.get());
     callbacks += {
         extraState.showPreSpectrum.changeBroadcaster.connect ([this]
                                                               {

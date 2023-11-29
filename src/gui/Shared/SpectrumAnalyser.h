@@ -14,8 +14,8 @@ public:
     void updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate);
     bool getShowPreEQ() { return showPreEQ; }
     bool getShowPostEQ() { return showPostEQ; }
-    void setShowPreEQ(bool showPreSpectrum) { showPreEQ = showPreSpectrum; }
-    void setShowPostEQ(bool showPostSpectrum) { showPostEQ = showPostSpectrum; }
+    void setShowPreEQ (bool showPreSpectrum) { showPreEQ = showPreSpectrum; }
+    void setShowPostEQ (bool showPostSpectrum) { showPostEQ = showPostSpectrum; }
 
 private:
     juce::Path prePath;
