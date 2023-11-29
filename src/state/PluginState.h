@@ -7,7 +7,8 @@ namespace dsp
 namespace eq
 {
     struct EQToolParams;
-}
+    struct ExtraState;
+} // namespace eq
 namespace waveshaper
 {
     struct Params;
@@ -73,6 +74,7 @@ struct PluginExtraState : chowdsp::NonParamState
     ~PluginExtraState();
 
     std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
+    chowdsp::LocalPointer<dsp::eq::ExtraState, 128> eqExtraState;
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state

@@ -74,6 +74,8 @@ target_sources(ChowMultiTool PRIVATE
     gui/Shared/TextSlider.cpp
     gui/Shared/LookAndFeels.cpp
     gui/Shared/VerticalSlider.cpp
+    gui/Shared/SpectrumAnalyser.cpp
+    gui/Shared/SpectrumAnalyserTask.cpp
 )
 
 target_precompile_headers(ChowMultiTool PRIVATE pch.h)

@@ -1,11 +1,11 @@
 #pragma once
 
+#include "WaveshaperChyron.h"
 #include "WaveshaperDrawer.h"
 #include "WaveshaperMathView.h"
 #include "WaveshaperPointsView.h"
 #include "dsp/Waveshaper/WaveshaperProcessor.h"
 #include "state/PluginState.h"
-#include "WaveshaperChyron.h"
 
 namespace gui::waveshaper
 {

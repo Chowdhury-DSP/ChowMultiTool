@@ -1,8 +1,8 @@
 #pragma once
 
+#include "BrickwallChyron.h"
 #include "dsp/Brickwall/BrickwallProcessor.h"
 #include "state/PluginState.h"
-#include "BrickwallChyron.h"
 
 namespace gui::brickwall
 {
