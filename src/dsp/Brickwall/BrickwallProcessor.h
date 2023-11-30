@@ -106,7 +106,7 @@ struct Params : chowdsp::ParamHolder
 class BrickwallProcessor
 {
 public:
-    explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState(es){}
+    explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState (es) {}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
@@ -116,10 +116,9 @@ public:
 
     std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> getSpectrumAnalyserTasks()
     {
-        return {std::nullopt, std::ref(postSpectrumAnalyserTask.SpectrumAnalyserUITask)};
+        return { std::nullopt, std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }
-//    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& getSpectrumAnalyserTasks() { return postSpectrumAnalyserTask.SpectrumAnalyserUITask; }
-
+    //    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& getSpectrumAnalyserTasks() { return postSpectrumAnalyserTask.SpectrumAnalyserUITask; }
 
 private:
     int getFilterTypeIndex() const;

@@ -9,7 +9,7 @@ EQEditor::EQEditor (State& pluginState,
                     dsp::eq::EQToolParams& eqParams,
                     dsp::eq::ExtraState& eqExtraState,
                     const chowdsp::HostContextProvider& hcp,
-                    std::pair<optionalSpectrumBackgroundTask , optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
+                    std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
     : params (eqParams),
       extraState (eqExtraState),
       plot (pluginState, eqParams.eqParams, hcp),

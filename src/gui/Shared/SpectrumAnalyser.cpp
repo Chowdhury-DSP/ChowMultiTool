@@ -3,8 +3,8 @@
 
 SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
     : eqPlot (eqPlot),
-      preTask (spectrumAnalyserTasks.first.has_value() ? std::ref(spectrumAnalyserTasks.first).get() : std::nullopt),
-      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref(spectrumAnalyserTasks.second).get() : std::nullopt)
+      preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
+      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
 
 {
 }
@@ -19,7 +19,7 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+    //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
 
     if (showPreEQ)
     {

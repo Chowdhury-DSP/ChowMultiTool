@@ -116,7 +116,6 @@ struct ExtraState
 class EQProcessor
 {
 public:
-
     EQProcessor (const EQToolParams& eqParams, const ExtraState& extraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
@@ -128,7 +127,7 @@ public:
 
     std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> getSpectrumAnalyserTasks()
     {
-        return {std::ref(preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref(postSpectrumAnalyserTask.SpectrumAnalyserUITask)};
+        return { std::ref (preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }
 
 private:

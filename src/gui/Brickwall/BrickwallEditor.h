@@ -24,7 +24,6 @@ public:
     void mouseDown (const juce::MouseEvent& event) override;
 
 private:
-
     dsp::brickwall::ExtraState& extraState;
     chowdsp::ScopedCallbackList callbacks;
 

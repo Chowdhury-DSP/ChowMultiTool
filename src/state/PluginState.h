@@ -30,7 +30,7 @@ namespace brickwall
 {
     struct Params;
     struct ExtraState;
-}
+} // namespace brickwall
 namespace svf
 {
     struct Params;

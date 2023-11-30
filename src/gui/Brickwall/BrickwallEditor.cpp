@@ -3,8 +3,6 @@
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/LookAndFeels.h"
 
-
-
 namespace gui::brickwall
 {
 BrickwallEditor::BrickwallEditor (State& pluginState,
@@ -12,9 +10,9 @@ BrickwallEditor::BrickwallEditor (State& pluginState,
                                   dsp::brickwall::ExtraState& brickwallExtraState,
                                   const chowdsp::HostContextProvider& hcp,
                                   std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
-    : extraState(brickwallExtraState),
+    : extraState (brickwallExtraState),
       plot (pluginState, params, hcp),
-      spectrumAnalyser(plot, spectrumAnalyserTasks)
+      spectrumAnalyser (plot, spectrumAnalyserTasks)
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
@@ -31,8 +29,8 @@ BrickwallEditor::BrickwallEditor (State& pluginState,
     addAndMakeVisible (plot);
     addAndMakeVisible (bottomBar.get());
     addAndMakeVisible (spectrumAnalyser);
-    spectrumAnalyser.toBehind(bottomBar.get());
-//    spectrumAnalyser.toBehind(&plot.getCutoffSlider());
+    spectrumAnalyser.toBehind (bottomBar.get());
+    //    spectrumAnalyser.toBehind(&plot.getCutoffSlider());
 }
 
 BrickwallEditor::~BrickwallEditor()
