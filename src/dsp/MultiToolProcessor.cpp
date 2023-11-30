@@ -38,8 +38,8 @@ namespace detail
                                                       { return analog_eq::AnalogEQProcessor { *params.analogEQParams }; }),
             tool_maker<band_splitter::BandSplitterProcessor> ([&params]
                                                               { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
-            tool_maker<brickwall::BrickwallProcessor> ([&params]
-                                                       { return brickwall::BrickwallProcessor { *params.brickwallParams }; }),
+            tool_maker<brickwall::BrickwallProcessor> ([&params, &pluginState]
+                                                       { return brickwall::BrickwallProcessor { *params.brickwallParams, *pluginState.nonParams.brickwallExtraState }; }),
             tool_maker<svf::SVFProcessor> ([&params]
                                            { return svf::SVFProcessor { *params.svfParams }; })
         };

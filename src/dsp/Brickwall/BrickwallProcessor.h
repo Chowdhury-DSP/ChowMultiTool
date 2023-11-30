@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gui/Shared/SpectrumAnalyserTask.h"
 #include <pch.h>
 
 namespace dsp::brickwall
@@ -28,6 +29,13 @@ enum class FilterType
     ChebyshevII = 2,
     Elliptic = 4,
 };
+
+struct ExtraState
+{
+    std::atomic<bool> isEditorOpen { false };
+    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "brickwall_show_post_spectrum", true };
+};
+
 } // namespace dsp::brickwall
 
 template <>
@@ -98,16 +106,26 @@ struct Params : chowdsp::ParamHolder
 class BrickwallProcessor
 {
 public:
-    explicit BrickwallProcessor (const Params& brickwallParams) : params (brickwallParams) {}
+    explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState(es){}
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
 
+    using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
+
+    std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> getSpectrumAnalyserTasks()
+    {
+        return {std::nullopt, std::ref(postSpectrumAnalyserTask.SpectrumAnalyserUITask)};
+    }
+//    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& getSpectrumAnalyserTasks() { return postSpectrumAnalyserTask.SpectrumAnalyserUITask; }
+
+
 private:
     int getFilterTypeIndex() const;
 
     const Params& params;
+    const dsp::brickwall::ExtraState& extraState;
 
     using EQBand = chowdsp::EQ::EQBand<
         float,
@@ -160,6 +178,8 @@ private:
         chowdsp::EllipticFilter<16, chowdsp::EllipticFilterType::Lowpass>,
         chowdsp::EllipticFilter<16, chowdsp::EllipticFilterType::Highpass>>;
     EQBand filter;
+
+    gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallProcessor)
 };

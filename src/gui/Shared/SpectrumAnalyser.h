@@ -2,11 +2,13 @@
 #include "SpectrumAnalyserTask.h"
 #include "dsp/MultiToolProcessor.h"
 
+using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
+
 class SpectrumAnalyser : public juce::Component,
                          public juce::Timer
 {
 public:
-    SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> spectrumAnalyserTasks);
+    SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks);
     ~SpectrumAnalyser() override;
     void paint (juce::Graphics& g) override;
     void visibilityChanged() override;
@@ -18,11 +20,12 @@ public:
     void setShowPostEQ (bool showPostSpectrum) { showPostEQ = showPostSpectrum; }
 
 private:
+    using optionalBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
     juce::Path prePath;
     juce::Path postPath;
     const chowdsp::SpectrumPlotBase& eqPlot;
-    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& preTask;
-    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& postTask;
+    optionalBackgroundTask preTask;
+    optionalBackgroundTask postTask;
     bool showPreEQ = true;
     bool showPostEQ = true;
 

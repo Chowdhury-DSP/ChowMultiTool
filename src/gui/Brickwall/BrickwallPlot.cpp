@@ -98,7 +98,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickw
                                 .sampleRate = sampleRate,
                                 .fftOrder = fftOrder,
                             }),
-      brickwall (brickwallParams),
+      brickwall (brickwallParams, *pluginState.nonParams.brickwallExtraState),
       cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp),
       chyron (pluginState, brickwallParams, hcp)
 {

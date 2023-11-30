@@ -1,25 +1,25 @@
 #include "SpectrumAnalyser.h"
 #include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> spectrumAnalyserTasks)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
     : eqPlot (eqPlot),
-      preTask (spectrumAnalyserTasks.first.SpectrumAnalyserUITask),
-      postTask (spectrumAnalyserTasks.second.SpectrumAnalyserUITask)
+      preTask (spectrumAnalyserTasks.first.has_value() ? std::ref(spectrumAnalyserTasks.first).get() : std::nullopt),
+      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref(spectrumAnalyserTasks.second).get() : std::nullopt)
 
 {
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
 {
-    if (preTask.isTaskRunning())
-        preTask.setShouldBeRunning (false);
-    if (postTask.isTaskRunning())
-        postTask.setShouldBeRunning (false);
+    if (preTask && preTask->get().isTaskRunning())
+        preTask->get().setShouldBeRunning (false);
+    if (postTask && postTask->get().isTaskRunning())
+        postTask->get().setShouldBeRunning (false);
 }
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+//    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
 
     if (showPreEQ)
     {
@@ -41,24 +41,28 @@ void SpectrumAnalyser::visibilityChanged()
 {
     if (isVisible())
     {
-        preTask.setShouldBeRunning (showPreEQ);
-        postTask.setShouldBeRunning (showPostEQ);
+        if (preTask)
+            preTask->get().setShouldBeRunning (showPreEQ);
+        if (postTask)
+            postTask->get().setShouldBeRunning (showPostEQ);
         startTimerHz (32);
     }
     else
     {
-        preTask.setShouldBeRunning (false);
-        postTask.setShouldBeRunning (false);
+        if (preTask)
+            preTask->get().setShouldBeRunning (false);
+        if (postTask)
+            postTask->get().setShouldBeRunning (false);
         stopTimer();
     }
 }
 
 void SpectrumAnalyser::timerCallback()
 {
-    if (showPreEQ)
-        updatePlotPath (prePath, preTask);
-    if (showPostEQ)
-        updatePlotPath (postPath, postTask);
+    if (preTask && showPreEQ)
+        updatePlotPath (prePath, preTask->get());
+    if (postTask && showPostEQ)
+        updatePlotPath (postPath, postTask->get());
 }
 
 void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)

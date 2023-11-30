@@ -48,12 +48,14 @@ PluginExtraState::PluginExtraState()
 {
     waveshaperExtraState = std::make_unique<dsp::waveshaper::ExtraState>();
     eqExtraState.emplace();
+    brickwallExtraState.emplace();
 
     addStateValues ({ &waveshaperExtraState->freeDrawState,
                       &waveshaperExtraState->mathState,
                       &waveshaperExtraState->pointsState,
                       &eqExtraState->showPreSpectrum,
                       &eqExtraState->showPostSpectrum,
+                      &brickwallExtraState->showPostSpectrum,
                       &editorBounds });
 }
 

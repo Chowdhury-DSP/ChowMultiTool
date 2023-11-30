@@ -29,6 +29,7 @@ namespace band_splitter
 namespace brickwall
 {
     struct Params;
+    struct ExtraState;
 }
 namespace svf
 {
@@ -75,6 +76,7 @@ struct PluginExtraState : chowdsp::NonParamState
 
     std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
     chowdsp::LocalPointer<dsp::eq::ExtraState, 128> eqExtraState;
+    chowdsp::LocalPointer<dsp::brickwall::ExtraState, 128> brickwallExtraState;
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state

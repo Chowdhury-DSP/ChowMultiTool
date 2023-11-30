@@ -14,6 +14,7 @@ public:
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
+//    juce::Slider& getCutoffSlider(){ return cutoffSlider ;}
 
 private:
     void updatePlot();

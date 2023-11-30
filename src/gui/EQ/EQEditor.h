@@ -8,6 +8,8 @@
 // - Figure out type-in values for chyron
 // - Better controls for Q values
 
+using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
+
 namespace gui::eq
 {
 class EQEditor : public juce::Component
@@ -17,7 +19,7 @@ public:
               dsp::eq::EQToolParams& eqParams,
               dsp::eq::ExtraState& extraState,
               const chowdsp::HostContextProvider& hcp,
-              std::pair<SpectrumAnalyserTask&, SpectrumAnalyserTask&> spectrumAnalyserTasks);
+              std::pair<optionalSpectrumBackgroundTask , optionalSpectrumBackgroundTask> spectrumAnalyserTasks);
     ~EQEditor() override;
 
     void paint (juce::Graphics& g) override;
