@@ -182,10 +182,10 @@ struct ExtraState
 class SVFProcessor
 {
 public:
-    explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState) : params (svfParams), extraState(extraState)
+    explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState) : params (svfParams), extraState (extraState)
     {
-        preSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-45, 24);
-        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-45, 24);
+        preSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-45, 24);
+        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-45, 24);
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);

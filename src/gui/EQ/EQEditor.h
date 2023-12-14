@@ -8,7 +8,6 @@
 // - Figure out type-in values for chyron
 // - Better controls for Q values
 
-
 namespace gui::eq
 {
 class EQEditor : public juce::Component

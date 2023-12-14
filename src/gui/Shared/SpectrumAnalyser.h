@@ -2,7 +2,6 @@
 #include "SpectrumAnalyserTask.h"
 #include "dsp/MultiToolProcessor.h"
 
-
 class SpectrumAnalyser : public juce::Component,
                          public juce::Timer
 {

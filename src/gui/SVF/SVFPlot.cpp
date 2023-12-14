@@ -45,11 +45,11 @@ SVFPlot::SVFPlot (State& pluginState,
         .minMagnitudeDB = -45.0f,
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
-      extraState(svfExtraState),
+      extraState (svfExtraState),
       processor (svfParams, extraState),
       freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
       keytrackSlider (svfParams.keytrackOffset, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
-      spectrumAnalyser(*this, spectrumAnalyserTasks),
+      spectrumAnalyser (*this, spectrumAnalyserTasks),
       chyron (pluginState, svfParams, hcp)
 {
     addMouseListener (this, true);

@@ -19,7 +19,7 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-//    g.fillAll(juce::Colours::blue.withAlpha(0.4f));
+    //    g.fillAll(juce::Colours::blue.withAlpha(0.4f));
 
     if (showPreEQ)
     {

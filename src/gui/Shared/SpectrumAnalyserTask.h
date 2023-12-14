@@ -18,12 +18,15 @@ public:
         void prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs) override;
         void resetTask() override;
         void runTask (const juce::AudioBuffer<float>& data) override;
-        void setDBRange (float min, float max) {minDB = min; maxDB = max;}
+        void setDBRange (float min, float max)
+        {
+            minDB = min;
+            maxDB = max;
+        }
 
         juce::CriticalSection mutex {};
         std::vector<float> fftFreqs {};
         std::vector<float> fftMagsSmoothedDB {};
-
 
         float minDB = -100.0f;
         float maxDB = -100.0f;

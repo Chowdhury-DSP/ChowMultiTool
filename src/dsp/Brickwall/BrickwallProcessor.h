@@ -108,13 +108,12 @@ class BrickwallProcessor
 public:
     explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState (es)
     {
-        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-60, 5);
+        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
-
 
     std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
     {

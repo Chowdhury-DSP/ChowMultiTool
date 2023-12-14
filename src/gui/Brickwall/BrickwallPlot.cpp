@@ -103,8 +103,8 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                                 .fftOrder = fftOrder,
                             }),
       brickwall (brickwallParams, *pluginState.nonParams.brickwallExtraState),
-      extraState(brickwallExtraState),
-      spectrumAnalyser(*this, spectrumAnalyserTasks),
+      extraState (brickwallExtraState),
+      spectrumAnalyser (*this, spectrumAnalyserTasks),
       chyron (pluginState, brickwallParams, hcp),
       cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {
@@ -148,8 +148,8 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
 
 BrickwallPlot::~BrickwallPlot()
 {
-    removeMouseListener(this);
-    extraState.isEditorOpen.store(false);
+    removeMouseListener (this);
+    extraState.isEditorOpen.store (false);
 }
 
 void BrickwallPlot::updatePlot()
@@ -198,9 +198,9 @@ void BrickwallPlot::paint (juce::Graphics& g)
                              colours::majorLinesColour,
                              colours::minorLinesColour);
 
-    spectrumAnalyser.paint(g);
-//    g.setColour (colours::plotColour);
-//    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
+    spectrumAnalyser.paint (g);
+    //    g.setColour (colours::plotColour);
+    //    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
 }
 
 void BrickwallPlot::paintOverChildren (juce::Graphics& g)

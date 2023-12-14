@@ -60,7 +60,7 @@ SVFEditor::SVFEditor (State& pluginState,
                       std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
     : plot (pluginState, svfParams, extraState, hcp, spectrumAnalyserTasks),
       paramControls (pluginState, svfParams, hcp),
-      extraState(extraState),
+      extraState (extraState),
       keytrackButton (std::make_unique<KeytrackButton> ("Vector/fad-keyboard.svg", colours::plotColour, colours::linesColour)),
       keytrackAttach (svfParams.keytrack, pluginState, *keytrackButton),
       arpLimitButton ("Vector/arrows-up-to-line-solid.svg", colours::plotColour, colours::linesColour),

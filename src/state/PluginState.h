@@ -35,7 +35,7 @@ namespace svf
 {
     struct Params;
     struct ExtraState;
-}
+} // namespace svf
 } // namespace dsp
 
 namespace state

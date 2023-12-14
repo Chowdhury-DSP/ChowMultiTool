@@ -17,8 +17,7 @@ BrickwallEditor::BrickwallEditor (State& pluginState,
     addAndMakeVisible (bottomBar.get());
 }
 
-BrickwallEditor::~BrickwallEditor()
-{};
+BrickwallEditor::~BrickwallEditor() {};
 
 void BrickwallEditor::paint (juce::Graphics& g)
 {

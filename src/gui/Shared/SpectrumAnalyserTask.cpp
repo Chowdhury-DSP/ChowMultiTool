@@ -95,9 +95,9 @@ void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::
 
     auto minMax = std::minmax_element (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
     float dynamicRange = std::max (std::abs (*minMax.first), std::abs (*minMax.second));
-    dynamicRange = std::clamp (dynamicRange, std::abs(minDB), range);
+    dynamicRange = std::clamp (dynamicRange, std::abs (minDB), range);
     for (auto& dB : fftMagsUnsmoothedDB)
-        dB = std::abs(minDB) * (dB / dynamicRange);
+        dB = std::abs (minDB) * (dB / dynamicRange);
 
     const juce::CriticalSection::ScopedLockType lock { mutex };
     freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 128.0f);

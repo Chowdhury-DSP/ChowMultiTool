@@ -3,7 +3,6 @@
 #include "BrickwallPlot.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 
-
 namespace gui::brickwall
 {
 class BrickwallEditor : public juce::Component
