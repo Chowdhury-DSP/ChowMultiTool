@@ -123,9 +123,8 @@ public:
 
     int getLatencySamples() const;
 
-    using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
 
-    std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> getSpectrumAnalyserTasks()
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
     {
         return { std::ref (preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }

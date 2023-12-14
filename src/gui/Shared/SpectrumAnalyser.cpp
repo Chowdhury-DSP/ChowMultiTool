@@ -1,7 +1,7 @@
 #include "SpectrumAnalyser.h"
 #include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
     : eqPlot (eqPlot),
       preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
       postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
@@ -19,7 +19,7 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+//    g.fillAll(juce::Colours::blue.withAlpha(0.4f));
 
     if (showPreEQ)
     {
@@ -55,6 +55,18 @@ void SpectrumAnalyser::visibilityChanged()
             postTask->get().setShouldBeRunning (false);
         stopTimer();
     }
+}
+
+void SpectrumAnalyser::setShouldShowPreEQ (bool shouldShow)
+{
+    showPreEQ = shouldShow;
+    preTask->get().setShouldBeRunning (showPreEQ && isVisible());
+}
+
+void SpectrumAnalyser::setShouldShowPostEQ (bool shouldShow)
+{
+    showPostEQ = shouldShow;
+    postTask->get().setShouldBeRunning (showPostEQ && isVisible());
 }
 
 void SpectrumAnalyser::timerCallback()

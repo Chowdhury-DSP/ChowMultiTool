@@ -9,7 +9,7 @@ EQEditor::EQEditor (State& pluginState,
                     dsp::eq::EQToolParams& eqParams,
                     dsp::eq::ExtraState& eqExtraState,
                     const chowdsp::HostContextProvider& hcp,
-                    std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks)
+                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
     : params (eqParams),
       extraState (eqExtraState),
       plot (pluginState, eqParams.eqParams, hcp),
@@ -23,16 +23,16 @@ EQEditor::EQEditor (State& pluginState,
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
-    spectrumAnalyser.setShowPreEQ (extraState.showPreSpectrum.get());
-    spectrumAnalyser.setShowPostEQ (extraState.showPostSpectrum.get());
+    spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
     callbacks += {
         extraState.showPreSpectrum.changeBroadcaster.connect ([this]
                                                               {
-            spectrumAnalyser.setShowPreEQ(extraState.showPreSpectrum.get());
+            spectrumAnalyser.setShouldShowPreEQ(extraState.showPreSpectrum.get());
             spectrumAnalyser.repaint(); }),
         extraState.showPostSpectrum.changeBroadcaster.connect ([this]
                                                                {
-            spectrumAnalyser.setShowPostEQ(extraState.showPostSpectrum.get());
+            spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
             spectrumAnalyser.repaint(); }),
     };
 

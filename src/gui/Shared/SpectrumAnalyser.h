@@ -2,22 +2,19 @@
 #include "SpectrumAnalyserTask.h"
 #include "dsp/MultiToolProcessor.h"
 
-using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
 
 class SpectrumAnalyser : public juce::Component,
                          public juce::Timer
 {
 public:
-    SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> spectrumAnalyserTasks);
+    SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
     ~SpectrumAnalyser() override;
     void paint (juce::Graphics& g) override;
     void visibilityChanged() override;
     void timerCallback() override;
     void updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate);
-    bool getShowPreEQ() { return showPreEQ; }
-    bool getShowPostEQ() { return showPostEQ; }
-    void setShowPreEQ (bool showPreSpectrum) { showPreEQ = showPreSpectrum; }
-    void setShowPostEQ (bool showPostSpectrum) { showPostEQ = showPostSpectrum; }
+    void setShouldShowPreEQ (bool shouldShow);
+    void setShouldShowPostEQ (bool shouldShow);
 
 private:
     using optionalBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;

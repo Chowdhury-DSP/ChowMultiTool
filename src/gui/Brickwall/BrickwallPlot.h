@@ -2,6 +2,7 @@
 
 #include "BrickwallChyron.h"
 #include "dsp/Brickwall/BrickwallProcessor.h"
+#include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
 
 namespace gui::brickwall
@@ -9,20 +10,29 @@ namespace gui::brickwall
 class BrickwallPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    BrickwallPlot (State& pluginState, dsp::brickwall::Params& params, const chowdsp::HostContextProvider& hcp);
+    BrickwallPlot (State& pluginState,
+                   dsp::brickwall::Params& params,
+                   dsp::brickwall::ExtraState& brickwallExtraState,
+                   const chowdsp::HostContextProvider& hcp,
+                   std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
 
+    ~BrickwallPlot();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
-    //    juce::Slider& getCutoffSlider(){ return cutoffSlider ;}
+    void mouseDown (const juce::MouseEvent& event) override;
 
 private:
     void updatePlot();
 
     chowdsp::GenericFilterPlotter filterPlotter;
     dsp::brickwall::BrickwallProcessor brickwall;
+    dsp::brickwall::ExtraState& extraState;
 
     chowdsp::ScopedCallbackList callbacks;
+
+    SpectrumAnalyser spectrumAnalyser;
+    BrickwallChyron chyron;
 
     struct InternalSlider : juce::Slider
     {
@@ -42,8 +52,6 @@ private:
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider;
-
-    BrickwallChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallPlot)
 };

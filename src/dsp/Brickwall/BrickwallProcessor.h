@@ -106,15 +106,17 @@ struct Params : chowdsp::ParamHolder
 class BrickwallProcessor
 {
 public:
-    explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState (es) {}
+    explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState (es)
+    {
+        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-60, 5);
+    }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
 
-    using optionalSpectrumBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
 
-    std::pair<optionalSpectrumBackgroundTask, optionalSpectrumBackgroundTask> getSpectrumAnalyserTasks()
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
     {
         return { std::nullopt, std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }
@@ -124,7 +126,7 @@ private:
     int getFilterTypeIndex() const;
 
     const Params& params;
-    const dsp::brickwall::ExtraState& extraState;
+    const ExtraState& extraState;
 
     using EQBand = chowdsp::EQ::EQBand<
         float,

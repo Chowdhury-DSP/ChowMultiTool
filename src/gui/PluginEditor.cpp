@@ -130,7 +130,11 @@ void PluginEditor::refreshEditor()
                                                                                     hostContextProvider,
                                                                                     std::get<dsp::brickwall::BrickwallProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasks());
                 else if constexpr (std::is_same_v<ToolType, dsp::svf::SVFProcessor>)
-                    editorComponent = std::make_unique<svf::SVFEditor> (pluginState, *pluginState.params.svfParams, hostContextProvider);
+                    editorComponent = std::make_unique<svf::SVFEditor> (pluginState,
+                                                                        *pluginState.params.svfParams,
+                                                                        *pluginState.nonParams.svfExtraState,
+                                                                        hostContextProvider,
+                                                                        std::get<dsp::svf::SVFProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasks());
             });
     }
 

@@ -34,6 +34,7 @@ namespace brickwall
 namespace svf
 {
     struct Params;
+    struct ExtraState;
 }
 } // namespace dsp
 
@@ -77,6 +78,7 @@ struct PluginExtraState : chowdsp::NonParamState
     std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
     chowdsp::LocalPointer<dsp::eq::ExtraState, 128> eqExtraState;
     chowdsp::LocalPointer<dsp::brickwall::ExtraState, 128> brickwallExtraState;
+    chowdsp::LocalPointer<dsp::svf::ExtraState, 128> svfExtraState;
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state

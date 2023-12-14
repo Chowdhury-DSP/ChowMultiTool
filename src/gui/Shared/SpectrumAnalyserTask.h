@@ -18,10 +18,15 @@ public:
         void prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs) override;
         void resetTask() override;
         void runTask (const juce::AudioBuffer<float>& data) override;
+        void setDBRange (float min, float max) {minDB = min; maxDB = max;}
 
         juce::CriticalSection mutex {};
         std::vector<float> fftFreqs {};
         std::vector<float> fftMagsSmoothedDB {};
+
+
+        float minDB = -100.0f;
+        float maxDB = -100.0f;
 
     private:
         std::optional<juce::dsp::FFT> fft {};
@@ -35,6 +40,8 @@ public:
         std::vector<float> fftMagsUnsmoothedDB {};
         std::vector<float> magsPrevious {};
     } SpectrumAnalyserUITask;
+
+    using Optional = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyserTask)

@@ -172,16 +172,32 @@ struct Params : public chowdsp::ParamHolder
     };
 };
 
+struct ExtraState
+{
+    std::atomic<bool> isEditorOpen { false };
+    chowdsp::StateValue<std::atomic_bool, bool> showPreSpectrum { "svf_show_pre_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "svf_show_post_spectrum", true };
+};
+
 class SVFProcessor
 {
 public:
-    explicit SVFProcessor (const Params& svfParams) : params (svfParams) {}
+    explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState) : params (svfParams), extraState(extraState)
+    {
+        preSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-45, 24);
+        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange(-45, 24);
+    }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept;
 
     static float midiNoteToHz (float midiNote);
+
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
+    {
+        return { std::ref (preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+    }
 
 private:
     void processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept;
@@ -190,6 +206,8 @@ private:
     int getHighestNotePriority() const noexcept;
 
     const Params& params;
+    const ExtraState& extraState;
+
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> cutoffSmooth;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Multiplicative> qSmooth;
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> modeSmooth;
@@ -206,6 +224,8 @@ private:
     chowdsp::WernerFilter wernerFilter;
 
     chowdsp::Gain<float> driveInGain, driveOutGain;
+    gui::SpectrumAnalyserTask preSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     static constexpr size_t maxPolyphony = 32;
     std::array<int, maxPolyphony> playingNotes {};

@@ -1,6 +1,7 @@
 #include "SVFPlot.h"
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui::svf
 {
@@ -33,25 +34,48 @@ double SVFPlot::KeytrackDotSlider::valueToProportionOfLength (double value)
     return xPos / (double) plotBase.getWidth();
 }
 
-SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp::HostContextProvider& hcp)
+SVFPlot::SVFPlot (State& pluginState,
+                  dsp::svf::Params& svfParams,
+                  dsp::svf::ExtraState& svfExtraState,
+                  const chowdsp::HostContextProvider& hcp,
+                  std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
         .minMagnitudeDB = -45.0f,
         .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
-      processor (svfParams),
+      extraState(svfExtraState),
+      processor (svfParams, extraState),
       freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
       keytrackSlider (svfParams.keytrackOffset, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
+      spectrumAnalyser(*this, spectrumAnalyserTasks),
       chyron (pluginState, svfParams, hcp)
 {
+    addMouseListener (this, true);
+    extraState.isEditorOpen.store (true);
+    spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    callbacks += {
+        extraState.showPreSpectrum.changeBroadcaster.connect ([this]
+                                                              {
+                                                                  spectrumAnalyser.setShouldShowPreEQ(extraState.showPreSpectrum.get());
+                                                                  spectrumAnalyser.repaint(); }),
+        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
+                                                               {
+                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                   spectrumAnalyser.repaint(); }),
+    };
+
     freqSlider.setColour (juce::Slider::thumbColourId, colours::boxColour);
     freqSlider.widthProportion = 0.03f;
     addAndMakeVisible (freqSlider);
     keytrackSlider.setColour (juce::Slider::thumbColourId, colours::boxColour);
     keytrackSlider.widthProportion = 0.03f;
     addAndMakeVisible (keytrackSlider);
+    addAndMakeVisible (spectrumAnalyser);
     addAndMakeVisible (chyron);
+    spectrumAnalyser.toBack();
 
     keytrackSlider.getXCoordinate = [this, &svfParams = std::as_const (svfParams)]
     {
@@ -99,6 +123,11 @@ SVFPlot::SVFPlot (State& pluginState, dsp::svf::Params& svfParams, const chowdsp
         startTimerHz (29);
 }
 
+SVFPlot::~SVFPlot()
+{
+    extraState.isEditorOpen.store (false);
+}
+
 void SVFPlot::keytrackParamChanged (bool keytrackModeOn)
 {
     freqSlider.setVisible (! keytrackModeOn);
@@ -140,6 +169,7 @@ void SVFPlot::paint (juce::Graphics& g)
 void SVFPlot::resized()
 {
     updatePlot();
+    spectrumAnalyser.setBounds (getLocalBounds());
     freqSlider.setBounds (getLocalBounds());
     keytrackSlider.setBounds (getLocalBounds());
 
@@ -151,4 +181,36 @@ void SVFPlot::resized()
                       chyronWidth,
                       chyronHeight);
 }
+
+void SVFPlot::mouseDown (const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        juce::PopupMenu menu;
+
+        juce::PopupMenu::Item preSpectrumItem;
+        preSpectrumItem.itemID = 100;
+        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-EQ Visualizer" : "Enable Pre-EQ Visualizer";
+        preSpectrumItem.action = [this]
+        {
+            extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
+        };
+        menu.addItem (preSpectrumItem);
+
+        juce::PopupMenu::Item postSpectrumItem;
+        postSpectrumItem.itemID = 101;
+        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.action = [this]
+        {
+            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+        };
+        menu.addItem (postSpectrumItem);
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        menu.showMenuAsync (juce::PopupMenu::Options {}
+                                .withParentComponent (getParentComponent()));
+    }
+}
+
 } // namespace gui::svf

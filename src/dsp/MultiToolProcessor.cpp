@@ -40,8 +40,8 @@ namespace detail
                                                               { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
             tool_maker<brickwall::BrickwallProcessor> ([&params, &pluginState]
                                                        { return brickwall::BrickwallProcessor { *params.brickwallParams, *pluginState.nonParams.brickwallExtraState }; }),
-            tool_maker<svf::SVFProcessor> ([&params]
-                                           { return svf::SVFProcessor { *params.svfParams }; })
+            tool_maker<svf::SVFProcessor> ([&params, &pluginState]
+                                           { return svf::SVFProcessor { *params.svfParams, *pluginState.nonParams.svfExtraState }; })
         };
     }
 } // namespace detail
