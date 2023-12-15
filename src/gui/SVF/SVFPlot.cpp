@@ -161,7 +161,10 @@ void SVFPlot::paint (juce::Graphics& g)
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);
+}
 
+void SVFPlot::paintOverChildren (juce::Graphics& g)
+{
     g.setColour (colours::plotColour);
     g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.5f });
 }

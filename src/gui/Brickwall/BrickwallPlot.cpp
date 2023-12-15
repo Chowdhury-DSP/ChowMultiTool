@@ -88,6 +88,15 @@ juce::Rectangle<int> BrickwallPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
+//==============================================================================
+void BrickwallPlot::FilterPlotComp::paint (juce::Graphics& g)
+{
+    g.setColour (colours::plotColour);
+    g.strokePath (parent->filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
+}
+
+//==============================================================================
+
 BrickwallPlot::BrickwallPlot (State& pluginState,
                               dsp::brickwall::Params& brickwallParams,
                               dsp::brickwall::ExtraState& brickwallExtraState,
@@ -143,6 +152,9 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
 
     updatePlot();
     addAndMakeVisible (cutoffSlider);
+    plotComp.setInterceptsMouseClicks (false, false);
+    plotComp.parent = this;
+    addAndMakeVisible (plotComp);
     addAndMakeVisible (chyron);
 }
 
@@ -197,22 +209,13 @@ void BrickwallPlot::paint (juce::Graphics& g)
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);
-
-    spectrumAnalyser.paint (g);
-    //    g.setColour (colours::plotColour);
-    //    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
-}
-
-void BrickwallPlot::paintOverChildren (juce::Graphics& g)
-{
-    g.setColour (colours::plotColour);
-    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
 }
 
 void BrickwallPlot::resized()
 {
     updatePlot();
     spectrumAnalyser.setBounds (getLocalBounds());
+    plotComp.setBounds (getLocalBounds());
     cutoffSlider.setBounds (getLocalBounds());
     const auto pad = proportionOfWidth (0.005f);
     const auto chyronWidth = proportionOfWidth (0.15f);

@@ -19,6 +19,7 @@ public:
              std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
     ~SVFPlot();
     void paint (juce::Graphics& g) override;
+    void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& event) override;
 

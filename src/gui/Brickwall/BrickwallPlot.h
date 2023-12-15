@@ -18,14 +18,22 @@ public:
 
     ~BrickwallPlot();
     void paint (juce::Graphics& g) override;
-    void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& event) override;
 
 private:
     void updatePlot();
 
+    struct FilterPlotComp : juce::Component
+    {
+        void paint (juce::Graphics& g);
+        void resized() { repaint(); }
+
+        BrickwallPlot* parent = nullptr;
+    };
+
     chowdsp::GenericFilterPlotter filterPlotter;
+    FilterPlotComp plotComp;
     dsp::brickwall::BrickwallProcessor brickwall;
     dsp::brickwall::ExtraState& extraState;
 
