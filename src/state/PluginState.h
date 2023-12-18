@@ -25,6 +25,7 @@ namespace analog_eq
 namespace band_splitter
 {
     struct Params;
+    struct ExtraState;
 }
 namespace brickwall
 {
@@ -79,6 +80,7 @@ struct PluginExtraState : chowdsp::NonParamState
     chowdsp::LocalPointer<dsp::eq::ExtraState, 128> eqExtraState;
     chowdsp::LocalPointer<dsp::brickwall::ExtraState, 128> brickwallExtraState;
     chowdsp::LocalPointer<dsp::svf::ExtraState, 128> svfExtraState;
+    chowdsp::LocalPointer<dsp::band_splitter::ExtraState, 128> bandSplitterExtraState;
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state

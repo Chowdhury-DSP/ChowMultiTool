@@ -36,8 +36,8 @@ namespace detail
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
             tool_maker<analog_eq::AnalogEQProcessor> ([&params]
                                                       { return analog_eq::AnalogEQProcessor { *params.analogEQParams }; }),
-            tool_maker<band_splitter::BandSplitterProcessor> ([&params]
-                                                              { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
+            tool_maker<band_splitter::BandSplitterProcessor> ([&params, &pluginState]
+                                                              { return band_splitter::BandSplitterProcessor { *params.bandSplitParams, *pluginState.nonParams.bandSplitterExtraState }; }),
             tool_maker<brickwall::BrickwallProcessor> ([&params, &pluginState]
                                                        { return brickwall::BrickwallProcessor { *params.brickwallParams, *pluginState.nonParams.brickwallExtraState }; }),
             tool_maker<svf::SVFProcessor> ([&params, &pluginState]

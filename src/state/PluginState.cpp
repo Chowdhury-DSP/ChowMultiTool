@@ -50,6 +50,7 @@ PluginExtraState::PluginExtraState()
     eqExtraState.emplace();
     brickwallExtraState.emplace();
     svfExtraState.emplace();
+    bandSplitterExtraState.emplace();
 
     addStateValues ({ &waveshaperExtraState->freeDrawState,
                       &waveshaperExtraState->mathState,
@@ -59,6 +60,8 @@ PluginExtraState::PluginExtraState()
                       &brickwallExtraState->showPostSpectrum,
                       &svfExtraState->showPreSpectrum,
                       &svfExtraState->showPostSpectrum,
+                      &bandSplitterExtraState->showPreSpectrum,
+                      &bandSplitterExtraState->showPostSpectrum,
                       &editorBounds });
 }
 

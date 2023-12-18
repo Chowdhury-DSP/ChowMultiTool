@@ -11,6 +11,9 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     pfr::for_each_field (threeBandFilters,
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
+
+    midPreSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    midPostSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>& bufferIn,
@@ -27,6 +30,9 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         || bufferMid.getReadPointer (0) == nullptr
         || bufferHigh.getReadPointer (0) == nullptr)
         return;
+
+    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
+        midPreSpectrumAnalyserTask.processBlockInput (bufferMid.toAudioBuffer());
 
     const auto processTwoBandFilter = [&] (auto& filter)
     {
@@ -59,6 +65,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     if (params.threeBandOnOff->get())
     {
         processCrossover (threeBandFilters, processThreeBandFilter);
+        if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+            midPostSpectrumAnalyserTask.processBlockInput (bufferMid.toAudioBuffer());
     }
     else
     {

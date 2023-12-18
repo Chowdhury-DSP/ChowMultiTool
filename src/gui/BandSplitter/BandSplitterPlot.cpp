@@ -80,7 +80,11 @@ juce::Rectangle<int> BandSplitterPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
-BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& bandSplitParams, const chowdsp::HostContextProvider& hcp)
+BandSplitterPlot::BandSplitterPlot (State& pluginState,
+                                    dsp::band_splitter::Params& bandSplitParams,
+                                    dsp::band_splitter::ExtraState& bandSplitterExtraState,
+                                    const chowdsp::HostContextProvider& hcp,
+                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
     : chowdsp::EQ::EqualizerPlot (numBands,
                                   chowdsp::SpectrumPlotParams {
                                       .minFrequencyHz = (float) minFrequency,
@@ -88,9 +92,16 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                       .minMagnitudeDB = -60.0f,
                                       .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
+      extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
-      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp)
+      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
+      spectrumAnalyser(*this, spectrumAnalyserTasks)
 {
+    addMouseListener (this, true);
+    extraState.isEditorOpen.store (true);
+    spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    addAndMakeVisible(spectrumAnalyser);
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
@@ -105,12 +116,16 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                               [this]
                                               {
                                                   updateCutoffFrequency();
+                                                  resized();
+                                                  spectrumAnalyser.minFrequencyHz.store(*bandSplitterParams.cutoff);
                                               }),
             pluginState.addParameterListener (*bandSplitterParams.cutoff2,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
                                                   updateCutoffFrequency();
+                                                  resized();
+                                                  spectrumAnalyser.maxFrequencyHz.store(*bandSplitterParams.cutoff2);
                                               }),
             pluginState.addParameterListener (*bandSplitterParams.slope,
                                               chowdsp::ParameterListenerThread::MessageThread,
@@ -124,15 +139,34 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                               {
                                                   cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
                                               }),
+
         };
+
+    callbacks += {
+        extraState.showPreSpectrum.changeBroadcaster.connect ([this]
+                                                              {
+                                                                  spectrumAnalyser.setShouldShowPreEQ(extraState.showPreSpectrum.get());
+                                                                  spectrumAnalyser.repaint(); }),
+        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
+                                                               {
+                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                   spectrumAnalyser.repaint(); }),
+    };
 
     updateFilterSlope();
 }
 
+BandSplitterPlot::~BandSplitterPlot()
+{
+    removeMouseListener(this);
+    extraState.isEditorOpen.store(false);
+}
+
 void BandSplitterPlot::updateCutoffFrequency()
 {
-    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
+    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3
     {
+        //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2 - this will be the current cutoff frequency in Hz
         const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
         setCutoffParameter (bandIndex, cutoffParam->get());
         updateFilterPlotPath (bandIndex);
@@ -208,5 +242,44 @@ void BandSplitterPlot::resized()
     const auto bounds = getLocalBounds();
     cutoffSlider.setBounds (bounds);
     cutoff2Slider.setBounds (bounds);
+    int x1 = cutoffSlider.getThumbBounds().getX();
+    int x2 = cutoff2Slider.getThumbBounds().getX();
+    int spectrumWidth = x2 - x1;
+    if (spectrumWidth > 0)
+        spectrumAnalyser.setBounds(x1, 0, spectrumWidth, bounds.getHeight());
+    else
+        spectrumAnalyser.setBounds(0, 0, 0, 0);
 }
+
+void BandSplitterPlot::mouseDown (const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        juce::PopupMenu menu;
+
+        juce::PopupMenu::Item preSpectrumItem;
+        preSpectrumItem.itemID = 100;
+        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-EQ Visualizer" : "Enable Pre-EQ Visualizer";
+        preSpectrumItem.action = [this]
+        {
+            extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
+        };
+        menu.addItem (preSpectrumItem);
+
+        juce::PopupMenu::Item postSpectrumItem;
+        postSpectrumItem.itemID = 101;
+        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.action = [this]
+        {
+            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+        };
+        menu.addItem (postSpectrumItem);
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        menu.showMenuAsync (juce::PopupMenu::Options {}
+                                .withParentComponent (getParentComponent()));
+    }
+}
+
 } // namespace gui::band_splitter

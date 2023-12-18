@@ -15,6 +15,9 @@ public:
     void setShouldShowPreEQ (bool shouldShow);
     void setShouldShowPostEQ (bool shouldShow);
 
+    std::atomic<float> minFrequencyHz;
+    std::atomic<float> maxFrequencyHz;
+
 private:
     using optionalBackgroundTask = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
     juce::Path prePath;

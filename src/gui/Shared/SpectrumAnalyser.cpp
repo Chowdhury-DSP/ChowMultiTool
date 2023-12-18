@@ -7,6 +7,8 @@ SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std
       postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
 
 {
+       minFrequencyHz.store(eqPlot.params.minFrequencyHz);
+       maxFrequencyHz.store(eqPlot.params.maxFrequencyHz);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -23,17 +25,23 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
 
     if (showPreEQ)
     {
-        g.setColour (gui::logo::colours::backgroundBlue.brighter (0.4f));
+        g.setColour (juce::Colour(0xff008080).withAlpha(0.4f).brighter (0.4f));
         g.strokePath (prePath, juce::PathStrokeType (1));
     }
 
     if (showPostEQ)
     {
-        g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
-                                                           eqPlot.getYCoordinateForDecibels (0.0f),
-                                                           gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
-                                                           (float) getHeight()));
-        g.fillPath (postPath);
+        float gradientStart = eqPlot.getYCoordinateForDecibels(-30.0f);
+        auto gradientEnd = (float) getHeight();
+
+        juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical(
+            juce::Colour(0xff008080).withAlpha(0.4f),
+            gradientStart,
+            juce::Colour(0xff00008b).withAlpha(0.4f),
+            gradientEnd
+        );
+        g.setGradientFill(lowFreqGradient);
+        g.fillPath(postPath);
     }
 }
 
@@ -89,7 +97,7 @@ void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAn
     const auto nPoints = freqAxis.size();
     for (size_t i = 0; i < nPoints;)
     {
-        if (freqAxis[i] < eqPlot.params.minFrequencyHz / 2.0f || freqAxis[i] > eqPlot.params.maxFrequencyHz * 1.01f)
+        if (freqAxis[i] < minFrequencyHz.load() / 2.0f || freqAxis[i] > maxFrequencyHz.load() * 1.01f)
         {
             i++;
             continue;
