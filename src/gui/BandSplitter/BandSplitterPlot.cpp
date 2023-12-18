@@ -95,13 +95,13 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
       cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
-      spectrumAnalyser(*this, spectrumAnalyserTasks)
+      spectrumAnalyser (*this, spectrumAnalyserTasks)
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
     spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
     spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
-    addAndMakeVisible(spectrumAnalyser);
+    addAndMakeVisible (spectrumAnalyser);
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
@@ -117,7 +117,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               {
                                                   updateCutoffFrequency();
                                                   resized();
-                                                  spectrumAnalyser.minFrequencyHz.store(*bandSplitterParams.cutoff);
+                                                  spectrumAnalyser.minFrequencyHz.store (*bandSplitterParams.cutoff);
                                               }),
             pluginState.addParameterListener (*bandSplitterParams.cutoff2,
                                               chowdsp::ParameterListenerThread::MessageThread,
@@ -125,7 +125,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               {
                                                   updateCutoffFrequency();
                                                   resized();
-                                                  spectrumAnalyser.maxFrequencyHz.store(*bandSplitterParams.cutoff2);
+                                                  spectrumAnalyser.maxFrequencyHz.store (*bandSplitterParams.cutoff2);
                                               }),
             pluginState.addParameterListener (*bandSplitterParams.slope,
                                               chowdsp::ParameterListenerThread::MessageThread,
@@ -158,8 +158,8 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
 
 BandSplitterPlot::~BandSplitterPlot()
 {
-    removeMouseListener(this);
-    extraState.isEditorOpen.store(false);
+    removeMouseListener (this);
+    extraState.isEditorOpen.store (false);
 }
 
 void BandSplitterPlot::updateCutoffFrequency()
@@ -246,9 +246,9 @@ void BandSplitterPlot::resized()
     int x2 = cutoff2Slider.getThumbBounds().getX();
     int spectrumWidth = x2 - x1;
     if (spectrumWidth > 0)
-        spectrumAnalyser.setBounds(x1, 0, spectrumWidth, bounds.getHeight());
+        spectrumAnalyser.setBounds (x1, 0, spectrumWidth, bounds.getHeight());
     else
-        spectrumAnalyser.setBounds(0, 0, 0, 0);
+        spectrumAnalyser.setBounds (0, 0, 0, 0);
 }
 
 void BandSplitterPlot::mouseDown (const juce::MouseEvent& event)

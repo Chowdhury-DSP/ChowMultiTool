@@ -7,8 +7,8 @@ SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std
       postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
 
 {
-       minFrequencyHz.store(eqPlot.params.minFrequencyHz);
-       maxFrequencyHz.store(eqPlot.params.maxFrequencyHz);
+    minFrequencyHz.store (eqPlot.params.minFrequencyHz);
+    maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -25,23 +25,22 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
 
     if (showPreEQ)
     {
-        g.setColour (juce::Colour(0xff008080).withAlpha(0.4f).brighter (0.4f));
+        g.setColour (juce::Colour (0xff008080).withAlpha (0.4f).brighter (0.4f));
         g.strokePath (prePath, juce::PathStrokeType (1));
     }
 
     if (showPostEQ)
     {
-        float gradientStart = eqPlot.getYCoordinateForDecibels(-30.0f);
+        float gradientStart = eqPlot.getYCoordinateForDecibels (-30.0f);
         auto gradientEnd = (float) getHeight();
 
-        juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical(
-            juce::Colour(0xff008080).withAlpha(0.4f),
+        juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical (
+            juce::Colour (0xff008080).withAlpha (0.4f),
             gradientStart,
-            juce::Colour(0xff00008b).withAlpha(0.4f),
-            gradientEnd
-        );
-        g.setGradientFill(lowFreqGradient);
-        g.fillPath(postPath);
+            juce::Colour (0xff00008b).withAlpha (0.4f),
+            gradientEnd);
+        g.setGradientFill (lowFreqGradient);
+        g.fillPath (postPath);
     }
 }
 

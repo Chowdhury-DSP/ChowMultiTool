@@ -43,12 +43,12 @@ struct Params : chowdsp::ParamHolder
     };
 
     //for use when we have 4 bands
-//    chowdsp::FreqHzParameter::Ptr cutoff3{
-//        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_0_0 },
-//        "Band Splitter Cutoff 3",
-//        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
-//        10000.0f
-//    };
+    //    chowdsp::FreqHzParameter::Ptr cutoff3{
+    //        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_0_0 },
+    //        "Band Splitter Cutoff 3",
+    //        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
+    //        10000.0f
+    //    };
 
     //change from bool to choice parameter when adding a 4th band
     chowdsp::BoolParameter::Ptr threeBandOnOff {
@@ -68,7 +68,7 @@ struct ExtraState
 class BandSplitterProcessor
 {
 public:
-    explicit BandSplitterProcessor (const Params& bandSplitParams, const ExtraState& extraState) : params (bandSplitParams), extraState(extraState)
+    explicit BandSplitterProcessor (const Params& bandSplitParams, const ExtraState& extraState) : params (bandSplitParams), extraState (extraState)
     {
         midPreSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
         midPostSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);

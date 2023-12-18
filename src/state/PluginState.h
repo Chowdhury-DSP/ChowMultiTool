@@ -26,7 +26,7 @@ namespace band_splitter
 {
     struct Params;
     struct ExtraState;
-}
+} // namespace band_splitter
 namespace brickwall
 {
     struct Params;
