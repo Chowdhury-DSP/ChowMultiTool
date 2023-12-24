@@ -1,11 +1,13 @@
 #include "SpectrumAnalyser.h"
 #include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot,
+                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks,
+                                    Type type)
     : eqPlot (eqPlot),
       preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
-      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
-
+      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt),
+      analyserType(type)
 {
     minFrequencyHz.store (eqPlot.params.minFrequencyHz);
     maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);
@@ -25,7 +27,7 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
 
     if (showPreEQ)
     {
-        g.setColour (juce::Colour (0xff008080).withAlpha (0.4f).brighter (0.4f));
+        g.setColour (drawOptions.lineColour);
         g.strokePath (prePath, juce::PathStrokeType (1));
     }
 
@@ -35,9 +37,9 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
         auto gradientEnd = (float) getHeight();
 
         juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical (
-            juce::Colour (0xff008080).withAlpha (0.4f),
+            drawOptions.gradientStartColour,
             gradientStart,
-            juce::Colour (0xff00008b).withAlpha (0.4f),
+            drawOptions.gradientEndColour,
             gradientEnd);
         g.setGradientFill (lowFreqGradient);
         g.fillPath (postPath);

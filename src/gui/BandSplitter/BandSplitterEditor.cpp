@@ -27,8 +27,10 @@ BandSplitterEditor::BandSplitterEditor (State& pluginState,
                                         dsp::band_splitter::Params& params,
                                         dsp::band_splitter::ExtraState& bandSplitterExtraState,
                                         const chowdsp::HostContextProvider& hcp,
-                                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
-    : bandSplitterPlot (pluginState, params, bandSplitterExtraState, hcp, spectrumAnalyserTasks),
+                                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksLow,
+                                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksMid,
+                                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksHigh)
+    : bandSplitterPlot (pluginState, params, bandSplitterExtraState, hcp, spectrumAnalyserTasksLow, spectrumAnalyserTasksMid, spectrumAnalyserTasksHigh),
       slopePicker (pluginState, *params.slope),
       extraState (bandSplitterExtraState),
       bandsButton (*params.threeBandOnOff, pluginState)

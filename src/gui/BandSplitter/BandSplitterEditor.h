@@ -14,7 +14,9 @@ public:
                         dsp::band_splitter::Params& params,
                         dsp::band_splitter::ExtraState& bandSplitterExtraState,
                         const chowdsp::HostContextProvider& hcp,
-                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
+                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksLow,
+                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksMid,
+                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksHigh);
 
     void paint (juce::Graphics& g) override;
     void resized() override;

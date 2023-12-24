@@ -16,7 +16,7 @@ EQEditor::EQEditor (State& pluginState,
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      spectrumAnalyser (plot, spectrumAnalyserTasks),
+      spectrumAnalyser (plot, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)

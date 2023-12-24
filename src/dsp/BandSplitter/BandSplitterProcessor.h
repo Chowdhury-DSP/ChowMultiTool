@@ -70,8 +70,12 @@ class BandSplitterProcessor
 public:
     explicit BandSplitterProcessor (const Params& bandSplitParams, const ExtraState& extraState) : params (bandSplitParams), extraState (extraState)
     {
+        lowPreSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
+        lowPostSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
         midPreSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
         midPostSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
+        highPreSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
+        highPostSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
@@ -80,10 +84,28 @@ public:
                        const chowdsp::BufferView<float>& bufferMid,
                        const chowdsp::BufferView<float>& bufferHigh);
 
-    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
+
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasksLow()
+    {
+        return { std::ref (lowPreSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (lowPostSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+    }
+
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasksMid()
     {
         return { std::ref (midPreSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (midPostSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }
+
+    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasksHigh()
+    {
+        return { std::ref (highPreSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (highPostSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+    }
+
+//    static std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks(gui::SpectrumAnalyserTask::Optional preTask,
+//                                                                                                                         gui::SpectrumAnalyserTask::Optional postTask)
+//    {
+//        return {preTask.has_value() ? std::ref (preTask).get() :std::nullopt,
+//                 postTask.has_value() ? std::ref (postTask).get() : std::nullopt };
+//    }
 
 private:
     const Params& params;
@@ -107,8 +129,13 @@ private:
         chowdsp::ThreeWayCrossoverFilter<float, 12> filter12;
     } threeBandFilters;
 
+
+    gui::SpectrumAnalyserTask lowPreSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask lowPostSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask midPreSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask midPostSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask highPreSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask highPostSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterProcessor)
 };

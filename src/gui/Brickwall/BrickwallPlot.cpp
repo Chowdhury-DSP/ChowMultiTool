@@ -113,7 +113,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                             }),
       brickwall (brickwallParams, *pluginState.nonParams.brickwallExtraState),
       extraState (brickwallExtraState),
-      spectrumAnalyser (*this, spectrumAnalyserTasks),
+      spectrumAnalyser (*this, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
       chyron (pluginState, brickwallParams, hcp),
       cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {

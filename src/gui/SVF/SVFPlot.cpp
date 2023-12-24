@@ -49,7 +49,7 @@ SVFPlot::SVFPlot (State& pluginState,
       processor (svfParams, extraState),
       freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
       keytrackSlider (svfParams.keytrackOffset, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
-      spectrumAnalyser (*this, spectrumAnalyserTasks),
+      spectrumAnalyser (*this, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
       chyron (pluginState, svfParams, hcp)
 {
     addMouseListener (this, true);
