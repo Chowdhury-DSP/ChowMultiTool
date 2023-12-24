@@ -84,7 +84,6 @@ public:
                        const chowdsp::BufferView<float>& bufferMid,
                        const chowdsp::BufferView<float>& bufferHigh);
 
-
     std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasksLow()
     {
         return { std::ref (lowPreSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (lowPostSpectrumAnalyserTask.SpectrumAnalyserUITask) };
@@ -100,12 +99,12 @@ public:
         return { std::ref (highPreSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (highPostSpectrumAnalyserTask.SpectrumAnalyserUITask) };
     }
 
-//    static std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks(gui::SpectrumAnalyserTask::Optional preTask,
-//                                                                                                                         gui::SpectrumAnalyserTask::Optional postTask)
-//    {
-//        return {preTask.has_value() ? std::ref (preTask).get() :std::nullopt,
-//                 postTask.has_value() ? std::ref (postTask).get() : std::nullopt };
-//    }
+    //    static std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks(gui::SpectrumAnalyserTask::Optional preTask,
+    //                                                                                                                         gui::SpectrumAnalyserTask::Optional postTask)
+    //    {
+    //        return {preTask.has_value() ? std::ref (preTask).get() :std::nullopt,
+    //                 postTask.has_value() ? std::ref (postTask).get() : std::nullopt };
+    //    }
 
 private:
     const Params& params;
@@ -128,7 +127,6 @@ private:
         chowdsp::ThreeWayCrossoverFilter<float, 8> filter8;
         chowdsp::ThreeWayCrossoverFilter<float, 12> filter12;
     } threeBandFilters;
-
 
     gui::SpectrumAnalyserTask lowPreSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask lowPostSpectrumAnalyserTask;

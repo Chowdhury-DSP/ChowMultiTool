@@ -7,7 +7,7 @@ SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot,
     : eqPlot (eqPlot),
       preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
       postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt),
-      analyserType(type)
+      analyserType (type)
 {
     minFrequencyHz.store (eqPlot.params.minFrequencyHz);
     maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);

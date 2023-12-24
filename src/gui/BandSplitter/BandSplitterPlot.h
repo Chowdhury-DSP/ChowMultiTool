@@ -20,7 +20,7 @@ public:
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& event) override;
-    void setSpectrumColours ();
+    void setSpectrumColours();
 
 private:
     void updateCutoffFrequency();
@@ -51,13 +51,12 @@ private:
 
     std::vector<std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers; //push_back instances of SpectrumAnalyser and destroy as needed
 
+    //    SpectrumAnalyser spectrumAnalyserLow;
+    //    SpectrumAnalyser spectrumAnalyserMid;
+    //    SpectrumAnalyser spectrumAnalyserHigh;
 
-//    SpectrumAnalyser spectrumAnalyserLow;
-//    SpectrumAnalyser spectrumAnalyserMid;
-//    SpectrumAnalyser spectrumAnalyserHigh;
-
-//    SpectrumAnalyser spectrumAnalyserLowMid;
-//    SpectrumAnalyser spectrumAnalyserHighMid;
+    //    SpectrumAnalyser spectrumAnalyserLowMid;
+    //    SpectrumAnalyser spectrumAnalyserHighMid;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };

@@ -75,7 +75,7 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         processCrossover (threeBandFilters, processThreeBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
         {
-            lowPostSpectrumAnalyserTask.processBlockInput(bufferLow.toAudioBuffer());
+            lowPostSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
             midPostSpectrumAnalyserTask.processBlockInput (bufferMid.toAudioBuffer());
             highPostSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
         }
