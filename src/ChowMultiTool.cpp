@@ -1,10 +1,9 @@
 #include "ChowMultiTool.h"
 #include "gui/PluginEditor.h"
-#include "state/PresetManager.h"
+#include "state/presets/PresetManager.h"
 
 namespace
 {
-const juce::String settingsFilePath = "ChowdhuryDSP/ChowMultiTool/.plugin_settings.json";
 const juce::String logFileSubDir = "ChowdhuryDSP/ChowMultiTool/Logs";
 const juce::String logFileNameRoot = "ChowMultiTool_Log_";
 } // namespace
@@ -82,3 +81,27 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new ChowMultiTool();
 }
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+#include "state/presets/PresetDiscovery.h"
+
+// bool BYOD::presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept
+// {
+//     return preset_discovery::presetLoadFromLocation (*presetManager, location_kind, location, load_key);
+// }
+
+static const clap_preset_discovery_factory chowmultitool_preset_discovery_factory {
+    .count = state::presets::discovery::count,
+    .get_descriptor = state::presets::discovery::get_descriptor,
+    .create = state::presets::discovery::create,
+};
+
+const void* JUCE_CALLTYPE clapJuceExtensionCustomFactory (const char* factory_id)
+{
+    if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
+    {
+        return &chowmultitool_preset_discovery_factory;
+    }
+    return nullptr;
+}
+#endif
