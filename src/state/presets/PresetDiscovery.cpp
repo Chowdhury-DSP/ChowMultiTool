@@ -61,7 +61,6 @@ struct UserPresetsProvider : chowdsp::presets::discovery::FilePresetsProvider
         .vendor = "User"
     };
 
-
     static constexpr clap_preset_discovery_filetype filetype {
         .name = "User Preset Filetype",
         .description = "User preset filetype for ChowMultiTool",
@@ -73,7 +72,7 @@ struct UserPresetsProvider : chowdsp::presets::discovery::FilePresetsProvider
     {
     }
 
-    bool fillInLocation(clap_preset_discovery_location& location) override
+    bool fillInLocation (clap_preset_discovery_location& location) override
     {
         const auto userPresetsFolder = getUserPresetsFolder();
         if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
