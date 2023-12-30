@@ -8,6 +8,29 @@ using namespace chowdsp::presets;
 constexpr std::string_view presetParamsTag { "preset_params" };
 constexpr std::string_view presetWaveshaperStateTag { "ws_state" };
 
+const auto createPresetFromEmbeddedFile = [] (const cmrc::embedded_filesystem& fs,
+                                              const std::string& path) -> Preset
+{
+    const auto presetFile = fs.open (path);
+    return { presetFile.begin(), presetFile.size() };
+};
+
+std::vector<Preset> PresetManager::getFactoryPresets()
+{
+    const auto fs = cmrc::presets::get_filesystem();
+
+    std::vector<Preset> factoryPresets;
+    factoryPresets.reserve (32);
+    for (auto&& entry : fs.iterate_directory (""))
+    {
+        jassert (entry.is_file());
+        jassert (fs.exists (entry.filename()));
+        factoryPresets.emplace_back (createPresetFromEmbeddedFile (fs, entry.filename()));
+    }
+
+    return factoryPresets;
+}
+
 PresetManager::PresetManager (ChowMultiTool& plugin)
     : chowdsp::presets::PresetManager (plugin.getState(), &plugin, ".chowpreset"),
       toolParam (*plugin.getState().params.toolParam)
@@ -70,22 +93,9 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
         }
     };
 
-    const auto fs = cmrc::presets::get_filesystem();
-    const auto createPresetFromEmbeddedFile = [&fs] (const std::string& path) -> Preset
-    {
-        const auto presetFile = fs.open (path);
-        return { presetFile.begin(), presetFile.size() };
-    };
-
-    std::vector<Preset> factoryPresets;
-    for (auto&& entry : fs.iterate_directory (""))
-    {
-        jassert (entry.is_file());
-        jassert (fs.exists (entry.filename()));
-        factoryPresets.emplace_back (createPresetFromEmbeddedFile (entry.filename()));
-    }
+    auto factoryPresets = getFactoryPresets();
     addPresets (std::move (factoryPresets));
-    setDefaultPreset (createPresetFromEmbeddedFile ("Init.chowpreset"));
+    setDefaultPreset (createPresetFromEmbeddedFile (cmrc::presets::get_filesystem(), "Init.chowpreset"));
 
     presetsSettings.emplace (*this,
                              *pluginSettings,
@@ -97,7 +107,7 @@ PresetManager::PresetManager (ChowMultiTool& plugin)
 
 Preset PresetManager::getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const
 {
-    std::cout << presetState << std::endl;
+    DBG (presetState.dump());
     const auto toolParamIndex = presetState[presetParamsTag][toolParam.paramID.toStdString()].get<int>();
     if (toolParamIndex == 0)
         return chowdsp::presets::PresetManager::getUserPresetForState (presetName, std::move (presetState));
