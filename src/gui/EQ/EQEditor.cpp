@@ -9,14 +9,14 @@ EQEditor::EQEditor (State& pluginState,
                     dsp::eq::EQToolParams& eqParams,
                     dsp::eq::ExtraState& eqExtraState,
                     const chowdsp::HostContextProvider& hcp,
-                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
+                    SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : params (eqParams),
       extraState (eqExtraState),
       plot (pluginState, eqParams.eqParams, hcp),
       paramsView (pluginState, eqParams),
       linearPhaseButton ("Vector/arrow-right-arrow-left-solid.svg", colours::thumbColours[0], colours::linesColour),
       linearPhaseAttach (eqParams.linearPhaseMode, pluginState, linearPhaseButton),
-      spectrumAnalyser (plot, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
+      spectrumAnalyser (plot, spectrumAnalyserTasks),
       drawButton ("Vector/pencil-solid.svg", colours::linesColour, colours::linesColour),
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)

@@ -2,16 +2,23 @@
 
 namespace gui
 {
+static constexpr auto minusInfDB = -100.0f;
+
 SpectrumAnalyserTask::SpectrumAnalyserTask() = default;
 
 void SpectrumAnalyserTask::prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels)
 {
-    SpectrumAnalyserUITask.prepare (sampleRate, samplesPerBlock, numChannels);
+    spectrumAnalyserUITask.prepare (sampleRate, samplesPerBlock, numChannels);
+}
+
+void SpectrumAnalyserTask::reset()
+{
+    spectrumAnalyserUITask.resetTask();
 }
 
 void SpectrumAnalyserTask::processBlockInput (const juce::AudioBuffer<float>& buffer)
 {
-    SpectrumAnalyserUITask.pushSamples (buffer);
+    spectrumAnalyserUITask.pushSamples (buffer);
 }
 
 static std::vector<float> getFFTFreqs (int N, float T)
@@ -49,7 +56,7 @@ static std::vector<float> getFFTFreqs (int N, float T)
     }
 }
 
-void gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
+void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::prepareTask (double sampleRate, [[maybe_unused]] int samplesPerBlock, int& requestedBlockSize, int& waitMs)
 {
     static constexpr auto maxBinWidth = 6.0;
     fftSize = juce::nextPowerOfTwo (int (sampleRate / maxBinWidth));
@@ -72,8 +79,9 @@ void gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::prepareTask (dou
 
 void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::resetTask()
 {
-    std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), 0.0f);
-    std::fill (magsPrevious.begin(), magsPrevious.end(), 0.0f);
+    const juce::CriticalSection::ScopedLockType lock { mutex };
+    std::fill (fftMagsSmoothedDB.begin(), fftMagsSmoothedDB.end(), minusInfDB);
+    std::fill (magsPrevious.begin(), magsPrevious.end(), minusInfDB);
 }
 
 void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::AudioBuffer<float>& data)
@@ -87,20 +95,27 @@ void SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask::runTask (const juce::
     window->multiplyWithWindowingTable (scratchData, (size_t) fftSize);
     fft->performFrequencyOnlyForwardTransform (scratchData, true);
 
-    juce::FloatVectorOperations::multiply (scratchData, 128.0f / (float) fftOutSize, fftOutSize);
+    juce::FloatVectorOperations::multiply (scratchData, 2.0f / (float) fftOutSize, fftOutSize);
     for (size_t i = 0; i < (size_t) fftOutSize; ++i)
-        fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i]);
+        fftMagsUnsmoothedDB[i] = juce::Decibels::gainToDecibels (scratchData[i], minusInfDB);
 
-    float range = maxDB - minDB;
-
-    auto minMax = std::minmax_element (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
-    float dynamicRange = std::max (std::abs (*minMax.first), std::abs (*minMax.second));
-    dynamicRange = std::clamp (dynamicRange, std::abs (minDB), range);
-    for (auto& dB : fftMagsUnsmoothedDB)
-        dB = std::abs (minDB) * (dB / dynamicRange);
+    auto maxElement = std::max_element (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end());
+    if (*maxElement == minusInfDB)
+    {
+        std::fill (fftMagsUnsmoothedDB.begin(), fftMagsUnsmoothedDB.end(), minDB);
+    }
+    else
+    {
+        for (auto& dB : fftMagsUnsmoothedDB)
+            dB = juce::jmap (dB,
+                             minusInfDB,
+                             std::max (*maxElement, maxDB - 6.0f),
+                             minDB,
+                             maxDB);
+    }
 
     const juce::CriticalSection::ScopedLockType lock { mutex };
     freqSmooth (fftMagsUnsmoothedDB.data(), fftMagsSmoothedDB.data(), fftOutSize, 1.0f / 128.0f);
-    expSmooth (magsPrevious.data(), fftMagsSmoothedDB.data(), fftOutSize, 0.2f);
+    expSmooth (magsPrevious.data(), fftMagsSmoothedDB.data(), fftOutSize, 0.15f);
 }
 } // namespace gui

@@ -101,7 +101,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                               dsp::brickwall::Params& brickwallParams,
                               dsp::brickwall::ExtraState& brickwallExtraState,
                               const chowdsp::HostContextProvider& hcp,
-                              std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
+                              SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -113,7 +113,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                             }),
       brickwall (brickwallParams, *pluginState.nonParams.brickwallExtraState),
       extraState (brickwallExtraState),
-      spectrumAnalyser (*this, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
+      spectrumAnalyser (*this, spectrumAnalyserTasks),
       chyron (pluginState, brickwallParams, hcp),
       cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {

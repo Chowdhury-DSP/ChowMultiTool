@@ -126,9 +126,7 @@ void PluginEditor::refreshEditor()
                                                                                            *pluginState.params.bandSplitParams,
                                                                                            *pluginState.nonParams.bandSplitterExtraState,
                                                                                            hostContextProvider,
-                                                                                           std::get<dsp::band_splitter::BandSplitterProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasksLow(),
-                                                                                           std::get<dsp::band_splitter::BandSplitterProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasksMid(),
-                                                                                           std::get<dsp::band_splitter::BandSplitterProcessor> (plugin.getProcessor().getTools()).getSpectrumAnalyserTasksHigh());
+                                                                                           std::get<dsp::band_splitter::BandSplitterProcessor> (plugin.getProcessor().getTools()).getAnalyzerTasks());
                 else if constexpr (std::is_same_v<ToolType, dsp::brickwall::BrickwallProcessor>)
                     editorComponent = std::make_unique<brickwall::BrickwallEditor> (pluginState,
                                                                                     *pluginState.params.brickwallParams,

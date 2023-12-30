@@ -16,7 +16,7 @@ public:
              dsp::svf::Params& params,
              dsp::svf::ExtraState& svfExtraState,
              const chowdsp::HostContextProvider& hcp,
-             std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
+             std::pair<SpectrumAnalyserTask::OptionalBackgroundTask, SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks);
     ~SVFPlot();
     void paint (juce::Graphics& g) override;
     void paintOverChildren (juce::Graphics& g) override;

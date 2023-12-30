@@ -123,9 +123,9 @@ public:
 
     int getLatencySamples() const;
 
-    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
+    gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
     {
-        return { std::ref (preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+        return { std::ref (preSpectrumAnalyserTask.spectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
     }
 
 private:

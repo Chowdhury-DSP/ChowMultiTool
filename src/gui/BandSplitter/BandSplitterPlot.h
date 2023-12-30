@@ -13,10 +13,9 @@ public:
                       dsp::band_splitter::Params& params,
                       dsp::band_splitter::ExtraState& bandSplitterExtraState,
                       const chowdsp::HostContextProvider& hcp,
-                      std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksLow,
-                      std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksMid,
-                      std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksHigh);
-    ~BandSplitterPlot();
+                      dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks);
+    ~BandSplitterPlot() override;
+
     void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
     void mouseDown (const juce::MouseEvent& event) override;
@@ -25,6 +24,7 @@ public:
 private:
     void updateCutoffFrequency();
     void updateFilterSlope();
+    void updateSpectrumPlots();
 
     const dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;
@@ -49,14 +49,8 @@ private:
         const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider, cutoff2Slider; //add another slider here for 4 band
 
-    std::vector<std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers; //push_back instances of SpectrumAnalyser and destroy as needed
-
-    //    SpectrumAnalyser spectrumAnalyserLow;
-    //    SpectrumAnalyser spectrumAnalyserMid;
-    //    SpectrumAnalyser spectrumAnalyserHigh;
-
-    //    SpectrumAnalyser spectrumAnalyserLowMid;
-    //    SpectrumAnalyser spectrumAnalyserHighMid;
+    dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks;
+    chowdsp::SmallMap<dsp::band_splitter::SpectrumBandID, std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };

@@ -57,7 +57,7 @@ SVFEditor::SVFEditor (State& pluginState,
                       dsp::svf::Params& svfParams,
                       dsp::svf::ExtraState& extraState,
                       const chowdsp::HostContextProvider& hcp,
-                      std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
+                      std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks)
     : plot (pluginState, svfParams, extraState, hcp, spectrumAnalyserTasks),
       paramControls (pluginState, svfParams, hcp),
       extraState (extraState),

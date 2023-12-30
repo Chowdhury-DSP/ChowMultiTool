@@ -14,7 +14,7 @@ public:
                dsp::svf::Params& svfParams,
                dsp::svf::ExtraState& extraState,
                const chowdsp::HostContextProvider& hcp,
-               std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
+               std::pair<SpectrumAnalyserTask::OptionalBackgroundTask, SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks);
 
     void resized() override;
     void paint (juce::Graphics& g) override;

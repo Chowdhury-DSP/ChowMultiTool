@@ -17,7 +17,7 @@ public:
               dsp::eq::EQToolParams& eqParams,
               dsp::eq::ExtraState& extraState,
               const chowdsp::HostContextProvider& hcp,
-              std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
+              std::pair<SpectrumAnalyserTask::OptionalBackgroundTask, SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks);
     ~EQEditor() override;
 
     void paint (juce::Graphics& g) override;

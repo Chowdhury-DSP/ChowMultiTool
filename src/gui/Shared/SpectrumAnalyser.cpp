@@ -2,12 +2,10 @@
 #include "gui/Shared/Colours.h"
 
 SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot,
-                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks,
-                                    Type type)
+                                    gui::SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : eqPlot (eqPlot),
       preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
-      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt),
-      analyserType (type)
+      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
 {
     minFrequencyHz.store (eqPlot.params.minFrequencyHz);
     maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);
@@ -23,27 +21,34 @@ SpectrumAnalyser::~SpectrumAnalyser()
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    //    g.fillAll(juce::Colours::blue.withAlpha(0.4f));
+    const auto paintSpectrum = [&g, &plot = std::as_const (eqPlot)] (const DrawOptions& drawOptions, const juce::Path& path)
+    {
+        if (drawOptions.drawFill)
+        {
+            float gradientStart = plot.getYCoordinateForDecibels (-30.0f);
+            auto gradientEnd = (float) plot.getHeight();
+
+            juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical (
+                drawOptions.gradientStartColour,
+                gradientStart,
+                drawOptions.gradientEndColour,
+                gradientEnd);
+            g.setGradientFill (lowFreqGradient);
+            g.fillPath (path);
+        }
+
+        if (drawOptions.drawLine)
+        {
+            g.setColour (drawOptions.lineColour);
+            g.strokePath (path, juce::PathStrokeType (1));
+        }
+    };
 
     if (showPreEQ)
-    {
-        g.setColour (drawOptions.lineColour);
-        g.strokePath (prePath, juce::PathStrokeType (1));
-    }
+        paintSpectrum (preEQDrawOptions, prePath);
 
     if (showPostEQ)
-    {
-        float gradientStart = eqPlot.getYCoordinateForDecibels (-30.0f);
-        auto gradientEnd = (float) getHeight();
-
-        juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical (
-            drawOptions.gradientStartColour,
-            gradientStart,
-            drawOptions.gradientEndColour,
-            gradientEnd);
-        g.setGradientFill (lowFreqGradient);
-        g.fillPath (postPath);
-    }
+        paintSpectrum (postEQDrawOptions, postPath);
 }
 
 void SpectrumAnalyser::visibilityChanged()

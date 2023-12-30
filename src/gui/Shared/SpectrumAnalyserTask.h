@@ -9,6 +9,7 @@ class SpectrumAnalyserTask
 public:
     SpectrumAnalyserTask();
     void prepareToPlay (double sampleRate, int samplesPerBlock, int numChannels);
+    void reset();
     void processBlockInput (const juce::AudioBuffer<float>& buffer);
 
     struct SpectrumAnalyserBackgroundTask : chowdsp::TimeSliceAudioUIBackgroundTask
@@ -42,9 +43,10 @@ public:
         chowdsp::Buffer<float> scratchMonoBuffer {};
         std::vector<float> fftMagsUnsmoothedDB {};
         std::vector<float> magsPrevious {};
-    } SpectrumAnalyserUITask;
+    } spectrumAnalyserUITask;
 
-    using Optional = std::optional<std::reference_wrapper<gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask>>;
+    using OptionalBackgroundTask = std::optional<std::reference_wrapper<SpectrumAnalyserBackgroundTask>>;
+    using PrePostPair = std::pair<OptionalBackgroundTask, OptionalBackgroundTask>;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpectrumAnalyserTask)

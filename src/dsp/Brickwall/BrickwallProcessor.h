@@ -108,18 +108,17 @@ class BrickwallProcessor
 public:
     explicit BrickwallProcessor (const Params& brickwallParams, const dsp::brickwall::ExtraState& es) : params (brickwallParams), extraState (es)
     {
-        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-60, 5);
+        postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-60, 5);
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer) noexcept;
 
-    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
+    gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
     {
-        return { std::nullopt, std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+        return { std::nullopt, std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
     }
-    //    gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& getSpectrumAnalyserTasks() { return postSpectrumAnalyserTask.SpectrumAnalyserUITask; }
 
 private:
     int getFilterTypeIndex() const;

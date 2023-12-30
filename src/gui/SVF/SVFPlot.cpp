@@ -38,7 +38,7 @@ SVFPlot::SVFPlot (State& pluginState,
                   dsp::svf::Params& svfParams,
                   dsp::svf::ExtraState& svfExtraState,
                   const chowdsp::HostContextProvider& hcp,
-                  std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks)
+                  std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -49,7 +49,7 @@ SVFPlot::SVFPlot (State& pluginState,
       processor (svfParams, extraState),
       freqSlider (svfParams.cutoff, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
       keytrackSlider (svfParams.keytrackOffset, pluginState, *this, SpectrumDotSlider::Orientation::FrequencyOriented, &hcp),
-      spectrumAnalyser (*this, spectrumAnalyserTasks, SpectrumAnalyser::Type::FullSpectrum),
+      spectrumAnalyser (*this, spectrumAnalyserTasks),
       chyron (pluginState, svfParams, hcp)
 {
     addMouseListener (this, true);

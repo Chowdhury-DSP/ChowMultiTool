@@ -184,8 +184,8 @@ class SVFProcessor
 public:
     explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState) : params (svfParams), extraState (extraState)
     {
-        preSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-45, 24);
-        postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-45, 24);
+        preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-45, 24);
+        postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-45, 24);
     }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
@@ -194,9 +194,9 @@ public:
 
     static float midiNoteToHz (float midiNote);
 
-    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> getSpectrumAnalyserTasks()
+    gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
     {
-        return { std::ref (preSpectrumAnalyserTask.SpectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.SpectrumAnalyserUITask) };
+        return { std::ref (preSpectrumAnalyserTask.spectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
     }
 
 private:

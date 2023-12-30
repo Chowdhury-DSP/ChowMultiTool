@@ -84,9 +84,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                     dsp::band_splitter::Params& bandSplitParams,
                                     dsp::band_splitter::ExtraState& bandSplitterExtraState,
                                     const chowdsp::HostContextProvider& hcp,
-                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksLow,
-                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksMid,
-                                    std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksHigh)
+                                    dsp::band_splitter::BandSplitterSpectrumTasks& splitterSpectrumTasks)
 
     : chowdsp::EQ::EqualizerPlot (numBands,
                                   chowdsp::SpectrumPlotParams {
@@ -97,49 +95,12 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       bandSplitterParams (bandSplitParams),
       extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
-      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp)
-/*spectrumAnalyserLow (*this, spectrumAnalyserTasksLow, SpectrumAnalyser::Type::Low),
-      spectrumAnalyserMid (*this, spectrumAnalyserTasksMid, SpectrumAnalyser::Type::Mid),
-      spectrumAnalyserHigh (*this, spectrumAnalyserTasksHigh, SpectrumAnalyser::Type::High)*/
+      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
+      spectrumTasks (splitterSpectrumTasks)
 {
-    //    if (bandSplitterParams.threeBandOnOff->get())
-    //        spectrumAnalysers.push_back (std::make_unique<SpectrumAnalyser> (*this, spectrumAnalyserTasksMid, SpectrumAnalyser::Type::Mid));
-
-    //    spectrumAnalyserLow.setGradientEndColour(juce::Colour (0xff00008b).withAlpha (0.4f));
-    //    spectrumAnalyserLow.setGradientStartColour(juce::Colour (0xff008080).withAlpha (0.4f));
-    //    spectrumAnalyserMid.setGradientEndColour(juce::Colour::fromRGB(0xFF, 0x66, 0x00).withAlpha(0.4f));
-    //    spectrumAnalyserMid.setGradientStartColour(juce::Colour::fromRGB(255, 215, 0).withAlpha(0.4f));
-    //    spectrumAnalyserHigh.setGradientEndColour(juce::Colour::fromRGB(0x8A, 0x2B, 0xE2).withAlpha(0.4f));
-    //    spectrumAnalyserHigh.setGradientStartColour(juce::Colour::fromRGB(0xDA, 0x70, 0xD6).withAlpha(0.4f));
-    //    spectrumAnalyserLow.setLineColour(juce::Colour (0xff008080).brighter());
-    //    spectrumAnalyserMid.setLineColour(juce::Colour::fromRGB(255, 215, 0).brighter());
-    //    spectrumAnalyserHigh.setLineColour(juce::Colour::fromRGB(0x8A, 0x2B, 0xE2).brighter());
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
 
-    spectrumAnalysers.push_back (std::make_unique<SpectrumAnalyser> (*this, spectrumAnalyserTasksLow, SpectrumAnalyser::Type::Low));
-    spectrumAnalysers.push_back (std::make_unique<SpectrumAnalyser> (*this, spectrumAnalyserTasksHigh, SpectrumAnalyser::Type::High));
-
-    if (bandSplitParams.threeBandOnOff->get())
-        spectrumAnalysers.push_back (std::make_unique<SpectrumAnalyser> (*this, spectrumAnalyserTasksMid, SpectrumAnalyser::Type::Mid));
-
-    setSpectrumColours();
-    //    spectrumAnalyserLow.setShouldShowPreEQ (extraState.showPreSpectrum.get());
-    //    spectrumAnalyserLow.setShouldShowPostEQ (extraState.showPostSpectrum.get());
-    //    spectrumAnalyserMid.setShouldShowPreEQ (extraState.showPreSpectrum.get());
-    //    spectrumAnalyserMid.setShouldShowPostEQ (extraState.showPostSpectrum.get());
-    //    spectrumAnalyserHigh.setShouldShowPreEQ (extraState.showPreSpectrum.get());
-    //    spectrumAnalyserHigh.setShouldShowPostEQ (extraState.showPostSpectrum.get());
-    for (auto& spectrum : spectrumAnalysers)
-    {
-        spectrum->setShouldShowPreEQ (extraState.showPreSpectrum.get());
-        spectrum->setShouldShowPostEQ (extraState.showPostSpectrum.get());
-        addAndMakeVisible (*spectrum);
-    }
-
-    //    addAndMakeVisible (spectrumAnalyserLow);
-    //    addAndMakeVisible (spectrumAnalyserMid);
-    //    addAndMakeVisible (spectrumAnalyserHigh);
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
@@ -169,69 +130,26 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               }),
             pluginState.addParameterListener (*bandSplitterParams.threeBandOnOff,
                                               chowdsp::ParameterListenerThread::MessageThread,
-                                              [this, &spectrumAnalyserTasksMid]
+                                              [this]
                                               {
-                                                  auto it = std::find_if (spectrumAnalysers.begin(), spectrumAnalysers.end(), [] (const std::unique_ptr<SpectrumAnalyser>& analyser)
-                                                                          { return analyser->getType() == SpectrumAnalyser::Type::Mid; });
-
-                                                  if (bandSplitterParams.threeBandOnOff->get()) //if 2->3
-                                                  {
-                                                      if (it == spectrumAnalysers.end()) //no mid spectrum
-                                                      {
-                                                          auto midSpectrum = std::make_unique<SpectrumAnalyser> (*this, spectrumAnalyserTasksMid, SpectrumAnalyser::Type::Mid);
-                                                          auto showPreEQ = extraState.showPreSpectrum.get();
-                                                          setSpectrumColours();
-                                                          midSpectrum->setVisible (true);
-                                                          midSpectrum->setShouldShowPreEQ (extraState.showPreSpectrum.get());
-                                                          midSpectrum->setShouldShowPostEQ (extraState.showPostSpectrum.get());
-                                                          addAndMakeVisible (*midSpectrum);
-                                                          spectrumAnalysers.push_back (std::move (midSpectrum));
-                                                          resized();
-                                                      }
-                                                  }
-                                                  else
-                                                  {
-                                                      if (it != spectrumAnalysers.end())
-                                                      {
-                                                          removeChildComponent (it->get());
-                                                          spectrumAnalysers.erase (it);
-                                                      }
-                                                  }
                                                   cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
+                                                  updateSpectrumPlots();
                                                   repaint();
                                               }),
         };
 
     callbacks += {
-        extraState.showPreSpectrum.changeBroadcaster.connect ([this]
-                                                              {
-                                                                  for (auto& spectrum : spectrumAnalysers)
-                                                                  {
-                                                                      spectrum->setShouldShowPreEQ(extraState.showPreSpectrum.get());
-                                                                      spectrum->repaint();
-                                                                  }
-                                                                  /*spectrumAnalyserLow.setShouldShowPreEQ(extraState.showPreSpectrum.get());
-                                                                  spectrumAnalyserLow.repaint();
-                                                                  spectrumAnalyserMid.setShouldShowPreEQ(extraState.showPreSpectrum.get());
-                                                                  spectrumAnalyserMid.repaint();
-                                                                  spectrumAnalyserHigh.setShouldShowPreEQ(extraState.showPreSpectrum.get());
-                                                                  spectrumAnalyserHigh.repaint();*/ }),
-        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
-                                                               {
-                                                                   for (auto& spectrum : spectrumAnalysers)
+        extraState.showSpectrum.changeBroadcaster.connect ([this]
+                                                           {
+                                                                   for (auto [_, spectrum] : spectrumAnalysers)
                                                                    {
-                                                                       spectrum->setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                       spectrum->setShouldShowPostEQ(extraState.showSpectrum.get());
                                                                        spectrum->repaint();
-                                                                   }
-                                                                   /*spectrumAnalyserLow.setShouldShowPostEQ(extraState.showPostSpectrum.get());
-                                                                   spectrumAnalyserLow.repaint();
-                                                                   spectrumAnalyserMid.setShouldShowPostEQ(extraState.showPostSpectrum.get());
-                                                                   spectrumAnalyserMid.repaint();
-                                                                   spectrumAnalyserHigh.setShouldShowPostEQ(extraState.showPostSpectrum.get());
-                                                                   spectrumAnalyserHigh.repaint();*/ }),
+                                                                   } }),
     };
 
     updateFilterSlope();
+    updateSpectrumPlots();
 }
 
 BandSplitterPlot::~BandSplitterPlot()
@@ -318,11 +236,8 @@ void BandSplitterPlot::resized()
     chowdsp::EQ::EqualizerPlot::resized();
 
     const auto bounds = getLocalBounds();
-    for (auto& spectrum : spectrumAnalysers)
+    for (auto [_, spectrum] : spectrumAnalysers)
         spectrum->setBounds (bounds);
-    //    spectrumAnalyserLow.setBounds(bounds);
-    //    spectrumAnalyserMid.setBounds(bounds);
-    //    spectrumAnalyserHigh.setBounds(bounds);
     cutoffSlider.setBounds (bounds);
     cutoff2Slider.setBounds (bounds);
 }
@@ -334,21 +249,12 @@ void BandSplitterPlot::mouseDown (const juce::MouseEvent& event)
         chowdsp::SharedLNFAllocator lnfAllocator;
         juce::PopupMenu menu;
 
-        juce::PopupMenu::Item preSpectrumItem;
-        preSpectrumItem.itemID = 100;
-        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-EQ Visualizer" : "Enable Pre-EQ Visualizer";
-        preSpectrumItem.action = [this]
-        {
-            extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
-        };
-        menu.addItem (preSpectrumItem);
-
         juce::PopupMenu::Item postSpectrumItem;
         postSpectrumItem.itemID = 101;
-        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.text = extraState.showSpectrum.get() ? "Disable Spectrum Visualizer" : "Enable Spectrum Visualizer";
         postSpectrumItem.action = [this]
         {
-            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+            extraState.showSpectrum.set (! extraState.showSpectrum.get());
         };
         menu.addItem (postSpectrumItem);
 
@@ -358,26 +264,61 @@ void BandSplitterPlot::mouseDown (const juce::MouseEvent& event)
     }
 }
 
+void BandSplitterPlot::updateSpectrumPlots()
+{
+    spectrumAnalysers.clear();
+    spectrumAnalysers.reserve (4);
+
+    using dsp::band_splitter::SpectrumBandID;
+    const auto spectrumIDs = [this]
+    {
+        using IDList = chowdsp::SmallVector<SpectrumBandID, 4>;
+        if (bandSplitterParams.threeBandOnOff->get())
+            return IDList { SpectrumBandID::Low, SpectrumBandID::Mid, SpectrumBandID::High };
+        return IDList { SpectrumBandID::Low, SpectrumBandID::High };
+    };
+
+    for (auto id : spectrumIDs())
+    {
+        auto* spectrumTask = *spectrumTasks[id];
+        spectrumTask->reset();
+        auto prePostPair = SpectrumAnalyserTask::PrePostPair { std::nullopt, std::ref (spectrumTask->spectrumAnalyserUITask) };
+        spectrumAnalysers.insert_or_assign (id, std::make_unique<SpectrumAnalyser> (*this, prePostPair));
+    }
+
+    setSpectrumColours();
+
+    for (auto [_, spectrum] : spectrumAnalysers)
+    {
+        spectrum->setShouldShowPostEQ (extraState.showSpectrum.get());
+        addAndMakeVisible (*spectrum);
+        spectrum->toBack();
+    }
+    resized();
+}
+
 void BandSplitterPlot::setSpectrumColours()
 {
-    for (auto& analyser : spectrumAnalysers)
+    using dsp::band_splitter::SpectrumBandID;
+    for (auto [id, analyser] : spectrumAnalysers)
     {
-        switch (analyser->getType())
+        analyser->postEQDrawOptions.drawLine = true;
+        switch (id)
         {
-            case SpectrumAnalyser::Type::Low:
-                analyser->setGradientEndColour (juce::Colour (0xff00008b).withAlpha (0.4f));
-                analyser->setGradientStartColour (juce::Colour (0xff008080).withAlpha (0.4f));
-                analyser->setLineColour (juce::Colour (0xff008080).brighter());
+            case SpectrumBandID::Low:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour (0xff00008b).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour (0xff008080).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour (0xff008080).brighter();
                 break;
-            case SpectrumAnalyser::Type::Mid:
-                analyser->setGradientEndColour (juce::Colour::fromRGB (0xFF, 0x66, 0x00).withAlpha (0.4f));
-                analyser->setGradientStartColour (juce::Colour::fromRGB (255, 215, 0).withAlpha (0.4f));
-                analyser->setLineColour (juce::Colour::fromRGB (255, 215, 0).brighter());
+            case SpectrumBandID::Mid:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB (0xFF, 0x66, 0x00).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB (255, 215, 0).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (255, 215, 0).brighter();
                 break;
-            case SpectrumAnalyser::Type::High:
-                analyser->setGradientEndColour (juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).withAlpha (0.4f));
-                analyser->setGradientStartColour (juce::Colour::fromRGB (0xDA, 0x70, 0xD6).withAlpha (0.4f));
-                analyser->setLineColour (juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).brighter());
+            case SpectrumBandID::High:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB (0xDA, 0x70, 0xD6).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).brighter();
                 break;
         }
     }

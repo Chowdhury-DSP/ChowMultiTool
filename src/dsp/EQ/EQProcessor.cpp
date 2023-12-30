@@ -6,8 +6,8 @@ EQProcessor::EQProcessor (const EQToolParams& eqParams, const ExtraState& es)
     : params (eqParams),
       extraState (es)
 {
-    preSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-20, 20);
-    postSpectrumAnalyserTask.SpectrumAnalyserUITask.setDBRange (-20, 20);
+    preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-20, 20);
+    postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-20, 20);
 }
 
 void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)

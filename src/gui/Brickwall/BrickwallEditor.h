@@ -12,7 +12,7 @@ public:
                      dsp::brickwall::Params& params,
                      dsp::brickwall::ExtraState& brickwallExtraState,
                      const chowdsp::HostContextProvider& hcp,
-                     std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasks);
+                     std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks);
 
     ~BrickwallEditor();
 

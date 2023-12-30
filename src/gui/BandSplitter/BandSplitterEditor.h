@@ -14,9 +14,7 @@ public:
                         dsp::band_splitter::Params& params,
                         dsp::band_splitter::ExtraState& bandSplitterExtraState,
                         const chowdsp::HostContextProvider& hcp,
-                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksLow,
-                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksMid,
-                        std::pair<gui::SpectrumAnalyserTask::Optional, gui::SpectrumAnalyserTask::Optional> spectrumAnalyserTasksHigh);
+                        dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks);
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -34,11 +32,6 @@ private:
         chowdsp::BoolParameter& bandParam;
         gui::SharedFonts fonts;
     } bandsButton;
-
-    std::vector<std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers; //push_back instances of SpectrumAnalyser and destroy as needed
-
-    //develop a pattern whereby multiple instances of SpectrumAnalyser can be managed dependent on the number of bands
-    //perhaps a dynamic container such as std::vector??
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };
