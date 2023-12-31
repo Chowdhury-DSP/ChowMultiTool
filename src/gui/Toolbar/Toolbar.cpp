@@ -2,7 +2,7 @@
 #include "ChowMultiTool.h"
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/LookAndFeels.h"
-#include "state/PresetManager.h"
+#include "state/presets/PresetManager.h"
 
 namespace gui
 {

@@ -48,3 +48,6 @@ CMRC_DECLARE (presets);
 
 // Any other widely used headers that don't change...
 #include "state/ParameterVersionHints.h"
+
+// constants
+const juce::String settingsFilePath = "ChowdhuryDSP/ChowMultiTool/.plugin_settings.json";

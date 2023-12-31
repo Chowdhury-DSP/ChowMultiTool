@@ -66,6 +66,7 @@ juce_add_plugin(ChowMultiTool
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
 )
 
+set(CHOWMULTITOOL_CLAP_ID "org.chowdsp.ChowMultiTool")
 if(CHOWMULTITOOL_BUILD_CLAP)
     clap_juce_extensions_plugin(
         TARGET ChowMultiTool
@@ -73,6 +74,7 @@ if(CHOWMULTITOOL_BUILD_CLAP)
         CLAP_FEATURES audio-effect win32-dpi-aware
         CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
         CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
+        CLAP_SUPPORTS_CUSTOM_FACTORY 1
     )
 endif()
 
@@ -82,6 +84,7 @@ add_subdirectory(res)
 
 target_compile_definitions(ChowMultiTool PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
+    CHOWMULTITOOL_CLAP_ID="${CHOWMULTITOOL_CLAP_ID}"
 )
 
 target_link_libraries(ChowMultiTool

@@ -14,6 +14,8 @@ public:
     [[nodiscard]] chowdsp::presets::Preset getUserPresetForState (const juce::String& presetName, nlohmann::json&& presetState) const override;
     auto* getPresetSettings() { return &(*presetsSettings); }
 
+    static std::vector<chowdsp::presets::Preset> getFactoryPresets();
+
 private:
     chowdsp::SharedPluginSettings pluginSettings;
     std::optional<chowdsp::presets::frontend::SettingsInterface> presetsSettings;
