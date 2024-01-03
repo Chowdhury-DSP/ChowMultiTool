@@ -116,7 +116,7 @@ struct ExtraState
 class EQProcessor
 {
 public:
-    EQProcessor (const EQToolParams& eqParams, const ExtraState& extraState);
+    EQProcessor (const EQToolParams& eqParams, const ExtraState& eqExtraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);

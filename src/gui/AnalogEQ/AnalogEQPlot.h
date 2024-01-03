@@ -2,6 +2,7 @@
 
 #include "EQChyron.h"
 #include "dsp/AnalogEQ/AnalogEQProcessor.h"
+#include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
 
 namespace gui::analog_eq
@@ -11,7 +12,11 @@ class DotSlider;
 class AnalogEQPlot : public chowdsp::SpectrumPlotBase
 {
 public:
-    AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp);
+    AnalogEQPlot (State& pluginState,
+                  dsp::analog_eq::Params& params,
+                  dsp::analog_eq::ExtraState& analogEqExtraState,
+                  const chowdsp::HostContextProvider& hcp,
+                  SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks);
     ~AnalogEQPlot() override;
 
     void paint (juce::Graphics& g) override;
@@ -26,12 +31,13 @@ public:
     };
 
 private:
-    void mouseDown (const juce::MouseEvent& e) override;
+    void mouseDown (const juce::MouseEvent& event) override;
 
     void updatePlot();
     void setSelectedBand (BandID bandID);
 
     chowdsp::GenericFilterPlotter filterPlotter;
+    dsp::analog_eq::ExtraState& extraState;
     dsp::analog_eq::AnalogEQProcessor pultecEQ;
 
     chowdsp::ScopedCallbackList callbacks;
@@ -47,6 +53,7 @@ private:
     std::unique_ptr<juce::Component> highCutFullControl;
 
     EQChyron chyron;
+    SpectrumAnalyser spectrumAnalyser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQPlot)
 };

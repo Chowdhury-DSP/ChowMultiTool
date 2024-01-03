@@ -34,8 +34,8 @@ namespace detail
                                                            }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
-            tool_maker<analog_eq::AnalogEQProcessor> ([&params]
-                                                      { return analog_eq::AnalogEQProcessor { *params.analogEQParams }; }),
+            tool_maker<analog_eq::AnalogEQProcessor> ([&params, &pluginState]
+                                                      { return analog_eq::AnalogEQProcessor { *params.analogEQParams, *pluginState.nonParams.analogEqExtraState }; }),
             tool_maker<band_splitter::BandSplitterProcessor> ([&params, &pluginState]
                                                               { return band_splitter::BandSplitterProcessor { *params.bandSplitParams, *pluginState.nonParams.bandSplitterExtraState }; }),
             tool_maker<brickwall::BrickwallProcessor> ([&params, &pluginState]
