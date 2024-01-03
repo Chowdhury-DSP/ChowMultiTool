@@ -33,7 +33,7 @@ enum class FilterType
 struct ExtraState
 {
     std::atomic<bool> isEditorOpen { false };
-    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "brickwall_show_post_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showSpectrum { "brickwall_show_spectrum", true };
 };
 
 } // namespace dsp::brickwall

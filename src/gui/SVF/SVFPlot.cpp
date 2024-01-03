@@ -194,7 +194,7 @@ void SVFPlot::mouseDown (const juce::MouseEvent& event)
 
         juce::PopupMenu::Item preSpectrumItem;
         preSpectrumItem.itemID = 100;
-        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-EQ Visualizer" : "Enable Pre-EQ Visualizer";
+        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-Filter Visualizer" : "Enable Pre-Filter Visualizer";
         preSpectrumItem.action = [this]
         {
             extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
@@ -203,7 +203,7 @@ void SVFPlot::mouseDown (const juce::MouseEvent& event)
 
         juce::PopupMenu::Item postSpectrumItem;
         postSpectrumItem.itemID = 101;
-        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-Filter Visualizer" : "Enable Post-Filter Visualizer";
         postSpectrumItem.action = [this]
         {
             extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());

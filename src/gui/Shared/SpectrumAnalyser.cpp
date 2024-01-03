@@ -56,9 +56,15 @@ void SpectrumAnalyser::visibilityChanged()
     if (isVisible())
     {
         if (preTask)
+        {
+            preTask->get().reset();
             preTask->get().setShouldBeRunning (showPreEQ);
+        }
         if (postTask)
+        {
+            postTask->get().reset();
             postTask->get().setShouldBeRunning (showPostEQ);
+        }
         startTimerHz (32);
     }
     else

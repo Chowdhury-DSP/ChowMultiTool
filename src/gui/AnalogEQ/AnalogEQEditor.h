@@ -18,7 +18,6 @@ public:
 
 private:
     AnalogEQPlot plot;
-    dsp::analog_eq::ExtraState& extraState;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQEditor)
 };

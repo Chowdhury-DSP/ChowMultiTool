@@ -119,11 +119,11 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
-    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
     callbacks += {
-        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
+        extraState.showSpectrum.changeBroadcaster.connect ([this]
                                                                {
-                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showSpectrum.get());
                                                                    spectrumAnalyser.repaint(); }),
     };
 
@@ -179,10 +179,10 @@ void BrickwallPlot::mouseDown (const juce::MouseEvent& event)
 
         juce::PopupMenu::Item postSpectrumItem;
         postSpectrumItem.itemID = 100;
-        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.text = extraState.showSpectrum.get() ? "Disable Spectrum Visualizer" : "Enable Spectrum Visualizer";
         postSpectrumItem.action = [this]
         {
-            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+            extraState.showSpectrum.set (! extraState.showSpectrum.get());
         };
         menu.addItem (postSpectrumItem);
 

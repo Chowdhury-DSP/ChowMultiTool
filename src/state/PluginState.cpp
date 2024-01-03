@@ -60,7 +60,7 @@ PluginExtraState::PluginExtraState()
                       &analogEqExtraState->showPostSpectrum,
                       &eqExtraState->showPreSpectrum,
                       &eqExtraState->showPostSpectrum,
-                      &brickwallExtraState->showPostSpectrum,
+                      &brickwallExtraState->showSpectrum,
                       &svfExtraState->showPreSpectrum,
                       &svfExtraState->showPostSpectrum,
                       &bandSplitterExtraState->showSpectrum,

@@ -281,7 +281,6 @@ void BandSplitterPlot::updateSpectrumPlots()
     for (auto id : spectrumIDs())
     {
         auto* spectrumTask = *spectrumTasks[id];
-        spectrumTask->reset();
         auto prePostPair = SpectrumAnalyserTask::PrePostPair { std::nullopt, std::ref (spectrumTask->spectrumAnalyserUITask) };
         spectrumAnalysers.insert_or_assign (id, std::make_unique<SpectrumAnalyser> (*this, prePostPair));
     }

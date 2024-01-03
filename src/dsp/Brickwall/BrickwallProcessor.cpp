@@ -22,7 +22,7 @@ void BrickwallProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     filter.setCutoffFrequency (*params.cutoff);
     filter.processBlock (buffer);
 
-    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+    if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 
