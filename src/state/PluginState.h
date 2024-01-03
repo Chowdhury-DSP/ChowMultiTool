@@ -22,7 +22,7 @@ namespace analog_eq
 {
     struct Params;
     struct ExtraState;
-}
+} // namespace analog_eq
 namespace band_splitter
 {
     struct Params;

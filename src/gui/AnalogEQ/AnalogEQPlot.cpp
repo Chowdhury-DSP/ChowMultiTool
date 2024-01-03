@@ -1,8 +1,8 @@
 #include "AnalogEQPlot.h"
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/DotSlider.h"
-#include "gui/Shared/LookAndFeels.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui::analog_eq
 {
@@ -58,9 +58,8 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
       extraState (analogEqExtraState),
       pultecEQ (pultecParams, extraState),
       chyron (pluginState, *pluginState.params.analogEQParams, hcp),
-      spectrumAnalyser(*this, spectrumAnalyserTasks)
+      spectrumAnalyser (*this, spectrumAnalyserTasks)
 {
-
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
     spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
@@ -224,7 +223,6 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
 
     updatePlot();
 
-
     addAndMakeVisible (chyron);
     chyron.toFront (false);
     addAndMakeVisible (spectrumAnalyser);
@@ -288,7 +286,7 @@ void AnalogEQPlot::resized()
                       getHeight() - pad - chyronHeight,
                       chyronWidth,
                       chyronHeight);
-    spectrumAnalyser.setBounds(getLocalBounds());
+    spectrumAnalyser.setBounds (getLocalBounds());
 }
 
 void AnalogEQPlot::mouseDown (const juce::MouseEvent& event)

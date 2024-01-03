@@ -9,7 +9,7 @@ AnalogEQEditor::AnalogEQEditor (State& pluginState,
                                 const chowdsp::HostContextProvider& hcp,
                                 SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : plot (pluginState, params, analogEqExtraState, hcp, spectrumAnalyserTasks),
-      extraState(analogEqExtraState)
+      extraState (analogEqExtraState)
 {
     addAndMakeVisible (plot);
 }

@@ -76,7 +76,7 @@ struct ExtraState
 class AnalogEQProcessor
 {
 public:
-    explicit AnalogEQProcessor (const Params& pultecParams, const ExtraState& pultecExtraState) : params (pultecParams), extraState(pultecExtraState)
+    explicit AnalogEQProcessor (const Params& pultecParams, const ExtraState& pultecExtraState) : params (pultecParams), extraState (pultecExtraState)
     {
         preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);
         postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);

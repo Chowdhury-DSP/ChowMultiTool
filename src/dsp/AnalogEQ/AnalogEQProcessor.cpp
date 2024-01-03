@@ -19,7 +19,6 @@ void AnalogEQProcessor::reset()
 
 void AnalogEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
-
     if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
         preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 
