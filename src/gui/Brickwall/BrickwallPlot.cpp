@@ -122,7 +122,7 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
     spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
     callbacks += {
         extraState.showSpectrum.changeBroadcaster.connect ([this]
-                                                               {
+                                                           {
                                                                    spectrumAnalyser.setShouldShowPostEQ(extraState.showSpectrum.get());
                                                                    spectrumAnalyser.repaint(); }),
     };
