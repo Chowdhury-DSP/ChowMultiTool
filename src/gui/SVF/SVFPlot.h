@@ -12,10 +12,16 @@ class SVFPlot : public chowdsp::SpectrumPlotBase,
                 private juce::Timer
 {
 public:
-    SVFPlot (State& pluginState, dsp::svf::Params& params, const chowdsp::HostContextProvider& hcp);
-
+    SVFPlot (State& pluginState,
+             dsp::svf::Params& params,
+             dsp::svf::ExtraState& svfExtraState,
+             const chowdsp::HostContextProvider& hcp,
+             SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks);
+    ~SVFPlot();
     void paint (juce::Graphics& g) override;
+    void paintOverChildren (juce::Graphics& g) override;
     void resized() override;
+    void mouseDown (const juce::MouseEvent& event) override;
 
 private:
     void timerCallback() override;
@@ -23,6 +29,7 @@ private:
     void keytrackParamChanged (bool keytrackModeOn);
 
     chowdsp::GenericFilterPlotter filterPlotter;
+    dsp::svf::ExtraState& extraState;
     dsp::svf::SVFProcessor processor;
 
     struct KeytrackDotSlider : SpectrumDotSlider
@@ -35,6 +42,7 @@ private:
     SpectrumDotSlider freqSlider;
     KeytrackDotSlider keytrackSlider;
 
+    SpectrumAnalyser spectrumAnalyser;
     SVFChyron chyron;
 
     chowdsp::ScopedCallbackList callbacks;

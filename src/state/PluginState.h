@@ -21,19 +21,23 @@ namespace signal_gen
 namespace analog_eq
 {
     struct Params;
+    struct ExtraState;
 }
 namespace band_splitter
 {
     struct Params;
-}
+    struct ExtraState;
+} // namespace band_splitter
 namespace brickwall
 {
     struct Params;
-}
+    struct ExtraState;
+} // namespace brickwall
 namespace svf
 {
     struct Params;
-}
+    struct ExtraState;
+} // namespace svf
 } // namespace dsp
 
 namespace state
@@ -74,7 +78,11 @@ struct PluginExtraState : chowdsp::NonParamState
     ~PluginExtraState();
 
     std::unique_ptr<dsp::waveshaper::ExtraState> waveshaperExtraState;
+    chowdsp::LocalPointer<dsp::analog_eq::ExtraState, 128> analogEqExtraState;
     chowdsp::LocalPointer<dsp::eq::ExtraState, 128> eqExtraState;
+    chowdsp::LocalPointer<dsp::brickwall::ExtraState, 128> brickwallExtraState;
+    chowdsp::LocalPointer<dsp::svf::ExtraState, 128> svfExtraState;
+    chowdsp::LocalPointer<dsp::band_splitter::ExtraState, 128> bandSplitterExtraState;
     chowdsp::StateValue<juce::Point<int>> editorBounds { "editor_bounds", { 750, 500 } };
 };
 } // namespace state

@@ -88,7 +88,20 @@ juce::Rectangle<int> BrickwallPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
-BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickwallParams, const chowdsp::HostContextProvider& hcp)
+//==============================================================================
+void BrickwallPlot::FilterPlotComp::paint (juce::Graphics& g)
+{
+    g.setColour (colours::plotColour);
+    g.strokePath (parent->filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
+}
+
+//==============================================================================
+
+BrickwallPlot::BrickwallPlot (State& pluginState,
+                              dsp::brickwall::Params& brickwallParams,
+                              dsp::brickwall::ExtraState& brickwallExtraState,
+                              const chowdsp::HostContextProvider& hcp,
+                              SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -98,12 +111,23 @@ BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickw
                                 .sampleRate = sampleRate,
                                 .fftOrder = fftOrder,
                             }),
-      brickwall (brickwallParams),
-      cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp),
-      chyron (pluginState, brickwallParams, hcp)
+      brickwall (brickwallParams, *pluginState.nonParams.brickwallExtraState),
+      extraState (brickwallExtraState),
+      spectrumAnalyser (*this, spectrumAnalyserTasks),
+      chyron (pluginState, brickwallParams, hcp),
+      cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {
-    addAndMakeVisible (cutoffSlider);
-    addAndMakeVisible (chyron);
+    addMouseListener (this, true);
+    extraState.isEditorOpen.store (true);
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    callbacks += {
+        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
+                                                               {
+                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                   spectrumAnalyser.repaint(); }),
+    };
+
+    addAndMakeVisible (spectrumAnalyser);
 
     brickwall.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
@@ -127,6 +151,17 @@ BrickwallPlot::BrickwallPlot (State& pluginState, dsp::brickwall::Params& brickw
         });
 
     updatePlot();
+    addAndMakeVisible (cutoffSlider);
+    plotComp.setInterceptsMouseClicks (false, false);
+    plotComp.parent = this;
+    addAndMakeVisible (plotComp);
+    addAndMakeVisible (chyron);
+}
+
+BrickwallPlot::~BrickwallPlot()
+{
+    removeMouseListener (this);
+    extraState.isEditorOpen.store (false);
 }
 
 void BrickwallPlot::updatePlot()
@@ -135,13 +170,32 @@ void BrickwallPlot::updatePlot()
     repaint();
 }
 
+void BrickwallPlot::mouseDown (const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        juce::PopupMenu menu;
+
+        juce::PopupMenu::Item postSpectrumItem;
+        postSpectrumItem.itemID = 100;
+        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.action = [this]
+        {
+            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+        };
+        menu.addItem (postSpectrumItem);
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        menu.showMenuAsync (juce::PopupMenu::Options {}
+                                .withParentComponent (getParentComponent()));
+    }
+}
+
 void BrickwallPlot::paint (juce::Graphics& g)
 {
     g.fillAll (juce::Colours::black);
-}
 
-void BrickwallPlot::paintOverChildren (juce::Graphics& g)
-{
     drawMagnitudeLabels (g, *this, { -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f });
     drawFrequencyLabels (g, *this, { 100.0f, 1'000.0f, 10'000.0f }, 2.0f);
     gui::drawFrequencyLines<minFrequency, maxFrequency> (*this,
@@ -155,16 +209,14 @@ void BrickwallPlot::paintOverChildren (juce::Graphics& g)
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);
-
-    g.setColour (colours::plotColour);
-    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 2.0f });
 }
 
 void BrickwallPlot::resized()
 {
     updatePlot();
+    spectrumAnalyser.setBounds (getLocalBounds());
+    plotComp.setBounds (getLocalBounds());
     cutoffSlider.setBounds (getLocalBounds());
-
     const auto pad = proportionOfWidth (0.005f);
     const auto chyronWidth = proportionOfWidth (0.15f);
     const auto chyronHeight = proportionOfWidth (0.05f);

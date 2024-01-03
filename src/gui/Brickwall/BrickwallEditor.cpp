@@ -4,14 +4,20 @@
 
 namespace gui::brickwall
 {
-BrickwallEditor::BrickwallEditor (State& pluginState, dsp::brickwall::Params& params, const chowdsp::HostContextProvider& hcp)
-    : plot (pluginState, params, hcp)
+BrickwallEditor::BrickwallEditor (State& pluginState,
+                                  dsp::brickwall::Params& params,
+                                  dsp::brickwall::ExtraState& brickwallExtraState,
+                                  const chowdsp::HostContextProvider& hcp,
+                                  std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks)
+    : plot (pluginState, params, brickwallExtraState, hcp, spectrumAnalyserTasks)
 {
     bottomBar = std::make_unique<BottomBar> (pluginState, params);
 
     addAndMakeVisible (plot);
     addAndMakeVisible (bottomBar.get());
 }
+
+BrickwallEditor::~BrickwallEditor() {};
 
 void BrickwallEditor::paint (juce::Graphics& g)
 {

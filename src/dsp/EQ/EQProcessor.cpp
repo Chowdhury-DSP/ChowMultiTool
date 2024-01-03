@@ -2,10 +2,12 @@
 
 namespace dsp::eq
 {
-EQProcessor::EQProcessor (const EQToolParams& eqParams, const ExtraState& es)
+EQProcessor::EQProcessor (const EQToolParams& eqParams, const ExtraState& eqExtraState)
     : params (eqParams),
-      extraState (es)
+      extraState (eqExtraState)
 {
+    preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);
+    postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);
 }
 
 void EQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
