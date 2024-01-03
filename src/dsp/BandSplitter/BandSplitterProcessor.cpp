@@ -2,6 +2,19 @@
 
 namespace dsp::band_splitter
 {
+BandSplitterProcessor::BandSplitterProcessor (const Params& bandSplitParams, const ExtraState& extraState)
+    : params (bandSplitParams),
+      extraState (extraState),
+      analyzerTasks ({
+          { SpectrumBandID::Low, &lowSpectrumAnalyserTask },
+          { SpectrumBandID::Mid, &midSpectrumAnalyserTask },
+          { SpectrumBandID::High, &highSpectrumAnalyserTask },
+      })
+{
+    for (auto [_, task] : analyzerTasks)
+        task->spectrumAnalyserUITask.setDBRange (-60.0f, 5.0f);
+}
+
 void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     pfr::for_each_field (twoBandFilters,
@@ -11,6 +24,10 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     pfr::for_each_field (threeBandFilters,
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
+
+    lowSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    midSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    highSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>& bufferIn,
@@ -59,11 +76,22 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     if (params.threeBandOnOff->get())
     {
         processCrossover (threeBandFilters, processThreeBandFilter);
+        if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
+        {
+            lowSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
+            midSpectrumAnalyserTask.processBlockInput (bufferMid.toAudioBuffer());
+            highSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
+        }
     }
     else
     {
         bufferMid.clear();
         processCrossover (twoBandFilters, processTwoBandFilter);
+        if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
+        {
+            lowSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
+            highSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
+        }
     }
 }
 } // namespace dsp::band_splitter

@@ -6,6 +6,7 @@ void BrickwallProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     filter.prepare (spec);
     filter.setQValue (chowdsp::CoefficientCalculators::butterworthQ<float>);
+    postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void BrickwallProcessor::reset()
@@ -20,6 +21,9 @@ void BrickwallProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     filter.setFilterType (getFilterTypeIndex());
     filter.setCutoffFrequency (*params.cutoff);
     filter.processBlock (buffer);
+
+    if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
+        postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 
 int BrickwallProcessor::getFilterTypeIndex() const

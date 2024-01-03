@@ -6,6 +6,9 @@ void AnalogEQProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     for (auto& model : wdf)
         model.prepare ((float) spec.sampleRate);
+
+    preSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void AnalogEQProcessor::reset()
@@ -16,6 +19,9 @@ void AnalogEQProcessor::reset()
 
 void AnalogEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
 {
+    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
+        preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
+
     const auto getMagParam = [] (const chowdsp::FloatParameter* param, bool isBoosting)
     {
         const auto normValue = param->convertTo0to1 (param->getCurrentValue());
@@ -41,5 +47,8 @@ void AnalogEQProcessor::processBlock (const chowdsp::BufferView<float>& buffer)
     }
 
     chowdsp::BufferMath::applyGain (buffer, juce::Decibels::decibelsToGain (22.4f));
+
+    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+        postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 } // namespace dsp::analog_eq

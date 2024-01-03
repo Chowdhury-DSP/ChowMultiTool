@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PultecEQWDF.h"
+#include "gui/Shared/SpectrumAnalyserTask.h"
 
 namespace dsp::analog_eq
 {
@@ -65,19 +66,39 @@ struct Params : chowdsp::ParamHolder
     };
 };
 
+struct ExtraState
+{
+    std::atomic<bool> isEditorOpen { false };
+    chowdsp::StateValue<std::atomic_bool, bool> showPreSpectrum { "analog_eq_show_pre_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "analog_eq_show_post_spectrum", true };
+};
+
 class AnalogEQProcessor
 {
 public:
-    explicit AnalogEQProcessor (const Params& pultecParams) : params (pultecParams) {}
+    explicit AnalogEQProcessor (const Params& pultecParams, const ExtraState& pultecExtraState) : params (pultecParams), extraState (pultecExtraState)
+    {
+        preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);
+        postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-25, 20);
+    }
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
+    gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
+    {
+        return { std::ref (preSpectrumAnalyserTask.spectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
+    }
+
 private:
     const Params& params;
+    const ExtraState& extraState;
 
     PultecEqWDF wdf[2];
+
+    gui::SpectrumAnalyserTask preSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnalogEQProcessor)
 };

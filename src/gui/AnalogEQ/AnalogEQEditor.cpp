@@ -3,8 +3,12 @@
 
 namespace gui::analog_eq
 {
-AnalogEQEditor::AnalogEQEditor (State& pluginState, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp)
-    : plot (pluginState, params, hcp)
+AnalogEQEditor::AnalogEQEditor (State& pluginState,
+                                dsp::analog_eq::Params& params,
+                                dsp::analog_eq::ExtraState& analogEqExtraState,
+                                const chowdsp::HostContextProvider& hcp,
+                                SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
+    : plot (pluginState, params, analogEqExtraState, hcp, spectrumAnalyserTasks)
 {
     addAndMakeVisible (plot);
 }
