@@ -1,64 +1,100 @@
 #include "SpectrumAnalyser.h"
 #include "gui/Shared/Colours.h"
 
-SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot, std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> spectrumAnalyserTasks)
+SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot,
+                                    gui::SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : eqPlot (eqPlot),
-      preTask (spectrumAnalyserTasks.first.SpectrumAnalyserUITask),
-      postTask (spectrumAnalyserTasks.second.SpectrumAnalyserUITask)
-
+      preTask (spectrumAnalyserTasks.first.has_value() ? std::ref (spectrumAnalyserTasks.first).get() : std::nullopt),
+      postTask (spectrumAnalyserTasks.second.has_value() ? std::ref (spectrumAnalyserTasks.second).get() : std::nullopt)
 {
+    minFrequencyHz.store (eqPlot.params.minFrequencyHz);
+    maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
 {
-    if (preTask.isTaskRunning())
-        preTask.setShouldBeRunning (false);
-    if (postTask.isTaskRunning())
-        postTask.setShouldBeRunning (false);
+    if (preTask && preTask->get().isTaskRunning())
+        preTask->get().setShouldBeRunning (false);
+    if (postTask && postTask->get().isTaskRunning())
+        postTask->get().setShouldBeRunning (false);
 }
 
 void SpectrumAnalyser::paint (juce::Graphics& g)
 {
-    //    g.fillAll(juce::Colours::whitesmoke.withAlpha(0.4f));
+    const auto paintSpectrum = [&g, &plot = std::as_const (eqPlot)] (const DrawOptions& drawOptions, const juce::Path& path)
+    {
+        if (drawOptions.drawFill)
+        {
+            float gradientStart = plot.getYCoordinateForDecibels (-30.0f);
+            auto gradientEnd = (float) plot.getHeight();
+
+            juce::ColourGradient lowFreqGradient = juce::ColourGradient::vertical (
+                drawOptions.gradientStartColour,
+                gradientStart,
+                drawOptions.gradientEndColour,
+                gradientEnd);
+            g.setGradientFill (lowFreqGradient);
+            g.fillPath (path);
+        }
+
+        if (drawOptions.drawLine)
+        {
+            g.setColour (drawOptions.lineColour);
+            g.strokePath (path, juce::PathStrokeType (1));
+        }
+    };
 
     if (showPreEQ)
-    {
-        g.setColour (gui::logo::colours::backgroundBlue.brighter (0.4f));
-        g.strokePath (prePath, juce::PathStrokeType (1));
-    }
+        paintSpectrum (preEQDrawOptions, prePath);
 
     if (showPostEQ)
-    {
-        g.setGradientFill (juce::ColourGradient::vertical (gui::logo::colours::backgroundBlue.withAlpha (0.4f),
-                                                           eqPlot.getYCoordinateForDecibels (0.0f),
-                                                           gui::logo::colours::backgroundBlue.darker().withAlpha (0.4f),
-                                                           (float) getHeight()));
-        g.fillPath (postPath);
-    }
+        paintSpectrum (postEQDrawOptions, postPath);
 }
 
 void SpectrumAnalyser::visibilityChanged()
 {
     if (isVisible())
     {
-        preTask.setShouldBeRunning (showPreEQ);
-        postTask.setShouldBeRunning (showPostEQ);
+        if (preTask)
+        {
+            preTask->get().reset();
+            preTask->get().setShouldBeRunning (showPreEQ);
+        }
+        if (postTask)
+        {
+            postTask->get().reset();
+            postTask->get().setShouldBeRunning (showPostEQ);
+        }
         startTimerHz (32);
     }
     else
     {
-        preTask.setShouldBeRunning (false);
-        postTask.setShouldBeRunning (false);
+        if (preTask)
+            preTask->get().setShouldBeRunning (false);
+        if (postTask)
+            postTask->get().setShouldBeRunning (false);
         stopTimer();
     }
 }
 
+void SpectrumAnalyser::setShouldShowPreEQ (bool shouldShow)
+{
+    showPreEQ = shouldShow;
+    preTask->get().setShouldBeRunning (showPreEQ && isVisible());
+}
+
+void SpectrumAnalyser::setShouldShowPostEQ (bool shouldShow)
+{
+    showPostEQ = shouldShow;
+    postTask->get().setShouldBeRunning (showPostEQ && isVisible());
+}
+
 void SpectrumAnalyser::timerCallback()
 {
-    if (showPreEQ)
-        updatePlotPath (prePath, preTask);
-    if (showPostEQ)
-        updatePlotPath (postPath, postTask);
+    if (preTask && showPreEQ)
+        updatePlotPath (prePath, preTask->get());
+    if (postTask && showPostEQ)
+        updatePlotPath (postPath, postTask->get());
 }
 
 void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAnalyserTask::SpectrumAnalyserBackgroundTask& taskToUpdate)
@@ -73,7 +109,7 @@ void SpectrumAnalyser::updatePlotPath (juce::Path& pathToUpdate, gui::SpectrumAn
     const auto nPoints = freqAxis.size();
     for (size_t i = 0; i < nPoints;)
     {
-        if (freqAxis[i] < eqPlot.params.minFrequencyHz / 2.0f || freqAxis[i] > eqPlot.params.maxFrequencyHz * 1.01f)
+        if (freqAxis[i] < minFrequencyHz.load() / 2.0f || freqAxis[i] > maxFrequencyHz.load() * 1.01f)
         {
             i++;
             continue;

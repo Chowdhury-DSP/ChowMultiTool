@@ -116,13 +116,17 @@ struct ExtraState
 class EQProcessor
 {
 public:
-    EQProcessor (const EQToolParams& eqParams, const ExtraState& extraState);
+    EQProcessor (const EQToolParams& eqParams, const ExtraState& eqExtraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void processBlock (const chowdsp::BufferView<float>& buffer);
 
     int getLatencySamples() const;
-    std::pair<gui::SpectrumAnalyserTask&, gui::SpectrumAnalyserTask&> getSpectrumAnalyserTasks() { return { preSpectrumAnalyserTask, postSpectrumAnalyserTask }; }
+
+    gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
+    {
+        return { std::ref (preSpectrumAnalyserTask.spectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
+    }
 
 private:
     const EQToolParams& params;

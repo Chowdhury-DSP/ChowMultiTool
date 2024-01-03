@@ -2,6 +2,7 @@
 #include "gui/Shared/Colours.h"
 #include "gui/Shared/DotSlider.h"
 #include "gui/Shared/FrequencyPlotHelpers.h"
+#include "gui/Shared/LookAndFeels.h"
 
 namespace gui::analog_eq
 {
@@ -39,7 +40,11 @@ namespace
     }
 } // namespace
 
-AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecParams, const chowdsp::HostContextProvider& hcp)
+AnalogEQPlot::AnalogEQPlot (State& pluginState,
+                            dsp::analog_eq::Params& pultecParams,
+                            dsp::analog_eq::ExtraState& analogEqExtraState,
+                            const chowdsp::HostContextProvider& hcp,
+                            SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
         .minFrequencyHz = (float) minFrequency,
         .maxFrequencyHz = (float) maxFrequency,
@@ -50,9 +55,26 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
                                 .freqSmoothOctaves = 1.0f / 12.0f,
                                 .fftOrder = fftOrder,
                             }),
-      pultecEQ (pultecParams),
-      chyron (pluginState, *pluginState.params.analogEQParams, hcp)
+      extraState (analogEqExtraState),
+      pultecEQ (pultecParams, extraState),
+      chyron (pluginState, *pluginState.params.analogEQParams, hcp),
+      spectrumAnalyser (*this, spectrumAnalyserTasks)
 {
+    addMouseListener (this, true);
+    extraState.isEditorOpen.store (true);
+    spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    callbacks += {
+        extraState.showPreSpectrum.changeBroadcaster.connect ([this]
+                                                              {
+                                                                  spectrumAnalyser.setShouldShowPreEQ(extraState.showPreSpectrum.get());
+                                                                  spectrumAnalyser.repaint(); }),
+        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
+                                                               {
+                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
+                                                                   spectrumAnalyser.repaint(); }),
+    };
+
     pultecEQ.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
     filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
     {
@@ -203,9 +225,15 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState, dsp::analog_eq::Params& pultecPa
 
     addAndMakeVisible (chyron);
     chyron.toFront (false);
+    addAndMakeVisible (spectrumAnalyser);
+    spectrumAnalyser.toBack();
 }
 
-AnalogEQPlot::~AnalogEQPlot() = default;
+AnalogEQPlot::~AnalogEQPlot()
+{
+    removeMouseListener (this);
+    extraState.isEditorOpen.store (false);
+}
 
 void AnalogEQPlot::updatePlot()
 {
@@ -258,10 +286,38 @@ void AnalogEQPlot::resized()
                       getHeight() - pad - chyronHeight,
                       chyronWidth,
                       chyronHeight);
+    spectrumAnalyser.setBounds (getLocalBounds());
 }
 
-void AnalogEQPlot::mouseDown (const juce::MouseEvent&)
+void AnalogEQPlot::mouseDown (const juce::MouseEvent& event)
 {
     chyron.setSelectedBand (EQBand::None);
+    if (event.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        juce::PopupMenu menu;
+
+        juce::PopupMenu::Item preSpectrumItem;
+        preSpectrumItem.itemID = 100;
+        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-EQ Visualizer" : "Enable Pre-EQ Visualizer";
+        preSpectrumItem.action = [this]
+        {
+            extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
+        };
+        menu.addItem (preSpectrumItem);
+
+        juce::PopupMenu::Item postSpectrumItem;
+        postSpectrumItem.itemID = 101;
+        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-EQ Visualizer" : "Enable Post-EQ Visualizer";
+        postSpectrumItem.action = [this]
+        {
+            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+        };
+        menu.addItem (postSpectrumItem);
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        menu.showMenuAsync (juce::PopupMenu::Options {}
+                                .withParentComponent (getParentComponent()));
+    }
 }
 } // namespace gui::analog_eq

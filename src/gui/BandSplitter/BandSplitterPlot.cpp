@@ -80,7 +80,12 @@ juce::Rectangle<int> BandSplitterPlot::InternalSlider::getThumbBounds() const
         .withHeight (getHeight());
 }
 
-BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Params& bandSplitParams, const chowdsp::HostContextProvider& hcp)
+BandSplitterPlot::BandSplitterPlot (State& pluginState,
+                                    dsp::band_splitter::Params& bandSplitParams,
+                                    dsp::band_splitter::ExtraState& bandSplitterExtraState,
+                                    const chowdsp::HostContextProvider& hcp,
+                                    dsp::band_splitter::BandSplitterSpectrumTasks& splitterSpectrumTasks)
+
     : chowdsp::EQ::EqualizerPlot (numBands,
                                   chowdsp::SpectrumPlotParams {
                                       .minFrequencyHz = (float) minFrequency,
@@ -88,9 +93,14 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                       .minMagnitudeDB = -60.0f,
                                       .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
+      extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
-      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp)
+      cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
+      spectrumTasks (splitterSpectrumTasks)
 {
+    addMouseListener (this, true);
+    extraState.isEditorOpen.store (true);
+
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
@@ -123,16 +133,36 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState, dsp::band_splitter::Para
                                               [this]
                                               {
                                                   cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
+                                                  updateSpectrumPlots();
+                                                  repaint();
                                               }),
         };
 
+    callbacks += {
+        extraState.showSpectrum.changeBroadcaster.connect ([this]
+                                                           {
+                                                                   for (auto [_, spectrum] : spectrumAnalysers)
+                                                                   {
+                                                                       spectrum->setShouldShowPostEQ(extraState.showSpectrum.get());
+                                                                       spectrum->repaint();
+                                                                   } }),
+    };
+
     updateFilterSlope();
+    updateSpectrumPlots();
+}
+
+BandSplitterPlot::~BandSplitterPlot()
+{
+    removeMouseListener (this);
+    extraState.isEditorOpen.store (false);
 }
 
 void BandSplitterPlot::updateCutoffFrequency()
 {
-    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
+    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3
     {
+        //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2 - this will be the current cutoff frequency in Hz
         const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
         setCutoffParameter (bandIndex, cutoffParam->get());
         updateFilterPlotPath (bandIndex);
@@ -206,7 +236,90 @@ void BandSplitterPlot::resized()
     chowdsp::EQ::EqualizerPlot::resized();
 
     const auto bounds = getLocalBounds();
+    for (auto [_, spectrum] : spectrumAnalysers)
+        spectrum->setBounds (bounds);
     cutoffSlider.setBounds (bounds);
     cutoff2Slider.setBounds (bounds);
+}
+
+void BandSplitterPlot::mouseDown (const juce::MouseEvent& event)
+{
+    if (event.mods.isPopupMenu())
+    {
+        chowdsp::SharedLNFAllocator lnfAllocator;
+        juce::PopupMenu menu;
+
+        juce::PopupMenu::Item postSpectrumItem;
+        postSpectrumItem.itemID = 101;
+        postSpectrumItem.text = extraState.showSpectrum.get() ? "Disable Spectrum Visualizer" : "Enable Spectrum Visualizer";
+        postSpectrumItem.action = [this]
+        {
+            extraState.showSpectrum.set (! extraState.showSpectrum.get());
+        };
+        menu.addItem (postSpectrumItem);
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<lnf::MenuLNF>());
+        menu.showMenuAsync (juce::PopupMenu::Options {}
+                                .withParentComponent (getParentComponent()));
+    }
+}
+
+void BandSplitterPlot::updateSpectrumPlots()
+{
+    spectrumAnalysers.clear();
+    spectrumAnalysers.reserve (4);
+
+    using dsp::band_splitter::SpectrumBandID;
+    const auto spectrumIDs = [this]
+    {
+        using IDList = chowdsp::SmallVector<SpectrumBandID, 4>;
+        if (bandSplitterParams.threeBandOnOff->get())
+            return IDList { SpectrumBandID::Low, SpectrumBandID::Mid, SpectrumBandID::High };
+        return IDList { SpectrumBandID::Low, SpectrumBandID::High };
+    };
+
+    for (auto id : spectrumIDs())
+    {
+        auto* spectrumTask = *spectrumTasks[id];
+        auto prePostPair = SpectrumAnalyserTask::PrePostPair { std::nullopt, std::ref (spectrumTask->spectrumAnalyserUITask) };
+        spectrumAnalysers.insert_or_assign (id, std::make_unique<SpectrumAnalyser> (*this, prePostPair));
+    }
+
+    setSpectrumColours();
+
+    for (auto [_, spectrum] : spectrumAnalysers)
+    {
+        spectrum->setShouldShowPostEQ (extraState.showSpectrum.get());
+        addAndMakeVisible (*spectrum);
+        spectrum->toBack();
+    }
+    resized();
+}
+
+void BandSplitterPlot::setSpectrumColours()
+{
+    using dsp::band_splitter::SpectrumBandID;
+    for (auto [id, analyser] : spectrumAnalysers)
+    {
+        analyser->postEQDrawOptions.drawLine = true;
+        switch (id)
+        {
+            case SpectrumBandID::Low:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour (0xff00008b).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour (0xff008080).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour (0xff008080).brighter();
+                break;
+            case SpectrumBandID::Mid:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB (0xFF, 0x66, 0x00).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB (255, 215, 0).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (255, 215, 0).brighter();
+                break;
+            case SpectrumBandID::High:
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB (0xDA, 0x70, 0xD6).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (0x8A, 0x2B, 0xE2).brighter();
+                break;
+        }
+    }
 }
 } // namespace gui::band_splitter

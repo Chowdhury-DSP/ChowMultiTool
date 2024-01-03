@@ -34,14 +34,14 @@ namespace detail
                                                            }; }),
             tool_maker<signal_gen::SignalGeneratorProcessor> ([&params]
                                                               { return signal_gen::SignalGeneratorProcessor { *params.signalGenParams }; }),
-            tool_maker<analog_eq::AnalogEQProcessor> ([&params]
-                                                      { return analog_eq::AnalogEQProcessor { *params.analogEQParams }; }),
-            tool_maker<band_splitter::BandSplitterProcessor> ([&params]
-                                                              { return band_splitter::BandSplitterProcessor { *params.bandSplitParams }; }),
-            tool_maker<brickwall::BrickwallProcessor> ([&params]
-                                                       { return brickwall::BrickwallProcessor { *params.brickwallParams }; }),
-            tool_maker<svf::SVFProcessor> ([&params]
-                                           { return svf::SVFProcessor { *params.svfParams }; })
+            tool_maker<analog_eq::AnalogEQProcessor> ([&params, &pluginState]
+                                                      { return analog_eq::AnalogEQProcessor { *params.analogEQParams, *pluginState.nonParams.analogEqExtraState }; }),
+            tool_maker<band_splitter::BandSplitterProcessor> ([&params, &pluginState]
+                                                              { return band_splitter::BandSplitterProcessor { *params.bandSplitParams, *pluginState.nonParams.bandSplitterExtraState }; }),
+            tool_maker<brickwall::BrickwallProcessor> ([&params, &pluginState]
+                                                       { return brickwall::BrickwallProcessor { *params.brickwallParams, *pluginState.nonParams.brickwallExtraState }; }),
+            tool_maker<svf::SVFProcessor> ([&params, &pluginState]
+                                           { return svf::SVFProcessor { *params.svfParams, *pluginState.nonParams.svfExtraState }; })
         };
     }
 } // namespace detail

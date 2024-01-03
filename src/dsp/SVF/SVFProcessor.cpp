@@ -26,6 +26,9 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
     dampingSmooth.setCurrentAndTargetValue (*params.wernerDamping);
 
     std::fill (playingNotes.begin(), playingNotes.end(), -1);
+
+    preSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void SVFProcessor::reset()
@@ -123,6 +126,9 @@ constexpr bool IsOneOfFilters = std::disjunction<std::is_same<FilterType, TestFi
 
 void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept
 {
+    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
+        preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
+
     if (params.keytrack->get())
         processKeytracking (midi);
     else
@@ -144,6 +150,9 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const
         sampleCount += samplesToProcess;
         numSamplesRemaining -= samplesToProcess;
     }
+
+    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+        postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 
 void SVFProcessor::processSmallBlock (const chowdsp::BufferView<float>& buffer) noexcept
