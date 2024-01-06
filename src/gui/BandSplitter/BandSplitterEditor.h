@@ -33,6 +33,15 @@ private:
         gui::SharedFonts fonts;
     } bandsButton;
 
+    struct FourBandsButton : juce::Button
+    {
+        FourBandsButton (chowdsp::BoolParameter& param, State& pluginState);
+        void paintButton (juce::Graphics& g, bool, bool) override;
+        chowdsp::ButtonAttachment attach;
+        chowdsp::BoolParameter& bandParam;
+        gui::SharedFonts fonts;
+    } fourBandsButton;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };
 } // namespace gui::band_splitter
