@@ -43,7 +43,7 @@ struct Params : chowdsp::ParamHolder
     };
 
     chowdsp::FreqHzParameter::Ptr cutoff3 {
-        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_0_0 },
+        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_1_0 },
         "Band Splitter Cutoff 3",
         chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
         10000.0f
@@ -56,7 +56,7 @@ struct Params : chowdsp::ParamHolder
     };
 
     chowdsp::BoolParameter::Ptr fourBandOnOff {
-        juce::ParameterID { "band_split_4band_on", ParameterVersionHints::version1_0_0 },
+        juce::ParameterID { "band_split_4band_on", ParameterVersionHints::version1_1_0 },
         "Band Splitter 4-Band",
         false
     };
@@ -115,32 +115,14 @@ private:
         chowdsp::ThreeWayCrossoverFilter<float, 12> filter12;
     } threeBandFilters {};
 
-    struct FourBandFiltersStage1
+    struct FourBandFilters
     {
-        chowdsp::LinkwitzRileyFilter<float, 1> filter1;
-        chowdsp::LinkwitzRileyFilter<float, 2> filter2;
-        chowdsp::LinkwitzRileyFilter<float, 4> filter4;
-        chowdsp::LinkwitzRileyFilter<float, 8> filter8;
-        chowdsp::LinkwitzRileyFilter<float, 12> filter12;
-    } fourBandFiltersStage1 {};
-
-    struct FourBandFiltersLowStage2
-    {
-        chowdsp::LinkwitzRileyFilter<float, 1> filter1;
-        chowdsp::LinkwitzRileyFilter<float, 2> filter2;
-        chowdsp::LinkwitzRileyFilter<float, 4> filter4;
-        chowdsp::LinkwitzRileyFilter<float, 8> filter8;
-        chowdsp::LinkwitzRileyFilter<float, 12> filter12;
-    } fourBandFiltersLowStage2 {};
-
-    struct FourBandFiltersHighStage2
-    {
-        chowdsp::LinkwitzRileyFilter<float, 1> filter1;
-        chowdsp::LinkwitzRileyFilter<float, 2> filter2;
-        chowdsp::LinkwitzRileyFilter<float, 4> filter4;
-        chowdsp::LinkwitzRileyFilter<float, 8> filter8;
-        chowdsp::LinkwitzRileyFilter<float, 12> filter12;
-    } fourBandFiltersHighStage2 {};
+        chowdsp::CrossoverFilter<float, 1, 4> filter1;
+        chowdsp::CrossoverFilter<float, 2, 4> filter2;
+        chowdsp::CrossoverFilter<float, 4, 4> filter4;
+        chowdsp::CrossoverFilter<float, 8, 4> filter8;
+        chowdsp::CrossoverFilter<float, 12, 4> filter12;
+    } fourBandFilters {};
 
     gui::SpectrumAnalyserTask lowSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask midSpectrumAnalyserTask;

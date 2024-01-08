@@ -27,17 +27,10 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
 
-    pfr::for_each_field (fourBandFiltersStage1,
+    pfr::for_each_field (fourBandFilters,
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
 
-    pfr::for_each_field (fourBandFiltersLowStage2,
-                         [spec] (auto&& filter)
-                         { filter.prepare (spec); });
-
-    pfr::for_each_field (fourBandFiltersHighStage2,
-                         [spec] (auto&& filter)
-                         { filter.prepare (spec); });
 
     lowSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     midSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
@@ -80,26 +73,12 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         filter.processBlock (bufferIn, bufferLow, bufferMid, bufferHigh);
     };
 
-    juce::AudioBuffer<float> tempLowBuffer, tempHighBuffer;
-    tempLowBuffer.setSize(bufferIn.getNumChannels(), bufferIn.getNumSamples());
-    tempHighBuffer.setSize(bufferIn.getNumChannels(), bufferIn.getNumSamples());
-
-    const auto processFourBandFilterStage1 = [&] (auto& filter)
+    const auto processFourBandFilter = [&] (auto& filter)
     {
-        filter.setCrossoverFrequency (params.cutoff2->getCurrentValue());
-        filter.processBlock (bufferIn, tempLowBuffer, tempHighBuffer);
-    };
-
-    const auto processFourBandFilterLowStage2 = [&] (auto& filter)
-    {
-        filter.setCrossoverFrequency (params.cutoff->getCurrentValue());
-        filter.processBlock (tempLowBuffer, bufferLow, bufferLowMid);
-    };
-
-    const auto processFourBandFilterHighStage2 = [&] (auto& filter)
-    {
-        filter.setCrossoverFrequency (params.cutoff3->getCurrentValue());
-        filter.processBlock (tempHighBuffer, bufferHighMid, bufferHigh);
+        filter.setCrossoverFrequency(0, params.cutoff->getCurrentValue());
+        filter.setCrossoverFrequency(1, params.cutoff2->getCurrentValue());
+        filter.setCrossoverFrequency(2, params.cutoff3->getCurrentValue());
+        filter.processBlock (bufferIn, {bufferLow, bufferLowMid, bufferHighMid, bufferHigh});
     };
 
     const auto processCrossover = [&] (auto& bandFilters, auto& processFilter)
@@ -120,9 +99,7 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     if (params.fourBandOnOff->get())
     {
         bufferMid.clear();
-        processCrossover (fourBandFiltersStage1, processFourBandFilterStage1);
-        processCrossover(fourBandFiltersLowStage2, processFourBandFilterLowStage2);
-        processCrossover(fourBandFiltersHighStage2, processFourBandFilterHighStage2);
+        processCrossover (fourBandFilters, processFourBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
             lowSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
