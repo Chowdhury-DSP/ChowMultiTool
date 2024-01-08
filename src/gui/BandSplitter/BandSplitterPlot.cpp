@@ -7,7 +7,7 @@ namespace gui::band_splitter
 {
 namespace
 {
-    constexpr int numBands = 4;
+    constexpr int numBands = 6;
     constexpr int minFrequency = 18;
     constexpr int maxFrequency = 22'000;
 } // namespace
@@ -177,10 +177,10 @@ BandSplitterPlot::~BandSplitterPlot()
 
 void BandSplitterPlot::updateCutoffFrequency()
 {
-    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3
+    for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3, 4, 5
     {
-        //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2 - this will be the current cutoff frequency in Hz
-        const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
+        //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2, bands 5 & 6 assigned cutoff 3 - this will be the current cutoff frequency in Hz
+        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands/2 ? bandSplitterParams.cutoff2 : bandSplitterParams.cutoff3;
         setCutoffParameter (bandIndex, cutoffParam->get());
         updateFilterPlotPath (bandIndex);
     }
@@ -211,10 +211,14 @@ void BandSplitterPlot::updateFilterSlope()
     setFilterType (1, highBandFilterType);
     setFilterType (2, lowBandFilterType);
     setFilterType (3, highBandFilterType);
+    setFilterType (4, lowBandFilterType);
+    setFilterType (5, highBandFilterType);
+
 
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        const auto& cutoffParam = bandIndex < (numBands / 2) ? bandSplitterParams.cutoff : bandSplitterParams.cutoff2;
+        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands/2 ? bandSplitterParams.cutoff2 : bandSplitterParams.cutoff3;
+
         setCutoffParameter (bandIndex, cutoffParam->get());
         setQParameter (bandIndex, 0.5f);
         updateFilterPlotPath (bandIndex);
@@ -247,11 +251,11 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
         g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
     }
 
-//    if (bandSplitterParams.fourBandOnOff->get())
-//    {
-//        g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
-//        g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });
-//    }
+    if (bandSplitterParams.fourBandOnOff->get())
+    {
+        g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });
+        g.strokePath (getPath (5), juce::PathStrokeType { 2.0f });
+    }
 }
 
 void BandSplitterPlot::resized()
