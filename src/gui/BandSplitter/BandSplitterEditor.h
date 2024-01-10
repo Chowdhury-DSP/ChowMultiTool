@@ -1,12 +1,19 @@
 #pragma once
 
 #include "BandSplitterPlot.h"
+#include "TriStateButtonAttachment.h"
 //#include "SlopePicker.h"
 #include "gui/Shared/ChoicePicker.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 
 namespace gui::band_splitter
 {
+enum class BandState
+{
+    TwoBands,
+    ThreeBands,
+    FourBands,
+};
 class BandSplitterEditor : public juce::Component
 {
 public:
@@ -24,23 +31,16 @@ private:
     ChoicePicker<dsp::band_splitter::Slope> slopePicker;
     dsp::band_splitter::ExtraState& extraState;
 
-    struct BandsButton : juce::Button
+    struct TriStateButton : public juce::Button
     {
-        BandsButton (chowdsp::BoolParameter& param, State& pluginState);
+        TriStateButton(chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff);
         void paintButton (juce::Graphics& g, bool, bool) override;
-        chowdsp::ButtonAttachment attach;
-        chowdsp::BoolParameter& bandParam;
+        chowdsp::BoolParameter& threeBandOnOffParam;
+        chowdsp::BoolParameter& fourBandOnOffParam;
         gui::SharedFonts fonts;
-    } bandsButton;
-
-    struct FourBandsButton : juce::Button
-    {
-        FourBandsButton (chowdsp::BoolParameter& param, State& pluginState);
-        void paintButton (juce::Graphics& g, bool, bool) override;
-        chowdsp::ButtonAttachment attach;
-        chowdsp::BoolParameter& bandParam;
-        gui::SharedFonts fonts;
-    } fourBandsButton;
+        TriStateButtonAttachment triStateButtonAttachment;
+        std::pair<BandState, int> currentState;
+    } triStateButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };
