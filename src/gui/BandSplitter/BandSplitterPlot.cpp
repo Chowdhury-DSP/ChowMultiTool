@@ -96,7 +96,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
       cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
-      cutoff3Slider(*bandSplitParams.cutoff3, *this, pluginState, hcp),
+      cutoff3Slider (*bandSplitParams.cutoff3, *this, pluginState, hcp),
       spectrumTasks (splitterSpectrumTasks)
 {
     addMouseListener (this, true);
@@ -104,7 +104,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
 
     addAndMakeVisible (cutoffSlider);
     addChildComponent (cutoff2Slider);
-    addChildComponent(cutoff3Slider);
+    addChildComponent (cutoff3Slider);
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
     cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
 
@@ -180,7 +180,8 @@ void BandSplitterPlot::updateCutoffFrequency()
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3, 4, 5
     {
         //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2, bands 5 & 6 assigned cutoff 3 - this will be the current cutoff frequency in Hz
-        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands/2 ? bandSplitterParams.cutoff2 : bandSplitterParams.cutoff3;
+        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands / 2 ? bandSplitterParams.cutoff2
+                                                                                                                     : bandSplitterParams.cutoff3;
         setCutoffParameter (bandIndex, cutoffParam->get());
         updateFilterPlotPath (bandIndex);
     }
@@ -214,10 +215,10 @@ void BandSplitterPlot::updateFilterSlope()
     setFilterType (4, lowBandFilterType);
     setFilterType (5, highBandFilterType);
 
-
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands/2 ? bandSplitterParams.cutoff2 : bandSplitterParams.cutoff3;
+        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands / 2 ? bandSplitterParams.cutoff2
+                                                                                                                     : bandSplitterParams.cutoff3;
 
         setCutoffParameter (bandIndex, cutoffParam->get());
         setQParameter (bandIndex, 0.5f);
@@ -355,9 +356,9 @@ void BandSplitterPlot::setSpectrumColours()
                 analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (255, 215, 0).brighter();
                 break;
             case SpectrumBandID::HighMid:
-                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB(0x00, 0xFF, 0x7F).withAlpha(0.4f);
-                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB(0x00, 0x80, 0x80).withAlpha(0.4f);
-                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB(0x00, 0xE5, 0xFF).brighter();
+                analyser->postEQDrawOptions.gradientEndColour = juce::Colour::fromRGB (0x00, 0xFF, 0x7F).withAlpha (0.4f);
+                analyser->postEQDrawOptions.gradientStartColour = juce::Colour::fromRGB (0x00, 0x80, 0x80).withAlpha (0.4f);
+                analyser->postEQDrawOptions.lineColour = juce::Colour::fromRGB (0x00, 0xE5, 0xFF).brighter();
                 break;
         }
     }

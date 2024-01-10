@@ -26,8 +26,8 @@ juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()
         .withOutput ("Band-Split (Low)", juce::AudioChannelSet::stereo(), true)
         .withOutput ("Band-Split (Mid)", juce::AudioChannelSet::stereo(), true)
         .withOutput ("Band-Split (High)", juce::AudioChannelSet::stereo(), true)
-        .withOutput("Band-Split (LowMid", juce::AudioChannelSet::stereo(), true)
-        .withOutput("Band-Split (HighMid", juce::AudioChannelSet::stereo(), true);
+        .withOutput ("Band-Split (LowMid", juce::AudioChannelSet::stereo(), true)
+        .withOutput ("Band-Split (HighMid", juce::AudioChannelSet::stereo(), true);
 }
 
 bool ChowMultiTool::isBusesLayoutSupported (const BusesLayout& layout) const

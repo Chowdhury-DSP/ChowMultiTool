@@ -15,7 +15,7 @@ BandSplitterEditor::BandSplitterEditor (State& pluginState,
                         spectrumTasks),
       slopePicker (pluginState, *params.slope),
       extraState (bandSplitterExtraState),
-      triStateButton(*params.threeBandOnOff, *params.fourBandOnOff)
+      triStateButton (*params.threeBandOnOff, *params.fourBandOnOff)
 {
     addAndMakeVisible (bandSplitterPlot);
     addAndMakeVisible (slopePicker);
@@ -47,12 +47,13 @@ void BandSplitterEditor::resized()
     triStateButton.setBounds (getWidth() - pad - dim, pad, dim, dim);
 }
 
-BandSplitterEditor::TriStateButton::TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff) : juce::Button("TriState"),
-                                                                                                                                     threeBandOnOffParam(threeBandOnOff),
+BandSplitterEditor::TriStateButton::TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff) : juce::Button ("TriState"),
+                                                                                                                                     threeBandOnOffParam (threeBandOnOff),
                                                                                                                                      fourBandOnOffParam (fourBandOnOff),
-                                                                                                                                     triStateButtonAttachment(threeBandOnOff,fourBandOnOff,*this,currentState)
+                                                                                                                                     triStateButtonAttachment (threeBandOnOff, fourBandOnOff, *this, currentState)
 {
-    currentState = (threeBandOnOffParam.get() && fourBandOnOffParam.get()) ? std::make_pair(BandState::FourBands, 4) : threeBandOnOffParam.get() ? std::make_pair(BandState::ThreeBands, 3) : std::make_pair(BandState::TwoBands, 2);
+    currentState = (threeBandOnOffParam.get() && fourBandOnOffParam.get()) ? std::make_pair (BandState::FourBands, 4) : threeBandOnOffParam.get() ? std::make_pair (BandState::ThreeBands, 3)
+                                                                                                                                                  : std::make_pair (BandState::TwoBands, 2);
 }
 
 void BandSplitterEditor::TriStateButton::paintButton (juce::Graphics& g, bool, bool)
@@ -62,7 +63,7 @@ void BandSplitterEditor::TriStateButton::paintButton (juce::Graphics& g, bool, b
 
     g.setFont (juce::Font { fonts->robotoBold }.withHeight ((float) getHeight()));
     g.setColour (colours::linesColour);
-    const auto text  = std::to_string(currentState.second);
+    const auto text = std::to_string (currentState.second);
     const auto pad = proportionOfWidth (0.2f);
     g.drawFittedText (text, getLocalBounds().reduced (pad), juce::Justification::centred, 1);
 }

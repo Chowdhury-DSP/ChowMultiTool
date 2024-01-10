@@ -31,7 +31,6 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
 
-
     lowSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     midSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     highSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
@@ -56,8 +55,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     if (bufferLow.getReadPointer (0) == nullptr
         || bufferMid.getReadPointer (0) == nullptr
         || bufferHigh.getReadPointer (0) == nullptr
-        || bufferLowMid.getReadPointer(0) == nullptr
-        || bufferHighMid.getReadPointer(0) == nullptr)
+        || bufferLowMid.getReadPointer (0) == nullptr
+        || bufferHighMid.getReadPointer (0) == nullptr)
         return;
 
     const auto processTwoBandFilter = [&] (auto& filter)
@@ -75,10 +74,10 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
 
     const auto processFourBandFilter = [&] (auto& filter)
     {
-        filter.setCrossoverFrequency(0, params.cutoff->getCurrentValue());
-        filter.setCrossoverFrequency(1, params.cutoff2->getCurrentValue());
-        filter.setCrossoverFrequency(2, params.cutoff3->getCurrentValue());
-        filter.processBlock (bufferIn, {bufferLow, bufferLowMid, bufferHighMid, bufferHigh});
+        filter.setCrossoverFrequency (0, params.cutoff->getCurrentValue());
+        filter.setCrossoverFrequency (1, params.cutoff2->getCurrentValue());
+        filter.setCrossoverFrequency (2, params.cutoff3->getCurrentValue());
+        filter.processBlock (bufferIn, { bufferLow, bufferLowMid, bufferHighMid, bufferHigh });
     };
 
     const auto processCrossover = [&] (auto& bandFilters, auto& processFilter)
@@ -103,8 +102,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
             lowSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
-            lowMidSpectrumAnalyserTask.processBlockInput(bufferLowMid.toAudioBuffer());
-            highMidSpectrumAnalyserTask.processBlockInput(bufferHighMid.toAudioBuffer());
+            lowMidSpectrumAnalyserTask.processBlockInput (bufferLowMid.toAudioBuffer());
+            highMidSpectrumAnalyserTask.processBlockInput (bufferHighMid.toAudioBuffer());
             highSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
         }
     }

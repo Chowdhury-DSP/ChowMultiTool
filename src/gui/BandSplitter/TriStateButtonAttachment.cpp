@@ -1,6 +1,6 @@
-#include <pch.h>
 #include "TriStateButtonAttachment.h"
 #include "BandSplitterEditor.h"
+#include <pch.h>
 
 namespace gui::band_splitter
 {

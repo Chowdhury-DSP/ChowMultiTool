@@ -33,7 +33,7 @@ private:
 
     struct TriStateButton : public juce::Button
     {
-        TriStateButton(chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff);
+        TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff);
         void paintButton (juce::Graphics& g, bool, bool) override;
         chowdsp::BoolParameter& threeBandOnOffParam;
         chowdsp::BoolParameter& fourBandOnOffParam;
