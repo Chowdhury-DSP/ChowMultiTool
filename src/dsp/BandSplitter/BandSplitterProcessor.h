@@ -18,7 +18,7 @@ struct Params : chowdsp::ParamHolder
 {
     Params()
     {
-        add (slope, cutoff, cutoff2, threeBandOnOff);
+        add (slope, cutoff, cutoff2, cutoff3, threeBandOnOff, fourBandOnOff);
     }
 
     chowdsp::EnumChoiceParameter<Slope>::Ptr slope {
@@ -42,18 +42,22 @@ struct Params : chowdsp::ParamHolder
         6000.0f
     };
 
-    //for use when we have 4 bands
-    //    chowdsp::FreqHzParameter::Ptr cutoff3{
-    //        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_0_0 },
-    //        "Band Splitter Cutoff 3",
-    //        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
-    //        10000.0f
-    //    };
+    chowdsp::FreqHzParameter::Ptr cutoff3 {
+        juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_1_0 },
+        "Band Splitter Cutoff 3",
+        chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
+        10000.0f
+    };
 
-    //change from bool to choice parameter when adding a 4th band
     chowdsp::BoolParameter::Ptr threeBandOnOff {
         juce::ParameterID { "band_split_3band_on", ParameterVersionHints::version1_0_0 },
         "Band Splitter 3-Band",
+        false
+    };
+
+    chowdsp::BoolParameter::Ptr fourBandOnOff {
+        juce::ParameterID { "band_split_4band_on", ParameterVersionHints::version1_1_0 },
+        "Band Splitter 4-Band",
         false
     };
 };
@@ -69,6 +73,8 @@ enum class SpectrumBandID : size_t
     Low = 0,
     Mid,
     High,
+    LowMid,
+    HighMid,
 };
 using BandSplitterSpectrumTasks = chowdsp::SmallMap<SpectrumBandID, gui::SpectrumAnalyserTask*>;
 
@@ -81,7 +87,9 @@ public:
     void processBlock (const chowdsp::BufferView<const float>& bufferIn,
                        const chowdsp::BufferView<float>& bufferLow,
                        const chowdsp::BufferView<float>& bufferMid,
-                       const chowdsp::BufferView<float>& bufferHigh);
+                       const chowdsp::BufferView<float>& bufferHigh,
+                       const chowdsp::BufferView<float>& bufferLowMid,
+                       const chowdsp::BufferView<float>& bufferHighMid);
 
     BandSplitterSpectrumTasks& getAnalyzerTasks() { return analyzerTasks; }
 
@@ -107,9 +115,20 @@ private:
         chowdsp::ThreeWayCrossoverFilter<float, 12> filter12;
     } threeBandFilters {};
 
+    struct FourBandFilters
+    {
+        chowdsp::CrossoverFilter<float, 1, 4> filter1;
+        chowdsp::CrossoverFilter<float, 2, 4> filter2;
+        chowdsp::CrossoverFilter<float, 4, 4> filter4;
+        chowdsp::CrossoverFilter<float, 8, 4> filter8;
+        chowdsp::CrossoverFilter<float, 12, 4> filter12;
+    } fourBandFilters {};
+
     gui::SpectrumAnalyserTask lowSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask midSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask highSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask lowMidSpectrumAnalyserTask;
+    gui::SpectrumAnalyserTask highMidSpectrumAnalyserTask;
     BandSplitterSpectrumTasks analyzerTasks {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterProcessor)

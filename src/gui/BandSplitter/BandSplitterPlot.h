@@ -47,7 +47,7 @@ private:
         chowdsp::EQ::EqualizerPlot& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
-    } cutoffSlider, cutoff2Slider; //add another slider here for 4 band
+    } cutoffSlider, cutoff2Slider, cutoff3Slider;
 
     dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks;
     chowdsp::SmallMap<dsp::band_splitter::SpectrumBandID, std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers;
