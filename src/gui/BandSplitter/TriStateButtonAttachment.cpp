@@ -6,9 +6,16 @@ namespace gui::band_splitter
 {
 TriStateButtonAttachment::TriStateButtonAttachment (chowdsp::BoolParameter& threeBandParam,
                                                     chowdsp::BoolParameter& fourBandParam,
+                                                    chowdsp::PluginState& pluginState,
                                                     juce::Button& triStateButton,
                                                     std::pair<BandState, int>& currentState)
-    : bandStateButton (&triStateButton), currentState (currentState), threeBandParam (threeBandParam), fourBandParam (fourBandParam)
+    : threeBandAttachment(threeBandParam, pluginState, [this](bool threeBandOn) { updateButtonState(); }),
+      fourBandAttachment(fourBandParam, pluginState, [this](bool fourBandOn) { updateButtonState(); }),
+      bandStateButton (&triStateButton),
+      um(pluginState.undoManager),
+      currentState (currentState),
+      threeBandParam (threeBandParam),
+      fourBandParam (fourBandParam)
 {
     updateButtonState();
     bandStateButton->addListener (this);
@@ -29,6 +36,7 @@ void TriStateButtonAttachment::updateButtonState()
         currentState = std::make_pair (BandState::ThreeBands, 3);
     else
         currentState = std::make_pair (BandState::FourBands, 4);
+    bandStateButton->repaint();
 }
 
 void TriStateButtonAttachment::buttonClicked (juce::Button* button)
@@ -38,21 +46,21 @@ void TriStateButtonAttachment::buttonClicked (juce::Button* button)
 
     if (currentState.first == BandState::TwoBands)
     {
-        currentState = std::make_pair (BandState::ThreeBands, 3);
         threeBandParam.setValueNotifyingHost (true);
         fourBandParam.setValueNotifyingHost (false);
     }
     else if (currentState.first == BandState::ThreeBands)
     {
-        currentState = std::make_pair (BandState::FourBands, 4);
         threeBandParam.setValueNotifyingHost (true);
         fourBandParam.setValueNotifyingHost (true);
     }
     else if (currentState.first == BandState::FourBands)
     {
-        currentState = std::make_pair (BandState::TwoBands, 2);
         threeBandParam.setValueNotifyingHost (false);
         fourBandParam.setValueNotifyingHost (false);
     }
+
+    threeBandAttachment.setValueAsCompleteGesture(threeBandParam.get(), um);
+    fourBandAttachment.setValueAsCompleteGesture(fourBandParam.get(), um);
 }
 } // namespace gui::band_splitter

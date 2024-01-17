@@ -15,7 +15,7 @@ BandSplitterEditor::BandSplitterEditor (State& pluginState,
                         spectrumTasks),
       slopePicker (pluginState, *params.slope),
       extraState (bandSplitterExtraState),
-      triStateButton (*params.threeBandOnOff, *params.fourBandOnOff)
+      triStateButton (*params.threeBandOnOff, *params.fourBandOnOff, pluginState)
 {
     addAndMakeVisible (bandSplitterPlot);
     addAndMakeVisible (slopePicker);
@@ -47,10 +47,10 @@ void BandSplitterEditor::resized()
     triStateButton.setBounds (getWidth() - pad - dim, pad, dim, dim);
 }
 
-BandSplitterEditor::TriStateButton::TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff) : juce::Button ("TriState"),
+BandSplitterEditor::TriStateButton::TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff, State& pluginState) : juce::Button ("TriState"),
                                                                                                                                      threeBandOnOffParam (threeBandOnOff),
                                                                                                                                      fourBandOnOffParam (fourBandOnOff),
-                                                                                                                                     triStateButtonAttachment (threeBandOnOff, fourBandOnOff, *this, currentState)
+                                                                                                                                     triStateButtonAttachment (threeBandOnOff, fourBandOnOff, pluginState, *this, currentState)
 {
     currentState = (threeBandOnOffParam.get() && fourBandOnOffParam.get()) ? std::make_pair (BandState::FourBands, 4) : threeBandOnOffParam.get() ? std::make_pair (BandState::ThreeBands, 3)
                                                                                                                                                   : std::make_pair (BandState::TwoBands, 2);

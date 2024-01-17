@@ -46,7 +46,7 @@ struct Params : chowdsp::ParamHolder
         juce::ParameterID { "band_split_cutoff3", ParameterVersionHints::version1_1_0 },
         "Band Splitter Cutoff 3",
         chowdsp::ParamUtils::createNormalisableRange (20.0f, 20000.0f, 2000.0f),
-        10000.0f
+        15000.0f
     };
 
     chowdsp::BoolParameter::Ptr threeBandOnOff {

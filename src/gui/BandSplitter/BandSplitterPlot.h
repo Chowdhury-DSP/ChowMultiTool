@@ -25,6 +25,7 @@ private:
     void updateCutoffFrequency();
     void updateFilterSlope();
     void updateSpectrumPlots();
+    std::function<const chowdsp::FreqHzParameter::Ptr&(int)> getCutoffParam;
 
     const dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;

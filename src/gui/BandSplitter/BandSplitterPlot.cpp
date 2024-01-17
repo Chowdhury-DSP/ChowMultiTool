@@ -111,6 +111,15 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
         setFilterActive (bandIndex, true);
 
+    getCutoffParam = [this](int bandIndex) -> const chowdsp::FreqHzParameter::Ptr& {
+        if (bandIndex < (numBands / 3))
+            return bandSplitterParams.cutoff;
+        else if (bandIndex <= numBands / 2)
+            return bandSplitterParams.cutoff2;
+        else
+            return bandSplitterParams.cutoff3;
+    };
+
     callbacks +=
         {
             pluginState.addParameterListener (*bandSplitterParams.cutoff,
@@ -179,10 +188,7 @@ void BandSplitterPlot::updateCutoffFrequency()
 {
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3, 4, 5
     {
-        //bands 1 & 2 assigned cutoff 1, bands 2 & 3 assigned cutoff 2, bands 5 & 6 assigned cutoff 3 - this will be the current cutoff frequency in Hz
-        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands / 2 ? bandSplitterParams.cutoff2
-                                                                                                                     : bandSplitterParams.cutoff3;
-        setCutoffParameter (bandIndex, cutoffParam->get());
+        setCutoffParameter (bandIndex, getCutoffParam(bandIndex)->get());
         updateFilterPlotPath (bandIndex);
     }
 }
@@ -217,10 +223,7 @@ void BandSplitterPlot::updateFilterSlope()
 
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        const auto& cutoffParam = bandIndex < (numBands / 3) ? bandSplitterParams.cutoff : bandIndex <= numBands / 2 ? bandSplitterParams.cutoff2
-                                                                                                                     : bandSplitterParams.cutoff3;
-
-        setCutoffParameter (bandIndex, cutoffParam->get());
+        setCutoffParameter (bandIndex, getCutoffParam(bandIndex)->get());
         setQParameter (bandIndex, 0.5f);
         updateFilterPlotPath (bandIndex);
     }
@@ -251,7 +254,6 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
         g.strokePath (getPath (2), juce::PathStrokeType { 2.0f });
         g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
     }
-
     if (bandSplitterParams.fourBandOnOff->get())
     {
         g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });

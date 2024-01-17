@@ -109,6 +109,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     }
     else if (params.threeBandOnOff->get())
     {
+        bufferLowMid.clear();
+        bufferHighMid.clear();
         processCrossover (threeBandFilters, processThreeBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
@@ -120,6 +122,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     else
     {
         bufferMid.clear();
+        bufferLowMid.clear();
+        bufferHighMid.clear();
         processCrossover (twoBandFilters, processTwoBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
