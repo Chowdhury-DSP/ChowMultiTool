@@ -14,6 +14,13 @@ enum class Slope
     m72_dBpOct = 16,
 };
 
+enum class BandState
+{
+    TwoBands,
+    ThreeBands,
+    FourBands,
+};
+
 struct Params : chowdsp::ParamHolder
 {
     Params()
@@ -60,6 +67,17 @@ struct Params : chowdsp::ParamHolder
         "Band Splitter 4-Band",
         false
     };
+
+    BandState getCurrentBandState() const
+    {
+        if (fourBandOnOff->get())
+            return BandState::FourBands;
+
+        if (threeBandOnOff->get())
+            return BandState::ThreeBands;
+
+        return BandState::TwoBands;
+    }
 };
 
 struct ExtraState

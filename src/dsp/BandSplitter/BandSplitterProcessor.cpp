@@ -95,6 +95,7 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
             processFilter (bandFilters.filter12);
     };
 
+    const auto currentBandState = getCurrentBandState();
     if (params.fourBandOnOff->get())
     {
         bufferMid.clear();

@@ -50,9 +50,9 @@ void BandSplitterEditor::resized()
 BandSplitterEditor::TriStateButton::TriStateButton (State& pluginState) : juce::Button ("TriState"),
                                                                           triStateButtonAttachment (pluginState, *this, currentState)
 {
-    currentState = (pluginState.params.bandSplitParams->threeBandOnOff.get() && pluginState.params.bandSplitParams->fourBandOnOff.get()) ? std::make_pair (BandState::FourBands, 4)
-                   : pluginState.params.bandSplitParams->threeBandOnOff.get()                                                            ? std::make_pair (BandState::ThreeBands, 3)
-                                                                                                                                         : std::make_pair (BandState::TwoBands, 2);
+    currentState = (pluginState.params.bandSplitParams->threeBandOnOff->get() && pluginState.params.bandSplitParams->fourBandOnOff->get()) ? std::make_pair (BandState::FourBands, 4)
+                   : pluginState.params.bandSplitParams->threeBandOnOff->get()                                                             ? std::make_pair (BandState::ThreeBands, 3)
+                                                                                                                                           : std::make_pair (BandState::TwoBands, 2);
 }
 
 void BandSplitterEditor::TriStateButton::paintButton (juce::Graphics& g, bool, bool)

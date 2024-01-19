@@ -8,12 +8,6 @@
 
 namespace gui::band_splitter
 {
-enum class BandState
-{
-    TwoBands,
-    ThreeBands,
-    FourBands,
-};
 class BandSplitterEditor : public juce::Component
 {
 public:

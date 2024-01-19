@@ -39,6 +39,42 @@ void TriStateButtonAttachment::updateButtonState()
     bandStateButton->repaint();
 }
 
+void TriStateButtonAttachment::setParametersFromUI (BandState newBandState)
+{
+    auto setParameter = [this] (chowdsp::BoolParameter& param, bool newValue)
+    {
+        if (param.get() == newValue)
+            return;
+
+        um->perform (
+            new chowdsp::ParameterAttachmentHelpers::ParameterChangeAction (
+                param,
+                chowdsp::ParameterTypeHelpers::getValue (param),
+                newValue));
+
+        param.beginChangeGesture();
+        chowdsp::ParameterTypeHelpers::setValue (newValue, param);
+        param.endChangeGesture();
+    };
+
+    um->beginNewTransaction();
+    if (newBandState == BandState::TwoBands)
+    {
+        setParameter (*threeBandAttachment.param, false);
+        setParameter (*fourBandAttachment.param, false);
+    }
+    else if (newBandState == BandState::ThreeBands)
+    {
+        setParameter (*threeBandAttachment.param, true);
+        setParameter (*fourBandAttachment.param, false);
+    }
+    else if (newBandState == BandState::FourBands)
+    {
+        setParameter (*threeBandAttachment.param, true);
+        setParameter (*fourBandAttachment.param, true);
+    }
+}
+
 void TriStateButtonAttachment::buttonClicked (juce::Button* button)
 {
     if (button != bandStateButton)
@@ -46,18 +82,15 @@ void TriStateButtonAttachment::buttonClicked (juce::Button* button)
 
     if (currentState.first == BandState::TwoBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture (true, um);
-        fourBandAttachment.setValueAsCompleteGesture (false, um);
+        setParametersFromUI (BandState::ThreeBands);
     }
     else if (currentState.first == BandState::ThreeBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture (true, um);
-        fourBandAttachment.setValueAsCompleteGesture (true, um);
+        setParametersFromUI (BandState::FourBands);
     }
     else if (currentState.first == BandState::FourBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture (false, um);
-        fourBandAttachment.setValueAsCompleteGesture (false, um);
+        setParametersFromUI (BandState::TwoBands);
     }
 }
 } // namespace gui::band_splitter

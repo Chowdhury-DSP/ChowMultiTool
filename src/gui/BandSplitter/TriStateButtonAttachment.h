@@ -1,9 +1,15 @@
 #pragma once
 
 #include "state/PluginState.h"
-namespace gui::band_splitter
+
+namespace dsp::band_splitter
 {
 enum class BandState;
+}
+
+namespace gui::band_splitter
+{
+using BandState = dsp::band_splitter::BandState;
 class TriStateButtonAttachment : public juce::Button::Listener
 {
 public:
@@ -17,6 +23,8 @@ public:
 
 private:
     void buttonClicked (juce::Button* button) override;
+
+    void setParametersFromUI (BandState newBandState);
 
     chowdsp::BoolParameter& threeBandParam;
     chowdsp::BoolParameter& fourBandParam;
