@@ -33,10 +33,10 @@ private:
 
     struct TriStateButton : public juce::Button
     {
-        TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff, State& pluginState);
+        TriStateButton (State& pluginState);
         void paintButton (juce::Graphics& g, bool, bool) override;
-        chowdsp::BoolParameter& threeBandOnOffParam;
-        chowdsp::BoolParameter& fourBandOnOffParam;
+//        chowdsp::BoolParameter& threeBandOnOffParam;
+//        chowdsp::BoolParameter& fourBandOnOffParam;
         gui::SharedFonts fonts;
         TriStateButtonAttachment triStateButtonAttachment;
         std::pair<BandState, int> currentState;

@@ -15,7 +15,7 @@ BandSplitterEditor::BandSplitterEditor (State& pluginState,
                         spectrumTasks),
       slopePicker (pluginState, *params.slope),
       extraState (bandSplitterExtraState),
-      triStateButton (*params.threeBandOnOff, *params.fourBandOnOff, pluginState)
+      triStateButton (pluginState)
 {
     addAndMakeVisible (bandSplitterPlot);
     addAndMakeVisible (slopePicker);
@@ -47,13 +47,12 @@ void BandSplitterEditor::resized()
     triStateButton.setBounds (getWidth() - pad - dim, pad, dim, dim);
 }
 
-BandSplitterEditor::TriStateButton::TriStateButton (chowdsp::BoolParameter& threeBandOnOff, chowdsp::BoolParameter& fourBandOnOff, State& pluginState) : juce::Button ("TriState"),
-                                                                                                                                     threeBandOnOffParam (threeBandOnOff),
-                                                                                                                                     fourBandOnOffParam (fourBandOnOff),
-                                                                                                                                     triStateButtonAttachment (threeBandOnOff, fourBandOnOff, pluginState, *this, currentState)
+BandSplitterEditor::TriStateButton::TriStateButton (State& pluginState) : juce::Button ("TriState"),
+                                                                          triStateButtonAttachment (pluginState, *this, currentState)
 {
-    currentState = (threeBandOnOffParam.get() && fourBandOnOffParam.get()) ? std::make_pair (BandState::FourBands, 4) : threeBandOnOffParam.get() ? std::make_pair (BandState::ThreeBands, 3)
-                                                                                                                                                  : std::make_pair (BandState::TwoBands, 2);
+    currentState = (pluginState.params.bandSplitParams->threeBandOnOff.get() && pluginState.params.bandSplitParams->fourBandOnOff.get()) ? std::make_pair (BandState::FourBands, 4)
+                                                                              : pluginState.params.bandSplitParams->threeBandOnOff.get() ? std::make_pair (BandState::ThreeBands, 3)
+                                                                                                                                         : std::make_pair (BandState::TwoBands, 2);
 }
 
 void BandSplitterEditor::TriStateButton::paintButton (juce::Graphics& g, bool, bool)

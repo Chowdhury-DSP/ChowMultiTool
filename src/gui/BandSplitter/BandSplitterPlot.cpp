@@ -111,15 +111,6 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
         setFilterActive (bandIndex, true);
 
-    getCutoffParam = [this](int bandIndex) -> const chowdsp::FreqHzParameter::Ptr& {
-        if (bandIndex < (numBands / 3))
-            return bandSplitterParams.cutoff;
-        else if (bandIndex <= numBands / 2)
-            return bandSplitterParams.cutoff2;
-        else
-            return bandSplitterParams.cutoff3;
-    };
-
     callbacks +=
         {
             pluginState.addParameterListener (*bandSplitterParams.cutoff,
@@ -188,7 +179,7 @@ void BandSplitterPlot::updateCutoffFrequency()
 {
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex) //bands 0, 1, 2, 3, 4, 5
     {
-        setCutoffParameter (bandIndex, getCutoffParam(bandIndex)->get());
+        setCutoffParameter (bandIndex, getCutoffParam(bandIndex, bandSplitterParams)->get());
         updateFilterPlotPath (bandIndex);
     }
 }
@@ -223,7 +214,7 @@ void BandSplitterPlot::updateFilterSlope()
 
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
     {
-        setCutoffParameter (bandIndex, getCutoffParam(bandIndex)->get());
+        setCutoffParameter (bandIndex, getCutoffParam(bandIndex, bandSplitterParams)->get());
         setQParameter (bandIndex, 0.5f);
         updateFilterPlotPath (bandIndex);
     }
@@ -249,16 +240,15 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
     g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
     g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
 
-    if (bandSplitterParams.threeBandOnOff->get())
-    {
+    if (bandSplitterParams.threeBandOnOff->get()) {
         g.strokePath (getPath (2), juce::PathStrokeType { 2.0f });
         g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
     }
-    if (bandSplitterParams.fourBandOnOff->get())
-    {
+    if (bandSplitterParams.fourBandOnOff->get()) {
         g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });
         g.strokePath (getPath (5), juce::PathStrokeType { 2.0f });
     }
+
 }
 
 void BandSplitterPlot::resized()
@@ -365,4 +355,13 @@ void BandSplitterPlot::setSpectrumColours()
         }
     }
 }
+const chowdsp::FreqHzParameter::Ptr& BandSplitterPlot::getCutoffParam (int bandIndex, const dsp::band_splitter::Params& bandParams)
+{
+    if (bandIndex < (numBands / 3))
+        return bandParams.cutoff;
+    else if (bandIndex <= numBands / 2)
+        return bandParams.cutoff2;
+    else
+        return bandParams.cutoff3;
+};
 } // namespace gui::band_splitter
