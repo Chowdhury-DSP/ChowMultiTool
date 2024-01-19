@@ -134,14 +134,16 @@ void MultiToolProcessor::processBlock (juce::AudioBuffer<float>& buffer, const j
                                          if constexpr (std::is_same_v<ToolType, band_splitter::BandSplitterProcessor>)
                                          {
                                              const auto outputBusCount = plugin.getBusCount (false);
-                                             if (outputBusCount != 4 || buffer.getNumChannels() < 4)
+                                             if (outputBusCount != 6 || buffer.getNumChannels() < 6)
                                                  return;
 
                                              const auto inBuffer = plugin.getBusBuffer (buffer, true, 0);
                                              auto lowBuffer = plugin.getBusBuffer (buffer, false, 1);
                                              auto midBuffer = plugin.getBusBuffer (buffer, false, 2);
                                              auto highBuffer = plugin.getBusBuffer (buffer, false, 3);
-                                             tool.processBlock (inBuffer, lowBuffer, midBuffer, highBuffer);
+                                             auto lowMidBuffer = plugin.getBusBuffer (buffer, false, 4);
+                                             auto highMidBuffer = plugin.getBusBuffer (buffer, false, 5);
+                                             tool.processBlock (inBuffer, lowBuffer, midBuffer, highBuffer, lowMidBuffer, highMidBuffer);
                                          }
                                          else if constexpr (std::is_same_v<ToolType, svf::SVFProcessor>)
                                          {
