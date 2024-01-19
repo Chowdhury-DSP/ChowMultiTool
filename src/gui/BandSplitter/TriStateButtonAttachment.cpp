@@ -9,8 +9,10 @@ TriStateButtonAttachment::TriStateButtonAttachment (State& pluginState,
                                                     std::pair<BandState, int>& currentState)
     : threeBandParam (pluginState.params.bandSplitParams->threeBandOnOff),
       fourBandParam (pluginState.params.bandSplitParams->fourBandOnOff),
-      threeBandAttachment(threeBandParam, pluginState, [this](bool threeBandOn) { updateButtonState(); }),
-      fourBandAttachment(fourBandParam, pluginState, [this](bool fourBandOn) { updateButtonState(); }),
+      threeBandAttachment (threeBandParam, pluginState, [this] (bool threeBandOn)
+                           { updateButtonState(); }),
+      fourBandAttachment (fourBandParam, pluginState, [this] (bool fourBandOn)
+                          { updateButtonState(); }),
       bandStateButton (&triStateButton),
       um (pluginState.undoManager),
       currentState (currentState)
@@ -44,18 +46,18 @@ void TriStateButtonAttachment::buttonClicked (juce::Button* button)
 
     if (currentState.first == BandState::TwoBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture(true, um);
-        fourBandAttachment.setValueAsCompleteGesture(false, um);
+        threeBandAttachment.setValueAsCompleteGesture (true, um);
+        fourBandAttachment.setValueAsCompleteGesture (false, um);
     }
     else if (currentState.first == BandState::ThreeBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture(true, um);
-        fourBandAttachment.setValueAsCompleteGesture(true, um);
+        threeBandAttachment.setValueAsCompleteGesture (true, um);
+        fourBandAttachment.setValueAsCompleteGesture (true, um);
     }
     else if (currentState.first == BandState::FourBands)
     {
-        threeBandAttachment.setValueAsCompleteGesture(false, um);
-        fourBandAttachment.setValueAsCompleteGesture(false, um);
+        threeBandAttachment.setValueAsCompleteGesture (false, um);
+        fourBandAttachment.setValueAsCompleteGesture (false, um);
     }
 }
 } // namespace gui::band_splitter
