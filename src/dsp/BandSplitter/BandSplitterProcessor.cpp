@@ -95,8 +95,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
             processFilter (bandFilters.filter12);
     };
 
-    const auto currentBandState = getCurrentBandState();
-    if (params.fourBandOnOff->get())
+    const auto currentBandState = params.getCurrentBandState();
+    if (currentBandState == BandState::FourBands)
     {
         bufferMid.clear();
         processCrossover (fourBandFilters, processFourBandFilter);
@@ -108,7 +108,7 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
             highSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
         }
     }
-    else if (params.threeBandOnOff->get())
+    else if (currentBandState == BandState::ThreeBands)
     {
         bufferLowMid.clear();
         bufferHighMid.clear();
