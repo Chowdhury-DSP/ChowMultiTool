@@ -27,7 +27,7 @@ private:
     void updateSpectrumPlots();
     static const chowdsp::FreqHzParameter::Ptr& getCutoffParam (int bandIndex, const dsp::band_splitter::Params& params);
 
-    const dsp::band_splitter::Params& bandSplitterParams;
+    dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;
     chowdsp::ScopedCallbackList callbacks;
 
