@@ -141,9 +141,9 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
-                                                  if (bandSplitterParams.fourBandOnOff->get() && !bandSplitterParams.threeBandOnOff->get())
+                                                  if (bandSplitterParams.fourBandOnOff->get() && ! bandSplitterParams.threeBandOnOff->get())
                                                   {
-                                                      bandSplitterParams.fourBandOnOff->setValueNotifyingHost(false);
+                                                      bandSplitterParams.fourBandOnOff->setValueNotifyingHost (false);
                                                       cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
                                                   }
                                                   cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
@@ -154,10 +154,10 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
-                                                  if (bandSplitterParams.fourBandOnOff->get() && !bandSplitterParams.threeBandOnOff->get())
+                                                  if (bandSplitterParams.fourBandOnOff->get() && ! bandSplitterParams.threeBandOnOff->get())
                                                   {
-                                                      bandSplitterParams.threeBandOnOff->setValueNotifyingHost(true);
-                                                      cutoff2Slider.setVisible(bandSplitterParams.threeBandOnOff->get());
+                                                      bandSplitterParams.threeBandOnOff->setValueNotifyingHost (true);
+                                                      cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
                                                   }
                                                   cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
                                                   updateSpectrumPlots();
