@@ -143,8 +143,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               [this]
                                               {
                                                   auto bandState = bandSplitterParams.getCurrentBandState();
-                                                  cutoff2Slider.setVisible (bandState == BandState::ThreeBands ||
-                                                                                         bandState == BandState::FourBands);
+                                                  cutoff2Slider.setVisible (bandState == BandState::ThreeBands || bandState == BandState::FourBands);
                                                   updateSpectrumPlots();
                                                   repaint();
                                               }),
@@ -154,8 +153,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               {
                                                   auto bandState = bandSplitterParams.getCurrentBandState();
                                                   cutoff3Slider.setVisible (bandState == BandState::FourBands);
-                                                  cutoff2Slider.setVisible (bandState == BandState ::FourBands ||
-                                                                                          bandState == BandState::ThreeBands);
+                                                  cutoff2Slider.setVisible (bandState == BandState ::FourBands || bandState == BandState::ThreeBands);
                                                   updateSpectrumPlots();
                                                   repaint();
                                               }),
