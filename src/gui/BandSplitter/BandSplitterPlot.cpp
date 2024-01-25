@@ -10,6 +10,7 @@ namespace
     constexpr int numBands = 6;
     constexpr int minFrequency = 18;
     constexpr int maxFrequency = 22'000;
+    using BandState = dsp::band_splitter::BandState;
 } // namespace
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
@@ -141,12 +142,9 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
-                                                  if (bandSplitterParams.fourBandOnOff->get() && ! bandSplitterParams.threeBandOnOff->get())
-                                                  {
-                                                      bandSplitterParams.fourBandOnOff->setValueNotifyingHost (false);
-                                                      cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
-                                                  }
-                                                  cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
+                                                  auto bandState = bandSplitterParams.getCurrentBandState();
+                                                  cutoff2Slider.setVisible (bandState == BandState::ThreeBands ||
+                                                                                         bandState == BandState::FourBands);
                                                   updateSpectrumPlots();
                                                   repaint();
                                               }),
@@ -154,12 +152,10 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                               chowdsp::ParameterListenerThread::MessageThread,
                                               [this]
                                               {
-                                                  if (bandSplitterParams.fourBandOnOff->get() && ! bandSplitterParams.threeBandOnOff->get())
-                                                  {
-                                                      bandSplitterParams.threeBandOnOff->setValueNotifyingHost (true);
-                                                      cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
-                                                  }
-                                                  cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
+                                                  auto bandState = bandSplitterParams.getCurrentBandState();
+                                                  cutoff3Slider.setVisible (bandState == BandState::FourBands);
+                                                  cutoff2Slider.setVisible (bandState == BandState ::FourBands ||
+                                                                                          bandState == BandState::ThreeBands);
                                                   updateSpectrumPlots();
                                                   repaint();
                                               }),
@@ -250,12 +246,13 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
     g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
     g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
 
-    if (bandSplitterParams.threeBandOnOff->get())
+    auto bandState = bandSplitterParams.getCurrentBandState();
+    if (bandState == BandState::FourBands || bandState == BandState::ThreeBands)
     {
         g.strokePath (getPath (2), juce::PathStrokeType { 2.0f });
         g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
     }
-    if (bandSplitterParams.fourBandOnOff->get())
+    if (bandState == BandState::FourBands)
     {
         g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });
         g.strokePath (getPath (5), juce::PathStrokeType { 2.0f });

@@ -4,6 +4,11 @@
 #include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
 
+namespace dsp::band_splitter
+{
+enum class BandState;
+}
+
 namespace gui::band_splitter
 {
 class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot
@@ -27,7 +32,7 @@ private:
     void updateSpectrumPlots();
     static const chowdsp::FreqHzParameter::Ptr& getCutoffParam (int bandIndex, const dsp::band_splitter::Params& params);
 
-    dsp::band_splitter::Params& bandSplitterParams;
+    const dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;
     chowdsp::ScopedCallbackList callbacks;
 
