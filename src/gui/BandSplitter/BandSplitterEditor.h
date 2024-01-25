@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BandSplitterPlot.h"
+#include "TriStateButtonAttachment.h"
 //#include "SlopePicker.h"
 #include "gui/Shared/ChoicePicker.h"
 #include "gui/Shared/SpectrumAnalyser.h"
@@ -24,14 +25,16 @@ private:
     ChoicePicker<dsp::band_splitter::Slope> slopePicker;
     dsp::band_splitter::ExtraState& extraState;
 
-    struct BandsButton : juce::Button
+    struct TriStateButton : public juce::Button
     {
-        BandsButton (chowdsp::BoolParameter& param, State& pluginState);
+        TriStateButton (State& pluginState);
         void paintButton (juce::Graphics& g, bool, bool) override;
-        chowdsp::ButtonAttachment attach;
-        chowdsp::BoolParameter& bandParam;
+        //        chowdsp::BoolParameter& threeBandOnOffParam;
+        //        chowdsp::BoolParameter& fourBandOnOffParam;
         gui::SharedFonts fonts;
-    } bandsButton;
+        TriStateButtonAttachment triStateButtonAttachment;
+        std::pair<BandState, int> currentState;
+    } triStateButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterEditor)
 };

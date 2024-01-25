@@ -9,6 +9,8 @@ BandSplitterProcessor::BandSplitterProcessor (const Params& bandSplitParams, con
           { SpectrumBandID::Low, &lowSpectrumAnalyserTask },
           { SpectrumBandID::Mid, &midSpectrumAnalyserTask },
           { SpectrumBandID::High, &highSpectrumAnalyserTask },
+          { SpectrumBandID::LowMid, &lowMidSpectrumAnalyserTask },
+          { SpectrumBandID::HighMid, &highMidSpectrumAnalyserTask },
       })
 {
     for (auto [_, task] : analyzerTasks)
@@ -25,24 +27,36 @@ void BandSplitterProcessor::prepare (const juce::dsp::ProcessSpec& spec)
                          [spec] (auto&& filter)
                          { filter.prepare (spec); });
 
+    pfr::for_each_field (fourBandFilters,
+                         [spec] (auto&& filter)
+                         { filter.prepare (spec); });
+
     lowSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     midSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     highSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    lowMidSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
+    highMidSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
 void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>& bufferIn,
                                           const chowdsp::BufferView<float>& bufferLow,
                                           const chowdsp::BufferView<float>& bufferMid,
-                                          const chowdsp::BufferView<float>& bufferHigh)
+                                          const chowdsp::BufferView<float>& bufferHigh,
+                                          const chowdsp::BufferView<float>& bufferLowMid,
+                                          const chowdsp::BufferView<float>& bufferHighMid)
 {
     if (bufferIn.getNumChannels() != bufferLow.getNumChannels()
         || bufferIn.getNumChannels() != bufferMid.getNumChannels()
-        || bufferIn.getNumChannels() != bufferHigh.getNumChannels())
+        || bufferIn.getNumChannels() != bufferHigh.getNumChannels()
+        || bufferIn.getNumChannels() != bufferLowMid.getNumChannels()
+        || bufferIn.getNumChannels() != bufferHighMid.getNumChannels())
         return;
 
     if (bufferLow.getReadPointer (0) == nullptr
         || bufferMid.getReadPointer (0) == nullptr
-        || bufferHigh.getReadPointer (0) == nullptr)
+        || bufferHigh.getReadPointer (0) == nullptr
+        || bufferLowMid.getReadPointer (0) == nullptr
+        || bufferHighMid.getReadPointer (0) == nullptr)
         return;
 
     const auto processTwoBandFilter = [&] (auto& filter)
@@ -56,6 +70,14 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
         filter.setLowCrossoverFrequency (params.cutoff->getCurrentValue());
         filter.setHighCrossoverFrequency (params.cutoff2->getCurrentValue());
         filter.processBlock (bufferIn, bufferLow, bufferMid, bufferHigh);
+    };
+
+    const auto processFourBandFilter = [&] (auto& filter)
+    {
+        filter.setCrossoverFrequency (0, params.cutoff->getCurrentValue());
+        filter.setCrossoverFrequency (1, params.cutoff2->getCurrentValue());
+        filter.setCrossoverFrequency (2, params.cutoff3->getCurrentValue());
+        filter.processBlock (bufferIn, { bufferLow, bufferLowMid, bufferHighMid, bufferHigh });
     };
 
     const auto processCrossover = [&] (auto& bandFilters, auto& processFilter)
@@ -73,8 +95,23 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
             processFilter (bandFilters.filter12);
     };
 
-    if (params.threeBandOnOff->get())
+    const auto currentBandState = params.getCurrentBandState();
+    if (currentBandState == BandState::FourBands)
     {
+        bufferMid.clear();
+        processCrossover (fourBandFilters, processFourBandFilter);
+        if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
+        {
+            lowSpectrumAnalyserTask.processBlockInput (bufferLow.toAudioBuffer());
+            lowMidSpectrumAnalyserTask.processBlockInput (bufferLowMid.toAudioBuffer());
+            highMidSpectrumAnalyserTask.processBlockInput (bufferHighMid.toAudioBuffer());
+            highSpectrumAnalyserTask.processBlockInput (bufferHigh.toAudioBuffer());
+        }
+    }
+    else if (currentBandState == BandState::ThreeBands)
+    {
+        bufferLowMid.clear();
+        bufferHighMid.clear();
         processCrossover (threeBandFilters, processThreeBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
@@ -86,6 +123,8 @@ void BandSplitterProcessor::processBlock (const chowdsp::BufferView<const float>
     else
     {
         bufferMid.clear();
+        bufferLowMid.clear();
+        bufferHighMid.clear();
         processCrossover (twoBandFilters, processTwoBandFilter);
         if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         {
