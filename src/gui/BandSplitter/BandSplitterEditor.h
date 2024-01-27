@@ -2,7 +2,6 @@
 
 #include "BandSplitterPlot.h"
 #include "TriStateButtonAttachment.h"
-//#include "SlopePicker.h"
 #include "gui/Shared/ChoicePicker.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 
@@ -29,8 +28,7 @@ private:
     {
         TriStateButton (State& pluginState);
         void paintButton (juce::Graphics& g, bool, bool) override;
-        //        chowdsp::BoolParameter& threeBandOnOffParam;
-        //        chowdsp::BoolParameter& fourBandOnOffParam;
+
         gui::SharedFonts fonts;
         TriStateButtonAttachment triStateButtonAttachment;
         std::pair<BandState, int> currentState;

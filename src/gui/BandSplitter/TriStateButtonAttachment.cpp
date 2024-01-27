@@ -9,9 +9,9 @@ TriStateButtonAttachment::TriStateButtonAttachment (State& pluginState,
                                                     std::pair<BandState, int>& currentState)
     : threeBandParam (pluginState.params.bandSplitParams->threeBandOnOff),
       fourBandParam (pluginState.params.bandSplitParams->fourBandOnOff),
-      threeBandAttachment (threeBandParam, pluginState, [this] (bool threeBandOn)
+      threeBandAttachment (threeBandParam, pluginState, [this] (bool)
                            { updateButtonState(); }),
-      fourBandAttachment (fourBandParam, pluginState, [this] (bool fourBandOn)
+      fourBandAttachment (fourBandParam, pluginState, [this] (bool)
                           { updateButtonState(); }),
       bandStateButton (&triStateButton),
       um (pluginState.undoManager),

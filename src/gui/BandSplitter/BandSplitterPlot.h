@@ -4,11 +4,6 @@
 #include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
 
-namespace dsp::band_splitter
-{
-enum class BandState;
-}
-
 namespace gui::band_splitter
 {
 class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot

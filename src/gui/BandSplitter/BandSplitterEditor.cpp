@@ -66,5 +66,4 @@ void BandSplitterEditor::TriStateButton::paintButton (juce::Graphics& g, bool, b
     const auto pad = proportionOfWidth (0.2f);
     g.drawFittedText (text, getLocalBounds().reduced (pad), juce::Justification::centred, 1);
 }
-
 } // namespace gui::band_splitter
