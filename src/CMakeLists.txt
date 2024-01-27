@@ -57,6 +57,7 @@ target_sources(ChowMultiTool PRIVATE
 
     gui/BandSplitter/BandSplitterEditor.cpp
     gui/BandSplitter/BandSplitterPlot.cpp
+    gui/BandSplitter/TriStateButtonAttachment.cpp
 
     gui/SignalGenerator/SignalGeneratorEditor.cpp
     gui/SignalGenerator/OscillatorController.cpp

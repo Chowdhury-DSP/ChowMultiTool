@@ -25,6 +25,7 @@ private:
     void updateCutoffFrequency();
     void updateFilterSlope();
     void updateSpectrumPlots();
+    static const chowdsp::FreqHzParameter::Ptr& getCutoffParam (int bandIndex, const dsp::band_splitter::Params& params);
 
     const dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;
@@ -47,7 +48,7 @@ private:
         chowdsp::EQ::EqualizerPlot& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
-    } cutoffSlider, cutoff2Slider; //add another slider here for 4 band
+    } cutoffSlider, cutoff2Slider, cutoff3Slider;
 
     dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks;
     chowdsp::SmallMap<dsp::band_splitter::SpectrumBandID, std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers;
