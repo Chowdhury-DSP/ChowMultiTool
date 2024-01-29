@@ -16,6 +16,16 @@ ChowMultiTool::ChowMultiTool() : chowdsp::PluginBase<State> (&undoManager, creat
 
     presetManager = std::make_unique<state::presets::PresetManager> (*this);
     programAdaptor = std::make_unique<chowdsp::presets::frontend::PresetsProgramAdapter> (presetManager);
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+    presetManager->clapPresetLoadedBroadcaster.connect (
+        [this] (uint32_t location_kind,
+                const char* location,
+                const char* load_key)
+        {
+            reportPresetLoaded (location_kind, location, load_key);
+        });
+#endif
 }
 
 juce::AudioProcessor::BusesProperties ChowMultiTool::createBusLayout()
@@ -100,7 +110,8 @@ static const clap_preset_discovery_factory chowmultitool_preset_discovery_factor
 
 const void* JUCE_CALLTYPE clapJuceExtensionCustomFactory (const char* factory_id)
 {
-    if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
+    if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0
+        || strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID_COMPAT) == 0)
     {
         return &chowmultitool_preset_discovery_factory;
     }

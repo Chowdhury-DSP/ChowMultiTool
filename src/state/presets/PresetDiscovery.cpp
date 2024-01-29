@@ -5,7 +5,7 @@
 
 namespace state::presets::discovery
 {
-static constexpr clap_plugin_id plugin_id {
+static constexpr clap_universal_plugin_id plugin_id {
     .abi = "clap",
     .id = CHOWMULTITOOL_CLAP_ID,
 };
@@ -35,7 +35,7 @@ struct FactoryPresetsProvider : chowdsp::presets::discovery::EmbeddedPresetsProv
 
     static constexpr clap_preset_discovery_location factoryPresetsLocation {
         .flags = CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT,
-        .name = "ChowMultiTool Factory Presets Location",
+        .name = "ChowMultiTool Factory Presets",
         .kind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
         .location = nullptr,
     };
@@ -57,7 +57,7 @@ struct UserPresetsProvider : chowdsp::presets::discovery::FilePresetsProvider
     static constexpr clap_preset_discovery_provider_descriptor descriptor {
         .clap_version = CLAP_VERSION_INIT,
         .id = "org.chowdsp.ChowMultiTool.user-presets",
-        .name = "ChowMultiTool User Presets Provider",
+        .name = "ChowMultiTool User Presets",
         .vendor = "User"
     };
 
