@@ -1,9 +1,9 @@
 #pragma once
 
+#include "BandSplitterChyron.h"
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
-#include "BandSplitterChyron.h"
 
 namespace gui::band_splitter
 {

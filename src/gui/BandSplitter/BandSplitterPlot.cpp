@@ -99,7 +99,7 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
       cutoff3Slider (*bandSplitParams.cutoff3, *this, pluginState, hcp),
       spectrumTasks (splitterSpectrumTasks),
-      chyron(pluginState, bandSplitParams, hcp)
+      chyron (pluginState, bandSplitParams, hcp)
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);

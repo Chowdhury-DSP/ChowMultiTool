@@ -27,10 +27,8 @@ BandSplitterChyron::BandSplitterChyron (chowdsp::PluginState& pluginState,
         };
 }
 
-
 void BandSplitterChyron::updateValues()
 {
-
     const auto reset = [this]
     {
         cutoffSliderLow.reset();
@@ -41,20 +39,20 @@ void BandSplitterChyron::updateValues()
     reset();
 
     auto bandState = bandSplitterParams.getCurrentBandState();
-    cutoffSliderLow.emplace(state, bandSplitterParams.cutoff.get(), &hostContextProvider);
-    cutoffSliderLow->setName("Cutoff Low");
+    cutoffSliderLow.emplace (state, bandSplitterParams.cutoff.get(), &hostContextProvider);
+    cutoffSliderLow->setName ("Cutoff Low");
     addAndMakeVisible (*cutoffSliderLow);
 
     if (bandState != dsp::band_splitter::BandState::TwoBands)
     {
-        cutoffSliderMid.emplace(state, bandSplitterParams.cutoff2.get(), &hostContextProvider);
-        cutoffSliderMid->setName("Cutoff Mid");
+        cutoffSliderMid.emplace (state, bandSplitterParams.cutoff2.get(), &hostContextProvider);
+        cutoffSliderMid->setName ("Cutoff Mid");
         addAndMakeVisible (*cutoffSliderMid);
     }
     if (bandState == dsp::band_splitter::BandState::FourBands)
     {
-        cutoffSliderHigh.emplace(state, bandSplitterParams.cutoff3.get(), &hostContextProvider);
-        cutoffSliderHigh->setName("Cutoff High");
+        cutoffSliderHigh.emplace (state, bandSplitterParams.cutoff3.get(), &hostContextProvider);
+        cutoffSliderHigh->setName ("Cutoff High");
         addAndMakeVisible (*cutoffSliderHigh);
     }
     resized();

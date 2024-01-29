@@ -1,9 +1,9 @@
 #pragma once
 
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
-#include "gui/Shared/TextSlider.h"
-#include "gui/Shared/Fonts.h"
 #include "gui/Shared/Colours.h"
+#include "gui/Shared/Fonts.h"
+#include "gui/Shared/TextSlider.h"
 
 namespace gui::band_splitter
 {
