@@ -3,6 +3,7 @@
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
+#include "BandSplitterChyron.h"
 
 namespace gui::band_splitter
 {
@@ -52,6 +53,7 @@ private:
 
     dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks;
     chowdsp::SmallMap<dsp::band_splitter::SpectrumBandID, std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers;
+    BandSplitterChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };

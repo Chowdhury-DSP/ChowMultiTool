@@ -98,7 +98,8 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
       cutoff2Slider (*bandSplitParams.cutoff2, *this, pluginState, hcp),
       cutoff3Slider (*bandSplitParams.cutoff3, *this, pluginState, hcp),
-      spectrumTasks (splitterSpectrumTasks)
+      spectrumTasks (splitterSpectrumTasks),
+      chyron(pluginState, bandSplitParams, hcp)
 {
     addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
@@ -169,6 +170,9 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                                                        spectrum->repaint();
                                                                    } }),
     };
+
+    addAndMakeVisible (chyron);
+    chyron.toFront (false);
 
     updateFilterSlope();
     updateSpectrumPlots();
@@ -261,6 +265,14 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 void BandSplitterPlot::resized()
 {
     chowdsp::EQ::EqualizerPlot::resized();
+
+    const auto pad = proportionOfWidth (0.005f);
+    const auto chyronWidth = proportionOfWidth (0.20f);
+    const auto chyronHeight = proportionOfWidth (0.1f);
+    chyron.setBounds (getWidth() - pad - chyronWidth,
+                      getHeight() - pad - chyronHeight - proportionOfHeight (0.075f),
+                      chyronWidth,
+                      chyronHeight);
 
     const auto bounds = getLocalBounds();
     for (auto [_, spectrum] : spectrumAnalysers)
