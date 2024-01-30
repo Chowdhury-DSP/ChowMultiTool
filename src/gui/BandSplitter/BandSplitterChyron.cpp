@@ -29,14 +29,9 @@ BandSplitterChyron::BandSplitterChyron (chowdsp::PluginState& pluginState,
 
 void BandSplitterChyron::updateValues()
 {
-    const auto reset = [this]
-    {
-        cutoffSliderLow.reset();
-        cutoffSliderMid.reset();
-        cutoffSliderHigh.reset();
-    };
-
-    reset();
+    cutoffSliderLow.reset();
+    cutoffSliderMid.reset();
+    cutoffSliderHigh.reset();
 
     auto bandState = bandSplitterParams.getCurrentBandState();
     cutoffSliderLow.emplace (state, bandSplitterParams.cutoff.get(), &hostContextProvider);
