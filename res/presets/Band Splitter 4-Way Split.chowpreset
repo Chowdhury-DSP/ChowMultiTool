@@ -2,7 +2,6 @@
     "category": "Band Splitter",
     "name": "4-Way Split",
     "plugin": "ChowMultiTool",
-    "preset_file": "/Users/jatin/Documents/Chowdhury DSP/Presets/ChowMultiTool/4-Way Split.chowpreset",
     "preset_state": {
         "preset_params": {
             "band_split_3band_on": true,
