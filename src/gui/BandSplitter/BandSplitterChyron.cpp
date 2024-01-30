@@ -46,7 +46,10 @@ void BandSplitterChyron::updateValues()
     if (bandState != dsp::band_splitter::BandState::TwoBands)
     {
         cutoffSliderMid.emplace (state, bandSplitterParams.cutoff2.get(), &hostContextProvider);
-        cutoffSliderMid->setName ("Cutoff Mid");
+        if (bandState == dsp::band_splitter::BandState::ThreeBands)
+            cutoffSliderMid->setName ("Cutoff High");
+        else
+            cutoffSliderMid->setName ("Cutoff Mid");
         addAndMakeVisible (*cutoffSliderMid);
     }
     if (bandState == dsp::band_splitter::BandState::FourBands)

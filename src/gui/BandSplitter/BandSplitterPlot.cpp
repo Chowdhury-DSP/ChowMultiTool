@@ -110,6 +110,10 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
     cutoff2Slider.setVisible (bandSplitterParams.threeBandOnOff->get());
     cutoff3Slider.setVisible (bandSplitterParams.fourBandOnOff->get());
 
+    plotComp.setInterceptsMouseClicks (false, false);
+    plotComp.parent = this;
+    addAndMakeVisible (plotComp);
+
     for (int bandIndex = 0; bandIndex < numBands; ++bandIndex)
         setFilterActive (bandIndex, true);
 
@@ -244,28 +248,13 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
                              { 0.0f },
                              colours::majorLinesColour,
                              colours::minorLinesColour);
-
-    g.setColour (colours::plotColour);
-    g.strokePath (getPath (0), juce::PathStrokeType { 2.0f });
-    g.strokePath (getPath (1), juce::PathStrokeType { 2.0f });
-
-    auto bandState = bandSplitterParams.getCurrentBandState();
-    if (bandState == BandState::FourBands || bandState == BandState::ThreeBands)
-    {
-        g.strokePath (getPath (2), juce::PathStrokeType { 2.0f });
-        g.strokePath (getPath (3), juce::PathStrokeType { 2.0f });
-    }
-    if (bandState == BandState::FourBands)
-    {
-        g.strokePath (getPath (4), juce::PathStrokeType { 2.0f });
-        g.strokePath (getPath (5), juce::PathStrokeType { 2.0f });
-    }
 }
 
 void BandSplitterPlot::resized()
 {
     chowdsp::EQ::EqualizerPlot::resized();
 
+    plotComp.setBounds (getLocalBounds());
     const auto pad = proportionOfWidth (0.005f);
     const auto chyronWidth = proportionOfWidth (0.20f);
     const auto chyronHeight = proportionOfWidth (0.1f);
@@ -383,4 +372,23 @@ const chowdsp::FreqHzParameter::Ptr& BandSplitterPlot::getCutoffParam (int bandI
     else
         return bandParams.cutoff3;
 };
+
+void BandSplitterPlot::FilterPlotComp::paint (juce::Graphics& g)
+{
+    g.setColour (colours::plotColour);
+    g.strokePath (parent->getPath (0), juce::PathStrokeType { 2.0f });
+    g.strokePath (parent->getPath (1), juce::PathStrokeType { 2.0f });
+
+    auto bandState = parent->bandSplitterParams.getCurrentBandState();
+    if (bandState == BandState::FourBands || bandState == BandState::ThreeBands)
+    {
+        g.strokePath (parent->getPath (2), juce::PathStrokeType { 2.0f });
+        g.strokePath (parent->getPath (3), juce::PathStrokeType { 2.0f });
+    }
+    if (bandState == BandState::FourBands)
+    {
+        g.strokePath (parent->getPath (4), juce::PathStrokeType { 2.0f });
+        g.strokePath (parent->getPath (5), juce::PathStrokeType { 2.0f });
+    }
+}
 } // namespace gui::band_splitter
