@@ -35,7 +35,10 @@ void BandSplitterChyron::updateValues()
 
     auto bandState = bandSplitterParams.getCurrentBandState();
     cutoffSliderLow.emplace (state, bandSplitterParams.cutoff.get(), &hostContextProvider);
-    cutoffSliderLow->setName ("Cutoff Low");
+    if (bandState == dsp::band_splitter::BandState::TwoBands)
+        cutoffSliderLow->setName ("Cutoff");
+    else
+        cutoffSliderLow->setName ("Cutoff Low");
     addAndMakeVisible (*cutoffSliderLow);
 
     if (bandState != dsp::band_splitter::BandState::TwoBands)
