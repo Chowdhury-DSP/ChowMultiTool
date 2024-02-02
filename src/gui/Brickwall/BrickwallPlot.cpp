@@ -103,11 +103,11 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                               const chowdsp::HostContextProvider& hcp,
                               SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
-          .minFrequencyHz = (float) minFrequency,
-          .maxFrequencyHz = (float) maxFrequency,
-          .minMagnitudeDB = -60.0f,
-          .maxMagnitudeDB = 6.0f,
-      }),
+        .minFrequencyHz = (float) minFrequency,
+        .maxFrequencyHz = (float) maxFrequency,
+        .minMagnitudeDB = -60.0f,
+        .maxMagnitudeDB = 6.0f,
+    }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
                                 .sampleRate = sampleRate,
                                 .fftOrder = fftOrder,
