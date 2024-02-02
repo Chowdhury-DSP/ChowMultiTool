@@ -29,32 +29,32 @@ BandSplitterChyron::BandSplitterChyron (chowdsp::PluginState& pluginState,
 
 void BandSplitterChyron::updateValues()
 {
-    cutoffSliderLow.reset();
-    cutoffSliderMid.reset();
-    cutoffSliderHigh.reset();
+    cutoffSlider1.reset();
+    cutoffSlider2.reset();
+    cutoffSlider3.reset();
 
     auto bandState = bandSplitterParams.getCurrentBandState();
-    cutoffSliderLow.emplace (state, bandSplitterParams.cutoff.get(), &hostContextProvider);
+    cutoffSlider1.emplace (state, bandSplitterParams.cutoff.get(), &hostContextProvider);
     if (bandState == dsp::band_splitter::BandState::TwoBands)
-        cutoffSliderLow->setName ("Cutoff");
+        cutoffSlider1->setName ("Cutoff");
     else
-        cutoffSliderLow->setName ("Cutoff Low");
-    addAndMakeVisible (*cutoffSliderLow);
+        cutoffSlider1->setName ("Cutoff Low");
+    addAndMakeVisible (*cutoffSlider1);
 
     if (bandState != dsp::band_splitter::BandState::TwoBands)
     {
-        cutoffSliderMid.emplace (state, bandSplitterParams.cutoff2.get(), &hostContextProvider);
+        cutoffSlider2.emplace (state, bandSplitterParams.cutoff2.get(), &hostContextProvider);
         if (bandState == dsp::band_splitter::BandState::ThreeBands)
-            cutoffSliderMid->setName ("Cutoff High");
+            cutoffSlider2->setName ("Cutoff High");
         else
-            cutoffSliderMid->setName ("Cutoff Mid");
-        addAndMakeVisible (*cutoffSliderMid);
+            cutoffSlider2->setName ("Cutoff Mid");
+        addAndMakeVisible (*cutoffSlider2);
     }
     if (bandState == dsp::band_splitter::BandState::FourBands)
     {
-        cutoffSliderHigh.emplace (state, bandSplitterParams.cutoff3.get(), &hostContextProvider);
-        cutoffSliderHigh->setName ("Cutoff High");
-        addAndMakeVisible (*cutoffSliderHigh);
+        cutoffSlider3.emplace (state, bandSplitterParams.cutoff3.get(), &hostContextProvider);
+        cutoffSlider3->setName ("Cutoff High");
+        addAndMakeVisible (*cutoffSlider3);
     }
     resized();
 }
@@ -64,22 +64,22 @@ void BandSplitterChyron::resized()
     auto bounds = getLocalBounds();
     const auto sliderBounds = bounds.withHeight (proportionOfHeight (1.0f / 3.0f));
 
-    if (cutoffSliderMid.has_value() && cutoffSliderHigh.has_value())
+    if (cutoffSlider2.has_value() && cutoffSlider3.has_value())
     {
         const auto fourthHeight = proportionOfHeight (1.0f / 4.0f);
-        cutoffSliderLow->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
-        cutoffSliderMid->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
-        cutoffSliderHigh->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 3 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider1->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider2->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider3->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 3 * fourthHeight }).reduced (proportionOfWidth (0.025f), 0));
     }
-    else if (cutoffSliderMid.has_value())
+    else if (cutoffSlider2.has_value())
     {
         const auto thirdHeight = proportionOfHeight (1.0f / 3.0f);
-        cutoffSliderLow->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
-        cutoffSliderMid->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider1->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider2->setBounds (sliderBounds.withCentre ({ bounds.getCentreX(), 2 * thirdHeight }).reduced (proportionOfWidth (0.025f), 0));
     }
     else
     {
-        cutoffSliderLow->setBounds (sliderBounds.withCentre (bounds.getCentre()).reduced (proportionOfWidth (0.025f), 0));
+        cutoffSlider1->setBounds (sliderBounds.withCentre (bounds.getCentre()).reduced (proportionOfWidth (0.025f), 0));
     }
 }
 

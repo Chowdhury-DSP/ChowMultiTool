@@ -21,9 +21,9 @@ private:
     chowdsp::PluginState& state;
     dsp::band_splitter::Params& bandSplitterParams;
 
-    std::optional<TextSlider> cutoffSliderLow;
-    std::optional<TextSlider> cutoffSliderMid;
-    std::optional<TextSlider> cutoffSliderHigh;
+    std::optional<TextSlider> cutoffSlider1;
+    std::optional<TextSlider> cutoffSlider2;
+    std::optional<TextSlider> cutoffSlider3;
 
     chowdsp::ScopedCallbackList callbacks;
     const chowdsp::HostContextProvider& hostContextProvider;
