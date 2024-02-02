@@ -103,10 +103,11 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
                               const chowdsp::HostContextProvider& hcp,
                               SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
-        .minFrequencyHz = (float) minFrequency,
-        .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -60.0f,
-        .maxMagnitudeDB = 6.0f }),
+          .minFrequencyHz = (float) minFrequency,
+          .maxFrequencyHz = (float) maxFrequency,
+          .minMagnitudeDB = -60.0f,
+          .maxMagnitudeDB = 6.0f,
+      }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
                                 .sampleRate = sampleRate,
                                 .fftOrder = fftOrder,
@@ -117,16 +118,18 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
       chyron (pluginState, brickwallParams, hcp),
       cutoffSlider (*brickwallParams.cutoff, *this, pluginState, hcp)
 {
-    addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
     spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
+    spectrumAnalyser.postEQDrawOptions.gradientStartColour = juce::Colour { 0xff008080 }.withAlpha (0.5f);
+    spectrumAnalyser.postEQDrawOptions.gradientEndColour = juce::Colour { 0xff00008b }.withAlpha (0.5f);
     callbacks += {
-        extraState.showSpectrum.changeBroadcaster.connect ([this]
-                                                           {
-                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showSpectrum.get());
-                                                                   spectrumAnalyser.repaint(); }),
+        extraState.showSpectrum.changeBroadcaster.connect (
+            [this]
+            {
+                spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
+                spectrumAnalyser.repaint();
+            }),
     };
-
     addAndMakeVisible (spectrumAnalyser);
 
     brickwall.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
@@ -160,7 +163,6 @@ BrickwallPlot::BrickwallPlot (State& pluginState,
 
 BrickwallPlot::~BrickwallPlot()
 {
-    removeMouseListener (this);
     extraState.isEditorOpen.store (false);
 }
 

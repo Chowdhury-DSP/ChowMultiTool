@@ -14,7 +14,7 @@ public:
                      const chowdsp::HostContextProvider& hcp,
                      std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks);
 
-    ~BrickwallEditor();
+    ~BrickwallEditor() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;

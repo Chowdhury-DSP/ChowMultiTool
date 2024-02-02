@@ -9,6 +9,8 @@ SpectrumAnalyser::SpectrumAnalyser (const chowdsp::SpectrumPlotBase& eqPlot,
 {
     minFrequencyHz.store (eqPlot.params.minFrequencyHz);
     maxFrequencyHz.store (eqPlot.params.maxFrequencyHz);
+
+    setInterceptsMouseClicks (false, false);
 }
 
 SpectrumAnalyser::~SpectrumAnalyser()
@@ -40,7 +42,7 @@ void SpectrumAnalyser::paint (juce::Graphics& g)
         if (drawOptions.drawLine)
         {
             g.setColour (drawOptions.lineColour);
-            g.strokePath (path, juce::PathStrokeType (1));
+            g.strokePath (path, juce::PathStrokeType { 1.1f });
         }
     };
 

@@ -3,6 +3,12 @@
 
 namespace dsp::svf
 {
+SVFProcessor::SVFProcessor (const Params& svfParams, const ExtraState& extraState)
+    : params (svfParams), extraState (extraState)
+{
+    postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-45, 24);
+}
+
 void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 {
     chowdsp::TupleHelpers::forEachInTuple ([&spec] (auto& filter, size_t)
@@ -27,7 +33,6 @@ void SVFProcessor::prepare (const juce::dsp::ProcessSpec& spec)
 
     std::fill (playingNotes.begin(), playingNotes.end(), -1);
 
-    preSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
     postSpectrumAnalyserTask.prepareToPlay (spec.sampleRate, (int) spec.maximumBlockSize, (int) spec.numChannels);
 }
 
@@ -126,9 +131,6 @@ constexpr bool IsOneOfFilters = std::disjunction<std::is_same<FilterType, TestFi
 
 void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const juce::MidiBuffer& midi) noexcept
 {
-    if (extraState.isEditorOpen.load() && extraState.showPreSpectrum.get())
-        preSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
-
     if (params.keytrack->get())
         processKeytracking (midi);
     else
@@ -151,7 +153,7 @@ void SVFProcessor::processBlock (const chowdsp::BufferView<float>& buffer, const
         numSamplesRemaining -= samplesToProcess;
     }
 
-    if (extraState.isEditorOpen.load() && extraState.showPostSpectrum.get())
+    if (extraState.isEditorOpen.load() && extraState.showSpectrum.get())
         postSpectrumAnalyserTask.processBlockInput (buffer.toAudioBuffer());
 }
 

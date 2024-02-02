@@ -19,7 +19,6 @@ public:
                   SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks);
     ~AnalogEQPlot() override;
 
-    void paint (juce::Graphics& g) override;
     void resized() override;
 
     enum class BandID
@@ -51,6 +50,12 @@ private:
     std::unique_ptr<juce::Slider> highCutFreqControl;
     std::unique_ptr<juce::Component> highBoostFullControl;
     std::unique_ptr<juce::Component> highCutFullControl;
+
+    struct PlotPainter : juce::Component
+    {
+        std::function<void (juce::Graphics&)> painter;
+        void paint (juce::Graphics& g) override { painter (g); }
+    } plotPainter;
 
     EQChyron chyron;
     SpectrumAnalyser spectrumAnalyser;
