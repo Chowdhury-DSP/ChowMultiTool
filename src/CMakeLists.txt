@@ -55,6 +55,7 @@ target_sources(ChowMultiTool PRIVATE
     gui/AnalogEQ/AnalogEQPlot.cpp
     gui/AnalogEQ/EQChyron.cpp
 
+    gui/BandSplitter/BandSplitterChyron.cpp
     gui/BandSplitter/BandSplitterEditor.cpp
     gui/BandSplitter/BandSplitterPlot.cpp
     gui/BandSplitter/TriStateButtonAttachment.cpp

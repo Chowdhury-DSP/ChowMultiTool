@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BandSplitterChyron.h"
 #include "dsp/BandSplitter/BandSplitterProcessor.h"
 #include "gui/Shared/SpectrumAnalyser.h"
 #include "state/PluginState.h"
@@ -27,9 +28,18 @@ private:
     void updateSpectrumPlots();
     static const chowdsp::FreqHzParameter::Ptr& getCutoffParam (int bandIndex, const dsp::band_splitter::Params& params);
 
+    struct FilterPlotComp : juce::Component
+    {
+        void paint (juce::Graphics& g);
+        void resized() { repaint(); }
+
+        BandSplitterPlot* parent = nullptr;
+    };
+
     const dsp::band_splitter::Params& bandSplitterParams;
     dsp::band_splitter::ExtraState& extraState;
     chowdsp::ScopedCallbackList callbacks;
+    FilterPlotComp plotComp;
 
     struct InternalSlider : juce::Slider
     {
@@ -52,6 +62,7 @@ private:
 
     dsp::band_splitter::BandSplitterSpectrumTasks& spectrumTasks;
     chowdsp::SmallMap<dsp::band_splitter::SpectrumBandID, std::unique_ptr<SpectrumAnalyser>> spectrumAnalysers;
+    BandSplitterChyron chyron;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BandSplitterPlot)
 };
