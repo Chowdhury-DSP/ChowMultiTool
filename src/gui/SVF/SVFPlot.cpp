@@ -40,10 +40,10 @@ SVFPlot::SVFPlot (State& pluginState,
                   const chowdsp::HostContextProvider& hcp,
                   std::pair<gui::SpectrumAnalyserTask::OptionalBackgroundTask, gui::SpectrumAnalyserTask::OptionalBackgroundTask> spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
-        .minFrequencyHz = (float) minFrequency,
-        .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -45.0f,
-        .maxMagnitudeDB = 30.0f }),
+          .minFrequencyHz = (float) minFrequency,
+          .maxFrequencyHz = (float) maxFrequency,
+          .minMagnitudeDB = -45.0f,
+          .maxMagnitudeDB = 30.0f }),
       filterPlotter (*this, chowdsp::GenericFilterPlotter::Params { .sampleRate = sampleRate, .fftOrder = 15 }),
       extraState (svfExtraState),
       processor (svfParams, extraState),
@@ -52,19 +52,17 @@ SVFPlot::SVFPlot (State& pluginState,
       spectrumAnalyser (*this, spectrumAnalyserTasks),
       chyron (pluginState, svfParams, hcp)
 {
-    addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
-    spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
-    spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
+    spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
+    spectrumAnalyser.postEQDrawOptions.gradientStartColour = juce::Colour { 0xff008080 }.withAlpha (0.5f);
+    spectrumAnalyser.postEQDrawOptions.gradientEndColour = juce::Colour { 0xff00008b }.withAlpha (0.5f);
     callbacks += {
-        extraState.showPreSpectrum.changeBroadcaster.connect ([this]
-                                                              {
-                                                                  spectrumAnalyser.setShouldShowPreEQ(extraState.showPreSpectrum.get());
-                                                                  spectrumAnalyser.repaint(); }),
-        extraState.showPostSpectrum.changeBroadcaster.connect ([this]
-                                                               {
-                                                                   spectrumAnalyser.setShouldShowPostEQ(extraState.showPostSpectrum.get());
-                                                                   spectrumAnalyser.repaint(); }),
+        extraState.showSpectrum.changeBroadcaster.connect (
+            [this]
+            {
+                spectrumAnalyser.setShouldShowPostEQ (extraState.showSpectrum.get());
+                spectrumAnalyser.repaint();
+            }),
     };
 
     freqSlider.setColour (juce::Slider::thumbColourId, colours::boxColour);
@@ -192,21 +190,12 @@ void SVFPlot::mouseDown (const juce::MouseEvent& event)
         chowdsp::SharedLNFAllocator lnfAllocator;
         juce::PopupMenu menu;
 
-        juce::PopupMenu::Item preSpectrumItem;
-        preSpectrumItem.itemID = 100;
-        preSpectrumItem.text = extraState.showPreSpectrum.get() ? "Disable Pre-Filter Visualizer" : "Enable Pre-Filter Visualizer";
-        preSpectrumItem.action = [this]
-        {
-            extraState.showPreSpectrum.set (! extraState.showPreSpectrum.get());
-        };
-        menu.addItem (preSpectrumItem);
-
         juce::PopupMenu::Item postSpectrumItem;
         postSpectrumItem.itemID = 101;
-        postSpectrumItem.text = extraState.showPostSpectrum.get() ? "Disable Post-Filter Visualizer" : "Enable Post-Filter Visualizer";
+        postSpectrumItem.text = extraState.showSpectrum.get() ? "Disable Spectrum Visualizer" : "Enable Spectrum Visualizer";
         postSpectrumItem.action = [this]
         {
-            extraState.showPostSpectrum.set (! extraState.showPostSpectrum.get());
+            extraState.showSpectrum.set (! extraState.showSpectrum.get());
         };
         menu.addItem (postSpectrumItem);
 

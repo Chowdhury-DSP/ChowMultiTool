@@ -101,7 +101,6 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
       spectrumTasks (splitterSpectrumTasks),
       chyron (pluginState, bandSplitParams, hcp)
 {
-    addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
 
     addAndMakeVisible (cutoffSlider);
@@ -184,7 +183,6 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
 
 BandSplitterPlot::~BandSplitterPlot()
 {
-    removeMouseListener (this);
     extraState.isEditorOpen.store (false);
 }
 

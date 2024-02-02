@@ -60,8 +60,14 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
       chyron (pluginState, *pluginState.params.analogEQParams, hcp),
       spectrumAnalyser (*this, spectrumAnalyserTasks)
 {
-    addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
+    spectrumAnalyser.preEQDrawOptions.drawFill = true;
+    spectrumAnalyser.preEQDrawOptions.drawLine = false;
+    spectrumAnalyser.preEQDrawOptions.gradientStartColour = juce::Colour { 0xff282828 };
+    spectrumAnalyser.preEQDrawOptions.gradientEndColour = spectrumAnalyser.preEQDrawOptions.gradientStartColour;
+    spectrumAnalyser.postEQDrawOptions.drawFill = false;
+    spectrumAnalyser.postEQDrawOptions.drawLine = true;
+    spectrumAnalyser.postEQDrawOptions.lineColour = juce::Colour { 0xff6a6a6a };
     spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
     spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
     callbacks += {
@@ -113,6 +119,20 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
         pluginState.addParameterListener (*pultecParams.trebleBoostParam, chowdsp::ParameterListenerThread::MessageThread, [this]
                                           { setSelectedBand (BandID::High_Boost); }),
     };
+
+    plotPainter.painter = [this] (juce::Graphics& g)
+    {
+        drawMagnitudeLabels (g, *this, { -20.0f, -15.0f, -10.0f, -5.0f, 0.0f, 5.0f, 10.0f, 15.0f, 20.0f });
+        drawFrequencyLabels (g, *this, { 100.0f, 1000.0f, 10'000.0f }, 20.0f);
+
+        gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
+        gui::drawMagnitudeLines (*this, g, { -20.0f, -15.0f, -10.0f, -5.0f, 5.0f, 10.0f, 15.0f, 20.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
+
+        g.setColour (juce::Colours::red);
+        g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
+    };
+    plotPainter.setInterceptsMouseClicks (false, false);
+    addAndMakeVisible (plotPainter);
 
     auto& lfControl = make_unique_component<SelectableDotSlider> (lowFreqControl,
                                                                   *pultecParams.bassFreqParam,
@@ -231,7 +251,6 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
 
 AnalogEQPlot::~AnalogEQPlot()
 {
-    removeMouseListener (this);
     extraState.isEditorOpen.store (false);
 }
 
@@ -257,18 +276,6 @@ void AnalogEQPlot::setSelectedBand (BandID band)
     }
 }
 
-void AnalogEQPlot::paint (juce::Graphics& g)
-{
-    drawMagnitudeLabels (g, *this, { -20.0f, -15.0f, -10.0f, -5.0f, 0.0f, 5.0f, 10.0f, 15.0f, 20.0f });
-    drawFrequencyLabels (g, *this, { 100.0f, 1000.0f, 10'000.0f }, 20.0f);
-
-    gui::drawFrequencyLines<minFrequency, maxFrequency> (*this, g, { 100.0f, 1000.0f, 10'000.0f }, colours::majorLinesColour, colours::minorLinesColour);
-    gui::drawMagnitudeLines (*this, g, { -20.0f, -15.0f, -10.0f, -5.0f, 5.0f, 10.0f, 15.0f, 20.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
-
-    g.setColour (juce::Colours::red);
-    g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
-}
-
 void AnalogEQPlot::resized()
 {
     updatePlot();
@@ -287,6 +294,7 @@ void AnalogEQPlot::resized()
                       chyronWidth,
                       chyronHeight);
     spectrumAnalyser.setBounds (getLocalBounds());
+    plotPainter.setBounds (getLocalBounds());
 }
 
 void AnalogEQPlot::mouseDown (const juce::MouseEvent& event)

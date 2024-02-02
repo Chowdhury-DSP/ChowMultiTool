@@ -175,18 +175,13 @@ struct Params : public chowdsp::ParamHolder
 struct ExtraState
 {
     std::atomic<bool> isEditorOpen { false };
-    chowdsp::StateValue<std::atomic_bool, bool> showPreSpectrum { "svf_show_pre_spectrum", true };
-    chowdsp::StateValue<std::atomic_bool, bool> showPostSpectrum { "svf_show_post_spectrum", true };
+    chowdsp::StateValue<std::atomic_bool, bool> showSpectrum { "svf_show_spectrum", true };
 };
 
 class SVFProcessor
 {
 public:
-    explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState) : params (svfParams), extraState (extraState)
-    {
-        preSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-45, 24);
-        postSpectrumAnalyserTask.spectrumAnalyserUITask.setDBRange (-45, 24);
-    }
+    explicit SVFProcessor (const Params& svfParams, const ExtraState& extraState);
 
     void prepare (const juce::dsp::ProcessSpec& spec);
     void reset();
@@ -196,7 +191,7 @@ public:
 
     gui::SpectrumAnalyserTask::PrePostPair getSpectrumAnalyserTasks()
     {
-        return { std::ref (preSpectrumAnalyserTask.spectrumAnalyserUITask), std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
+        return { std::nullopt, std::ref (postSpectrumAnalyserTask.spectrumAnalyserUITask) };
     }
 
 private:
@@ -224,7 +219,6 @@ private:
     chowdsp::WernerFilter wernerFilter;
 
     chowdsp::Gain<float> driveInGain, driveOutGain;
-    gui::SpectrumAnalyserTask preSpectrumAnalyserTask;
     gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     static constexpr size_t maxPolyphony = 32;
