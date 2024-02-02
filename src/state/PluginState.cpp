@@ -61,8 +61,7 @@ PluginExtraState::PluginExtraState()
                       &eqExtraState->showPreSpectrum,
                       &eqExtraState->showPostSpectrum,
                       &brickwallExtraState->showSpectrum,
-                      &svfExtraState->showPreSpectrum,
-                      &svfExtraState->showPostSpectrum,
+                      &svfExtraState->showSpectrum,
                       &bandSplitterExtraState->showSpectrum,
                       &editorBounds });
 }

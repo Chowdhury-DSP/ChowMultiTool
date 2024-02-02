@@ -21,8 +21,14 @@ EQEditor::EQEditor (State& pluginState,
       drawCheckButton ("Vector/square-check-regular.svg", colours::linesColour, colours::linesColour),
       drawXButton ("Vector/rectangle-xmark-regular.svg", colours::linesColour, colours::linesColour)
 {
-    addMouseListener (this, true);
     extraState.isEditorOpen.store (true);
+    spectrumAnalyser.preEQDrawOptions.drawFill = true;
+    spectrumAnalyser.preEQDrawOptions.drawLine = false;
+    spectrumAnalyser.preEQDrawOptions.gradientStartColour = juce::Colour { 0xff282828 };
+    spectrumAnalyser.preEQDrawOptions.gradientEndColour = spectrumAnalyser.preEQDrawOptions.gradientStartColour;
+    spectrumAnalyser.postEQDrawOptions.drawFill = false;
+    spectrumAnalyser.postEQDrawOptions.drawLine = true;
+    spectrumAnalyser.postEQDrawOptions.lineColour = juce::Colour { 0xff6a6a6a };
     spectrumAnalyser.setShouldShowPreEQ (extraState.showPreSpectrum.get());
     spectrumAnalyser.setShouldShowPostEQ (extraState.showPostSpectrum.get());
     callbacks += {
@@ -77,7 +83,6 @@ EQEditor::EQEditor (State& pluginState,
 
 EQEditor::~EQEditor()
 {
-    removeMouseListener (this);
     extraState.isEditorOpen.store (false);
 }
 
