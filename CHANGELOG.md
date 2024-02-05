@@ -3,8 +3,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Added internal "Bypass" control.
+- Added spectrum analyzers for filter-based tools.
+- Added 4-band mode for Band Splitter tool.
 - Added gain and frequency labels to spectrum plots.
 - Added gain control text slider for Waveshaper.
+- Added parameter control chyrons for Brickwall and Band-Splitter.
+- Added support for CLAP preset discovery.
 - Fixed overshoots when using "clipping" waveshapers.
 - Fixed incorrect EQ filter type for First-Order Lowpass Filter.
 
