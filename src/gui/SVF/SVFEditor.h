@@ -23,7 +23,6 @@ private:
     SVFPlot plot;
     SVFParamControls paramControls;
     std::unique_ptr<BottomBar> bottomBar;
-    dsp::svf::ExtraState& extraState;
 
     std::unique_ptr<IconButton> keytrackButton;
     chowdsp::ButtonAttachment keytrackAttach;

@@ -26,7 +26,6 @@ public:
     void mouseDown (const juce::MouseEvent& event) override;
 
 private:
-    dsp::eq::EQToolParams& params;
     dsp::eq::ExtraState& extraState;
     chowdsp::ScopedCallbackList callbacks;
 

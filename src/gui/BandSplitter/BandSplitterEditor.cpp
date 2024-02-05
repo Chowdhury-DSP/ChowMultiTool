@@ -14,7 +14,6 @@ BandSplitterEditor::BandSplitterEditor (State& pluginState,
                         hcp,
                         spectrumTasks),
       slopePicker (pluginState, *params.slope),
-      extraState (bandSplitterExtraState),
       triStateButton (pluginState)
 {
     addAndMakeVisible (bandSplitterPlot);

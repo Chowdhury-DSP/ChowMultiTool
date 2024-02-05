@@ -22,7 +22,6 @@ public:
 private:
     BandSplitterPlot bandSplitterPlot;
     ChoicePicker<dsp::band_splitter::Slope> slopePicker;
-    dsp::band_splitter::ExtraState& extraState;
 
     struct TriStateButton : public juce::Button
     {
