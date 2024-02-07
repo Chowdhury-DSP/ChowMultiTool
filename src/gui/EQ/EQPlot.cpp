@@ -282,8 +282,9 @@ void EQPlot::resized()
     optItersLabel.setBounds (0, 0, 1000, 100);
 }
 
-void EQPlot::mouseDown (const juce::MouseEvent&)
+void EQPlot::mouseDown (const juce::MouseEvent& e)
 {
     setSelectedBand (-1);
+    getParentComponent()->mouseDown (e);
 }
 } // namespace gui::eq
