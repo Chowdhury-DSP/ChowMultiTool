@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.1.0] - 2024-02-13
 - Added internal "Bypass" control.
 - Added spectrum analyzers for filter-based tools.
 - Added 4-band mode for Band Splitter tool.
