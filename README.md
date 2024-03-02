@@ -45,7 +45,7 @@ Clang builds on all platforms.
 
 ```bash
 # Clone the repository
-$ git clone https://github.com/Chowdhury-DSP/ChowMultiTool.git
+$ git clone --recurse-submodules https://github.com/Chowdhury-DSP/ChowMultiTool.git
 $ cd ChowMultiTool
 
 # build with CMake
