@@ -64,12 +64,12 @@ struct PluginParams : chowdsp::ParamHolder
     };
 
     std::unique_ptr<dsp::eq::EQToolParams> eqParams;
-    chowdsp::LocalPointer<dsp::waveshaper::Params, 384> waveshaperParams;
-    chowdsp::LocalPointer<dsp::signal_gen::Params, 384> signalGenParams;
-    chowdsp::LocalPointer<dsp::analog_eq::Params, 512> analogEQParams;
-    chowdsp::LocalPointer<dsp::band_splitter::Params, 384> bandSplitParams;
-    chowdsp::LocalPointer<dsp::brickwall::Params, 384> brickwallParams;
-    chowdsp::LocalPointer<dsp::svf::Params, 512> svfParams;
+    chowdsp::LocalPointer<dsp::waveshaper::Params, 384, 16> waveshaperParams;
+    chowdsp::LocalPointer<dsp::signal_gen::Params, 384, 16> signalGenParams;
+    chowdsp::LocalPointer<dsp::analog_eq::Params, 512, 16> analogEQParams;
+    chowdsp::LocalPointer<dsp::band_splitter::Params, 384, 16> bandSplitParams;
+    chowdsp::LocalPointer<dsp::brickwall::Params, 384, 16> brickwallParams;
+    chowdsp::LocalPointer<dsp::svf::Params, 512, 16> svfParams;
 };
 
 struct PluginExtraState : chowdsp::NonParamState
