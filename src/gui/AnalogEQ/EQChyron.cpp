@@ -1,4 +1,5 @@
 #include "EQChyron.h"
+#include "AnalogEQPlot.h"
 #include "gui/Shared/Colours.h"
 
 namespace gui::analog_eq
@@ -6,7 +7,8 @@ namespace gui::analog_eq
 constexpr float labelHeightFactor = 0.275f;
 
 EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params, const chowdsp::HostContextProvider& hcp)
-    : lowFreqBoostSlider (state, params.bassBoostParam.get(), &hcp),
+    : band (BandID::None),
+      lowFreqBoostSlider (state, params.bassBoostParam.get(), &hcp),
       lowFreqCutSlider (state, params.bassCutParam.get(), &hcp),
       lowFreqCutoffSlider (state, params.bassFreqParam.get(), &hcp),
       highFreqBoostSlider (state, params.trebleBoostParam.get(), &hcp),
@@ -15,41 +17,6 @@ EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params,
       highFreqCutSlider (state, params.trebleCutParam.get(), &hcp),
       highFreqCutFreqSlider (state, params.trebleCutFreqParam.get(), &hcp)
 {
-    for (auto* param : { (chowdsp::FloatParameter*) params.bassBoostParam.get(),
-                         (chowdsp::FloatParameter*) params.bassCutParam.get(),
-                         (chowdsp::FloatParameter*) params.bassFreqParam.get() })
-    {
-        callbacks += {
-            state.addParameterListener (*param,
-                                        chowdsp::ParameterListenerThread::MessageThread,
-                                        [this]
-                                        { setSelectedBand (EQBand::Bass); }),
-        };
-    }
-
-    for (auto* param : { (chowdsp::FloatParameter*) params.trebleCutParam.get(),
-                         (chowdsp::FloatParameter*) params.trebleCutFreqParam.get() })
-    {
-        callbacks += {
-            state.addParameterListener (*param,
-                                        chowdsp::ParameterListenerThread::MessageThread,
-                                        [this]
-                                        { setSelectedBand (EQBand::TrebleCut); }),
-        };
-    }
-
-    for (auto* param : { (chowdsp::FloatParameter*) params.trebleBoostParam.get(),
-                         (chowdsp::FloatParameter*) params.trebleBoostFreqParam.get(),
-                         (chowdsp::FloatParameter*) params.trebleBoostQParam.get() })
-    {
-        callbacks += {
-            state.addParameterListener (*param,
-                                        chowdsp::ParameterListenerThread::MessageThread,
-                                        [this]
-                                        { setSelectedBand (EQBand::TrebleBoost); }),
-        };
-    }
-
     lowFreqBoostSlider.setName ("Boost");
     addAndMakeVisible (lowFreqBoostSlider);
     lowFreqCutSlider.setName ("Cut");
@@ -72,9 +39,9 @@ EQChyron::EQChyron (chowdsp::PluginState& state, dsp::analog_eq::Params& params,
     setSelectedBand (band);
 }
 
-void EQChyron::setSelectedBand (EQBand eqBand)
+void EQChyron::setSelectedBand (BandID bandID)
 {
-    band = eqBand;
+    band = bandID;
 
     lowFreqBoostSlider.setVisible (false);
     lowFreqCutSlider.setVisible (false);
@@ -85,19 +52,19 @@ void EQChyron::setSelectedBand (EQBand eqBand)
     highFreqCutSlider.setVisible (false);
     highFreqCutFreqSlider.setVisible (false);
 
-    if (band == EQBand::Bass)
+    if (band == BandID::Low)
     {
         lowFreqBoostSlider.setVisible (true);
         lowFreqCutSlider.setVisible (true);
         lowFreqCutoffSlider.setVisible (true);
     }
-    else if (band == EQBand::TrebleBoost)
+    else if (band == BandID::High_Boost)
     {
         highFreqBoostSlider.setVisible (true);
         highFreqBoostFreqSlider.setVisible (true);
         highFreqBoostQSlider.setVisible (true);
     }
-    else if (band == EQBand::TrebleCut)
+    else if (band == BandID::High_Cut)
     {
         highFreqCutSlider.setVisible (true);
         highFreqCutFreqSlider.setVisible (true);
@@ -135,16 +102,16 @@ void EQChyron::paint (juce::Graphics& g)
     g.setColour (colours::linesColour);
     g.drawRoundedRectangle (bounds.toFloat(), 2.5f, 1.0f);
 
-    if (band != EQBand::None)
+    if (band != BandID::None)
     {
         const auto labelBounds = bounds.withHeight (proportionOfHeight (labelHeightFactor));
         const auto labelText = [this]() -> juce::String
         {
-            if (band == EQBand::Bass)
+            if (band == BandID::Low)
                 return "Bass";
-            if (band == EQBand::TrebleBoost)
+            if (band == BandID::High_Boost)
                 return "Treble Boost";
-            if (band == EQBand::TrebleCut)
+            if (band == BandID::High_Cut)
                 return "Treble Cut";
             return "";
         }();

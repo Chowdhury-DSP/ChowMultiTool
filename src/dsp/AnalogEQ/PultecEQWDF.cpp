@@ -45,7 +45,7 @@ void PultecEqWDF::setParameters (float treble_boost, float treble_boost_q, float
 
     // see sim/pultec_treble_boost_freq_curve_fit.py
     static constexpr auto A_r = gcem::sqrt (1.0e7f);
-    const auto g_val = chowdsp::Polynomials::estrin<3> ({ -4.96665892e-17f, 1.73050404e-12f, -2.05889893e-08f, 9.75043069e-05f }, treble_boost_freq);
+    const auto g_val = chowdsp::Polynomials::estrin<3> (chowdsp::Polynomial<float, 3> { { -4.96665892e-17f, 1.73050404e-12f, -2.05889893e-08f, 9.75043069e-05f } }, treble_boost_freq);
     const auto treble_boost_cap_val = g_val / A_r;
     const auto treble_boost_ind_val = chowdsp::Power::ipow<2> (A_r) * treble_boost_cap_val;
     C_treble_boost.setCapacitanceValue (treble_boost_cap_val);

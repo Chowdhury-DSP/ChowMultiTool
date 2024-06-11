@@ -19,7 +19,9 @@ namespace
     {
         using SpectrumDotSlider::SpectrumDotSlider;
         bool isSelected = false;
-        AnalogEQPlot::BandID bandID = AnalogEQPlot::BandID::None;
+        BandID bandID = BandID::None;
+        juce::dsp::FixedSizeFunction<16, void()> callback;
+
         void paint (juce::Graphics& g) override
         {
             SpectrumDotSlider::paint (g);
@@ -29,6 +31,12 @@ namespace
                 g.setColour (findColour (juce::Slider::thumbColourId));
                 g.drawEllipse (getThumbBounds().expanded (2.0f), 1.0f);
             }
+        }
+
+        void mouseDown (const juce::MouseEvent& event) override
+        {
+            callback();
+            SpectrumDotSlider::mouseDown (event);
         }
     };
 
@@ -40,6 +48,44 @@ namespace
     }
 } // namespace
 
+AnalogEQPlot::BackgroundPlotter::BackgroundPlotter (chowdsp::SpectrumPlotBase& plotBase, juce::Component& parentComponent)
+    : parent (parentComponent),
+      filterPlotter (plotBase, chowdsp::GenericFilterPlotter::Params {
+                                   .sampleRate = sampleRate,
+                                   .freqSmoothOctaves = 1.0f / 12.0f,
+                                   .fftOrder = fftOrder,
+                               })
+{
+}
+
+AnalogEQPlot::BackgroundPlotter::~BackgroundPlotter()
+{
+    sharedTimeSliceThread->removeTimeSliceClient (this);
+    if (sharedTimeSliceThread->getNumClients() == 0)
+        sharedTimeSliceThread->stopThread (-1);
+}
+
+void AnalogEQPlot::BackgroundPlotter::start()
+{
+    useTimeSlice();
+    sharedTimeSliceThread->addTimeSliceClient (this);
+    if (! sharedTimeSliceThread->isThreadRunning())
+        sharedTimeSliceThread->startThread();
+}
+
+int AnalogEQPlot::BackgroundPlotter::useTimeSlice()
+{
+    if (chowdsp::AtomicHelpers::compareNegate (needsUpdate))
+    {
+        filterPlotter.updateFilterPlot();
+
+        juce::MessageManagerLock mml {};
+        parent.repaint();
+    }
+
+    return 30;
+}
+
 AnalogEQPlot::AnalogEQPlot (State& pluginState,
                             dsp::analog_eq::Params& pultecParams,
                             dsp::analog_eq::ExtraState& analogEqExtraState,
@@ -50,11 +96,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
         .maxFrequencyHz = (float) maxFrequency,
         .minMagnitudeDB = -21.0f,
         .maxMagnitudeDB = 21.0f }),
-      filterPlotter (*this, chowdsp::GenericFilterPlotter::Params {
-                                .sampleRate = sampleRate,
-                                .freqSmoothOctaves = 1.0f / 12.0f,
-                                .fftOrder = fftOrder,
-                            }),
+      plotter (*this, *this),
       extraState (analogEqExtraState),
       pultecEQ (pultecParams, extraState),
       chyron (pluginState, *pluginState.params.analogEQParams, hcp),
@@ -82,13 +124,14 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
     };
 
     pultecEQ.prepare ({ sampleRate, (uint32_t) blockSize, 1 });
-    filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
+    plotter.filterPlotter.runFilterCallback = [this] (const float* input, float* output, int numSamples)
     {
         pultecEQ.reset();
         juce::FloatVectorOperations::multiply (output, input, 0.1f, numSamples);
         pultecEQ.processBlock (chowdsp::BufferView<float> { output, numSamples });
         juce::FloatVectorOperations::multiply (output, output, 10.0f, numSamples);
     };
+    plotter.start();
 
     pultecParams.doForAllParameters (
         [this, &pluginState] (juce::RangedAudioParameter& param, size_t)
@@ -103,23 +146,6 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                 };
         });
 
-    callbacks += {
-        pluginState.addParameterListener (*pultecParams.bassFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::Low); }),
-        pluginState.addParameterListener (*pultecParams.bassBoostParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::Low); }),
-        pluginState.addParameterListener (*pultecParams.bassCutParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::Low); }),
-        pluginState.addParameterListener (*pultecParams.trebleCutFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::High_Cut); }),
-        pluginState.addParameterListener (*pultecParams.trebleCutParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::High_Cut); }),
-        pluginState.addParameterListener (*pultecParams.trebleBoostFreqParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::High_Boost); }),
-        pluginState.addParameterListener (*pultecParams.trebleBoostParam, chowdsp::ParameterListenerThread::MessageThread, [this]
-                                          { setSelectedBand (BandID::High_Boost); }),
-    };
-
     plotPainter.painter = [this] (juce::Graphics& g)
     {
         drawMagnitudeLabels (g, *this, { -20.0f, -15.0f, -10.0f, -5.0f, 0.0f, 5.0f, 10.0f, 15.0f, 20.0f });
@@ -129,10 +155,18 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
         gui::drawMagnitudeLines (*this, g, { -20.0f, -15.0f, -10.0f, -5.0f, 5.0f, 10.0f, 15.0f, 20.0f }, { 0.0f }, colours::majorLinesColour, colours::minorLinesColour);
 
         g.setColour (juce::Colours::red);
-        g.strokePath (filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
+        const juce::ScopedLock pathLock { plotter.filterPlotter.pathMutex };
+        g.strokePath (plotter.filterPlotter.getPath(), juce::PathStrokeType { 1.5f });
     };
     plotPainter.setInterceptsMouseClicks (false, false);
     addAndMakeVisible (plotPainter);
+
+    const auto setBandID = [this] (SelectableDotSlider& slider, BandID id)
+    {
+        slider.bandID = id;
+        slider.callback = [this, id]
+        { setSelectedBand (id); };
+    };
 
     auto& lfControl = make_unique_component<SelectableDotSlider> (lowFreqControl,
                                                                   *pultecParams.bassFreqParam,
@@ -153,7 +187,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                   &hcp);
     lbControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
     lbControl.widthProportion = thumbSizeFactor;
-    lbControl.bandID = BandID::Low;
+    setBandID (lbControl, BandID::Low);
     lbControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 0.7f);
@@ -168,7 +202,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                   &hcp);
     lcControl.setColour (juce::Slider::thumbColourId, juce::Colours::goldenrod);
     lcControl.widthProportion = thumbSizeFactor;
-    lcControl.bandID = BandID::Low;
+    setBandID (lcControl, BandID::Low);
     lcControl.getXCoordinate = [this, &bassFreqParam = *pultecParams.bassFreqParam]
     {
         return getXCoordinateForFrequency (bassFreqParam.get() * 1.0f / 0.7f);
@@ -182,7 +216,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                       gui::SpectrumDotSlider::MagnitudeOriented);
     highBoostGain.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
     highBoostGain.widthProportion = thumbSizeFactor;
-    highBoostGain.bandID = BandID::High_Boost;
+    setBandID (highBoostGain, BandID::High_Boost);
     highBoostGain.getXCoordinate = [this, &trebleBoostFreqParam = *pultecParams.trebleBoostFreqParam]
     {
         return getXCoordinateForFrequency (trebleBoostFreqParam.get());
@@ -196,7 +230,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                       gui::SpectrumDotSlider::FrequencyOriented);
     highBoostFreq.setColour (juce::Slider::thumbColourId, juce::Colours::teal);
     highBoostFreq.widthProportion = thumbSizeFactor;
-    highBoostFreq.bandID = BandID::High_Boost;
+    setBandID (highBoostFreq, BandID::High_Boost);
     highBoostFreq.getYCoordinate = [this, &trebleBoostParam = *pultecParams.trebleBoostParam]
     {
         return getYCoordinateForDecibels (trebleBoostParam.get());
@@ -215,7 +249,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                     gui::SpectrumDotSlider::MagnitudeOriented);
     highCutGain.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
     highCutGain.widthProportion = thumbSizeFactor;
-    highCutGain.bandID = BandID::High_Cut;
+    setBandID (highCutGain, BandID::High_Cut);
     highCutGain.getXCoordinate = [this, &trebleCutFreqParam = *pultecParams.trebleCutFreqParam]
     {
         return getXCoordinateForFrequency (trebleCutFreqParam.get());
@@ -229,7 +263,7 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                                                                     gui::SpectrumDotSlider::FrequencyOriented);
     highCutFreq.setColour (juce::Slider::thumbColourId, juce::Colours::limegreen);
     highCutFreq.widthProportion = thumbSizeFactor;
-    highCutFreq.bandID = BandID::High_Cut;
+    setBandID (highCutFreq, BandID::High_Cut);
     highCutFreq.getYCoordinate = [this, &trebleCutParam = *pultecParams.trebleCutParam]
     {
         return getYCoordinateForDecibels (trebleCutParam.get());
@@ -256,12 +290,12 @@ AnalogEQPlot::~AnalogEQPlot()
 
 void AnalogEQPlot::updatePlot()
 {
-    filterPlotter.updateFilterPlot();
-    repaint();
+    plotter.needsUpdate.store (true, std::memory_order_release);
 }
 
 void AnalogEQPlot::setSelectedBand (BandID band)
 {
+    chyron.setSelectedBand (band);
     for (juce::Slider* slider : { lowFreqControl.get(),
                                   lowBoostControl.get(),
                                   lowCutControl.get(),
@@ -299,7 +333,7 @@ void AnalogEQPlot::resized()
 
 void AnalogEQPlot::mouseDown (const juce::MouseEvent& event)
 {
-    chyron.setSelectedBand (EQBand::None);
+    setSelectedBand (BandID::None);
     if (event.mods.isPopupMenu())
     {
         chowdsp::SharedLNFAllocator lnfAllocator;

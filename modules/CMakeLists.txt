@@ -17,6 +17,7 @@ target_link_libraries(juce_plugin_modules
     PRIVATE
         juce::juce_audio_utils
         juce::juce_dsp
+        chowdsp::chowdsp_logging
         chowdsp::chowdsp_plugin_base
         chowdsp::chowdsp_plugin_state
         chowdsp::chowdsp_plugin_utils
