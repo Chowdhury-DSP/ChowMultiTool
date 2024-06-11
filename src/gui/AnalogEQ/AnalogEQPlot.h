@@ -9,6 +9,14 @@ namespace gui::analog_eq
 {
 class DotSlider;
 
+enum class BandID
+{
+    None,
+    Low,
+    High_Cut,
+    High_Boost,
+};
+
 class AnalogEQPlot : public chowdsp::SpectrumPlotBase
 {
 public:
@@ -21,21 +29,25 @@ public:
 
     void resized() override;
 
-    enum class BandID
-    {
-        None,
-        Low,
-        High_Cut,
-        High_Boost,
-    };
-
 private:
     void mouseDown (const juce::MouseEvent& event) override;
 
     void updatePlot();
     void setSelectedBand (BandID bandID);
 
-    chowdsp::GenericFilterPlotter filterPlotter;
+    struct BackgroundPlotter : juce::TimeSliceClient
+    {
+        BackgroundPlotter (chowdsp::SpectrumPlotBase& plotBase, juce::Component& parent);
+        ~BackgroundPlotter() override;
+        void start();
+        int useTimeSlice() override;
+
+        std::atomic_bool needsUpdate { true };
+        juce::Component& parent;
+        chowdsp::GenericFilterPlotter filterPlotter;
+        juce::SharedResourcePointer<chowdsp::detail::TimeSliceBackgroundTask::TimeSliceThread> sharedTimeSliceThread;
+    } plotter;
+
     dsp::analog_eq::ExtraState& extraState;
     dsp::analog_eq::AnalogEQProcessor pultecEQ;
 

@@ -39,7 +39,7 @@ double evaluateSpline (const Spline& spline, double x)
     const auto splineSetIndex = juce::truncatePositiveToUnsignedInt (scaler * x + offset);
 
     const auto& ss = spline[splineSetIndex];
-    return chowdsp::Polynomials::estrin<3> ({ ss.d, ss.c, ss.b, ss.a }, x - ss.x);
+    return chowdsp::Polynomials::estrin<3> (chowdsp::Polynomial<double, 3> { { ss.d, ss.c, ss.b, ss.a } }, x - ss.x);
 }
 
 // ADAA reference: https://www.desmos.com/calculator/o36ytu5rro
@@ -135,7 +135,7 @@ double evaluateSpline (const VectorSpline& spline, double x)
     }
 
     const auto& ss = spline[splineSetIndex];
-    return chowdsp::Polynomials::estrin<3> ({ ss.d, ss.c, ss.b, ss.a }, x - ss.x);
+    return chowdsp::Polynomials::estrin<3> (chowdsp::Polynomial<double, 3> { { ss.d, ss.c, ss.b, ss.a } }, x - ss.x);
 }
 
 double evaluateSplineADAA (const std::vector<SplineADAASection>& spline, double x)

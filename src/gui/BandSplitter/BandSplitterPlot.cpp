@@ -14,7 +14,7 @@ namespace
 } // namespace
 
 BandSplitterPlot::InternalSlider::InternalSlider (chowdsp::FloatParameter& cutoff,
-                                                  chowdsp::EQ::EqualizerPlot& plot,
+                                                  EqualizerPlot& plot,
                                                   State& pluginState,
                                                   const chowdsp::HostContextProvider& hcp)
     : cutoffParam (cutoff),
@@ -87,12 +87,11 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                     const chowdsp::HostContextProvider& hcp,
                                     dsp::band_splitter::BandSplitterSpectrumTasks& splitterSpectrumTasks)
 
-    : chowdsp::EQ::EqualizerPlot (numBands,
-                                  chowdsp::SpectrumPlotParams {
-                                      .minFrequencyHz = (float) minFrequency,
-                                      .maxFrequencyHz = (float) maxFrequency,
-                                      .minMagnitudeDB = -60.0f,
-                                      .maxMagnitudeDB = 6.0f }),
+    : EqualizerPlot (chowdsp::SpectrumPlotParams {
+          .minFrequencyHz = (float) minFrequency,
+          .maxFrequencyHz = (float) maxFrequency,
+          .minMagnitudeDB = -60.0f,
+          .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
       extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
@@ -250,7 +249,7 @@ void BandSplitterPlot::paintOverChildren (juce::Graphics& g)
 
 void BandSplitterPlot::resized()
 {
-    chowdsp::EQ::EqualizerPlot::resized();
+    EqualizerPlot::resized();
 
     plotComp.setBounds (getLocalBounds());
     const auto pad = proportionOfWidth (0.005f);

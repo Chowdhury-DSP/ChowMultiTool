@@ -178,6 +178,8 @@ private:
         chowdsp::EllipticFilter<16, chowdsp::EllipticFilterType::Highpass>>;
     EQBand filter;
 
+    chowdsp::ArenaAllocator<> arena;
+
     gui::SpectrumAnalyserTask postSpectrumAnalyserTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BrickwallProcessor)
