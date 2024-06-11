@@ -41,6 +41,9 @@ static constexpr auto TOL = chowdsp::ScientificRatio<1, -2>::value<double>;
 
 void SignalSmithWaveshaper::prepare (double sample_rate, int block_size, int numChannels)
 {
+    if (sample_rate == 0.0)
+        return;
+
     k_smooth.prepare (sample_rate, block_size);
     k_smooth.setRampLength (0.05);
     M_smooth.prepare (sample_rate, block_size);

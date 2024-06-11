@@ -7,14 +7,7 @@
 
 namespace gui::analog_eq
 {
-enum class EQBand
-{
-    None,
-    Bass,
-    TrebleBoost,
-    TrebleCut,
-};
-
+enum class BandID;
 class EQChyron : public juce::Component
 {
 public:
@@ -22,10 +15,10 @@ public:
 
     void resized() override;
     void paint (juce::Graphics& g) override;
-    void setSelectedBand (EQBand eqBand);
+    void setSelectedBand (BandID eqBand);
 
 private:
-    EQBand band = EQBand::None;
+    BandID band;
 
     TextSlider lowFreqBoostSlider;
     TextSlider lowFreqCutSlider;

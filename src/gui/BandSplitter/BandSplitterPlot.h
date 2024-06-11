@@ -7,7 +7,7 @@
 
 namespace gui::band_splitter
 {
-class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot
+class BandSplitterPlot : public chowdsp::EQ::EqualizerPlot<6>
 {
 public:
     BandSplitterPlot (State& pluginState,
@@ -44,7 +44,7 @@ private:
     struct InternalSlider : juce::Slider
     {
         InternalSlider (chowdsp::FloatParameter& cutoffParam,
-                        chowdsp::EQ::EqualizerPlot& plotBase,
+                        EqualizerPlot& plotBase,
                         State& pluginState,
                         const chowdsp::HostContextProvider& hcp);
         void paint (juce::Graphics& g) override;
@@ -55,7 +55,7 @@ private:
         juce::Rectangle<int> getThumbBounds() const;
 
         chowdsp::FloatParameter& cutoffParam;
-        chowdsp::EQ::EqualizerPlot& plotBase;
+        EqualizerPlot& plotBase;
         chowdsp::SliderAttachment cutoffAttachment;
         const chowdsp::HostContextProvider& hostContextProvider;
     } cutoffSlider, cutoff2Slider, cutoff3Slider;
