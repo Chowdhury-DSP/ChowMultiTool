@@ -10,9 +10,9 @@
 #include <juce_audio_utils/juce_audio_utils.h>
 #include <juce_dsp/juce_dsp.h>
 
-#include <chowdsp_logging/chowdsp_logging.h>
 #include <chowdsp_eq/chowdsp_eq.h>
 #include <chowdsp_gui/chowdsp_gui.h>
+#include <chowdsp_logging/chowdsp_logging.h>
 #include <chowdsp_plugin_base/chowdsp_plugin_base.h>
 #include <chowdsp_plugin_state/chowdsp_plugin_state.h>
 #include <chowdsp_plugin_utils/chowdsp_plugin_utils.h>

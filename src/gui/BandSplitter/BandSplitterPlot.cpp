@@ -88,10 +88,10 @@ BandSplitterPlot::BandSplitterPlot (State& pluginState,
                                     dsp::band_splitter::BandSplitterSpectrumTasks& splitterSpectrumTasks)
 
     : EqualizerPlot (chowdsp::SpectrumPlotParams {
-          .minFrequencyHz = (float) minFrequency,
-          .maxFrequencyHz = (float) maxFrequency,
-          .minMagnitudeDB = -60.0f,
-          .maxMagnitudeDB = 6.0f }),
+        .minFrequencyHz = (float) minFrequency,
+        .maxFrequencyHz = (float) maxFrequency,
+        .minMagnitudeDB = -60.0f,
+        .maxMagnitudeDB = 6.0f }),
       bandSplitterParams (bandSplitParams),
       extraState (bandSplitterExtraState),
       cutoffSlider (*bandSplitParams.cutoff, *this, pluginState, hcp),
