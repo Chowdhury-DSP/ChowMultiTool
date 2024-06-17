@@ -79,8 +79,12 @@ int AnalogEQPlot::BackgroundPlotter::useTimeSlice()
     {
         filterPlotter.updateFilterPlot();
 
-        juce::MessageManagerLock mml {};
-        parent.repaint();
+        juce::MessageManager::callAsync (
+            [safeParent = juce::Component::SafePointer { &parent }]
+            {
+                if (safeParent != nullptr)
+                    safeParent->repaint();
+            });
     }
 
     return 30;
@@ -92,10 +96,10 @@ AnalogEQPlot::AnalogEQPlot (State& pluginState,
                             const chowdsp::HostContextProvider& hcp,
                             SpectrumAnalyserTask::PrePostPair spectrumAnalyserTasks)
     : chowdsp::SpectrumPlotBase (chowdsp::SpectrumPlotParams {
-        .minFrequencyHz = (float) minFrequency,
-        .maxFrequencyHz = (float) maxFrequency,
-        .minMagnitudeDB = -21.0f,
-        .maxMagnitudeDB = 21.0f }),
+          .minFrequencyHz = (float) minFrequency,
+          .maxFrequencyHz = (float) maxFrequency,
+          .minMagnitudeDB = -21.0f,
+          .maxMagnitudeDB = 21.0f }),
       plotter (*this, *this),
       extraState (analogEqExtraState),
       pultecEQ (pultecParams, extraState),
