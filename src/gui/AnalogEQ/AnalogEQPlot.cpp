@@ -79,8 +79,12 @@ int AnalogEQPlot::BackgroundPlotter::useTimeSlice()
     {
         filterPlotter.updateFilterPlot();
 
-        juce::MessageManagerLock mml {};
-        parent.repaint();
+        juce::MessageManager::callAsync (
+            [safeParent = juce::Component::SafePointer { &parent }]
+            {
+                if (safeParent != nullptr)
+                    safeParent->repaint();
+            });
     }
 
     return 30;

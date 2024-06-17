@@ -38,7 +38,7 @@ target_include_directories(lbfgspp INTERFACE
 # | FIND EXTERNAL LIBRARIES |
 # + ----------------------- +
 
-target_link_libraries(lbfgspp INTERFACE Eigen3::Eigen)
+#target_link_libraries(lbfgspp INTERFACE Eigen3::Eigen)
 
 # + ------------ +
 # | INSTALLATION |
