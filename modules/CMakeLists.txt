@@ -1,7 +1,6 @@
 add_subdirectory(JUCE)
 add_subdirectory(chowdsp_utils)
 add_subdirectory(chowdsp_wdf)
-add_subdirectory(eigen)
 add_subdirectory(LBFGSpp)
 
 subproject_version(JUCE juce_version)
@@ -28,7 +27,6 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_wdf
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_visualizers
-        Eigen3::Eigen
         lbfgspp
     PUBLIC
         juce::juce_recommended_config_flags
@@ -73,6 +71,7 @@ target_compile_definitions(juce_plugin_modules
 target_include_directories(juce_plugin_modules
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/exprtk
+        ${CMAKE_CURRENT_SOURCE_DIR}/Eigen
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
 )
