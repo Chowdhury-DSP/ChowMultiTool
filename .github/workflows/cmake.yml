@@ -21,7 +21,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12"
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-15 -DCMAKE_CXX_COMPILER=clang++-15"
           - os: windows-2022
             cmake_args: "-T ClangCl"
           - os: macos-13
@@ -32,9 +32,9 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
-        sudo apt-add-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main"
+        sudo apt-add-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
         sudo apt update
-        sudo apt install clang-12 -y
+        sudo apt install clang-15 -y
         sudo apt-get update
         sudo apt install libasound2-dev libcurl4-openssl-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev libjack-jackd2-dev
 
