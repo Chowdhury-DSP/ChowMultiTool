@@ -79,9 +79,12 @@ struct UserPresetsProvider : chowdsp::presets::discovery::FilePresetsProvider
             return false;
 
         location.name = "ChowMultiTool User Presets Location";
-        location.location = userPresetsFolder.getFullPathName().toRawUTF8();
+        userPresetsFolderPath = userPresetsFolder.getFullPathName();
+        location.location = userPresetsFolderPath.toRawUTF8();
         return true;
     }
+
+    juce::String userPresetsFolderPath {};
 };
 
 //==============================================================================
